@@ -1,0 +1,47 @@
+Grammar:
+
+NProgram → NFunctions
+NFunctions → NFunctions NFunction | NFunction
+NFunction → NFunctionHeader = NStatements .
+NFunctionHeader → NFunctionHeaderTypeName | NFunctionHeaderTypeName <- NFormalParameters
+NFunctionHeaderTypeName → NType NIdentifier | KW_VOID NIdentifier
+NFormalParameters → NFormalParameters , NFormalParameter | NFormalParameter
+NFormalParameter → NType IDENTIFIER_NAME
+
+NExpr → ...
+
+NStatements → NStatements ; NStatement | NStatement
+
+Оператор объявления
+NStatement → NType NDeclarationAssignment;
+NDeclarationAssignments → NDeclarationAssignments , NDeclarationAssignment ;
+NDeclarationAssignment → NIdentifier | NIdentifier := NExpr
+
+
+Оператор присваивания
+NStatement → NExpr := NExpr ;
+
+Оператор вызова функции
+NStatement → IDENTIFIER_NAME <- ActualParameters
+ActualParameters → ActualParameters , ActualParameter | ActualParameter
+ActualParameter → NExpr
+
+Оператор выбора
+NStatement → NExpr KW_THEN NStatements . | NExpr KW_THEN NStatements KW_ELSE NStatements .
+
+Оператор цикла с предусловием
+NStatement → NExpr KW_LOOP NStatements .
+Второй вариант
+NStatement → NExpr ~ NExpr KW_LOOP NIdentifier .
+
+Оператор цикла с постусловием
+NStatement → KW_LOOP NStatements KW_WHILE NExpr .
+
+Оператор завершения функции
+NStatement → return Expr | return
+
+Тип
+NType → KW_INT | KW_CHAR | KW_BOOL | NArrayType
+Ссылочный тип
+NArrayType → KW_INT NBrackets | KW_CHAR NBrackets | KW_BOOL NBrackets
+NBrackets → NBrackets [] | []
