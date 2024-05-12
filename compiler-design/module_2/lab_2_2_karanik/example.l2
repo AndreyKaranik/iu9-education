@@ -1,2 +1,2 @@
-void {foo} <- int {a} =
+bool[] {foo} <- int {a}, bool {abc} =
 return.

@@ -143,14 +143,12 @@ NFunctionDeclarations |= NFunctionDeclaration, lambda fd: [fd]
 NFunctionDeclarations |= NFunctionDeclarations, NFunctionDeclaration, lambda fds, fd: fds + [fd]
 NFunctionDeclaration |= NFunctionHeader, '=', NStatements, '.', FunctionDeclaration
 NFunctionHeader |= NFunctionHeaderTypeName, lambda typename: FunctionHeader(typename[0], typename[1], [])
-NFunctionHeader |= (
-    NFunctionHeaderTypeName, '<-', NFormalParameters, lambda typename, params: FunctionHeader(typename[0], typename[1], params)
-)
+NFunctionHeader |= NFunctionHeaderTypeName, '<-', NFormalParameters, lambda typename, params: FunctionHeader(typename[0], typename[1], params)
 NFunctionHeaderTypeName |= NType, IDENTIFIER, lambda t, n: (t, n)
 NFunctionHeaderTypeName |= KW_VOID, IDENTIFIER, lambda n: (None, n)
-NFormalParameters |= NFormalParameters, ',', NFormalParameter
-NFormalParameters |= NFormalParameter
-NFormalParameter |= NType, IDENTIFIER
+NFormalParameters |= NFormalParameters, ',', NFormalParameter, lambda fps, fp: fps + [fp]
+NFormalParameters |= NFormalParameter, lambda fp: [fp]
+NFormalParameter |= NType, IDENTIFIER, lambda t, n: (t, n)
 
 
 NStatements |= NStatements, ';', NStatement, lambda sts, st: sts + [st]
