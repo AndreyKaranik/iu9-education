@@ -1,7 +1,6 @@
 %option noyywrap bison-bridge bison-locations
 
 %{
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -9,9 +8,9 @@
 #include <algorithm>
 #include <map>
 
-#define TAG_KEYWORD   1
-#define TAG_IDENTIFIER      2
-#define TAG_ERROR       3
+#define TAG_KEYWORD    1
+#define TAG_IDENTIFIER 2
+#define TAG_ERROR      3
 
 char *tag_names[] = {
     "END_OF_PROGRAM", "KEYWORD", "IDENTIFIER", "ERROR"
@@ -69,33 +68,33 @@ struct Position cur;
 
 typedef struct {
     YYLTYPE* array;
-    size_t used;
+    size_t cap;
     size_t size;
 } Array;
 
 void initArray(Array* a, int initial_size) {
     a->array = new YYLTYPE[initial_size];
-    a->used = 0;
+    a->cap = 0;
     a->size = initial_size;
 }
 
 void insertArray(Array* a, YYLTYPE element) {
-    if (a->used == a->size) {
+    if (a->cap == a->size) {
         a->size *= 2;
         a->array = new YYLTYPE[a->size];
     }
-    a->array[a->used++] = element;
+    a->array[a->cap++] = element;
 }
 
 void freeArray(Array* a) {
     free(a->array);
     a->array = NULL;
-    a->used = a->size = 0;
+    a->cap = a->size = 0;
 }
 
 void printArray(Array* a) {
     printf("Comments:");
-    for(int i = 0; i < a->used; i++) {
+    for(int i = 0; i < a->cap; i++) {
         print_frag(&a->array[i]);
     } 
 }
@@ -111,15 +110,14 @@ void init_scanner(const char *path) {
     yyin = fopen(path, "r");
 }
 
-void err(const char *msg) {
-    printf("Error");
+void error(const char *msg) {
+    printf("error");
     print_pos(&cur);
     printf(": %s\n", msg);
 }
 
 std::vector<std::string> names;
 std::map<std::string, int> nameCodes;
-
 
 int addName(std::string name) {
     if (std::find(names.begin(), names.end(), name) != names.end()) {
@@ -159,7 +157,7 @@ KEYWORD     with|end|\*\*
             }
 
 . {
-    err("unexpected symbol");
+    error("unexpected symbol");
     BEGIN(SKIP);
 }
 
@@ -175,7 +173,8 @@ int main(int argc, const char **argv) {
     int tag;
     YYSTYPE value;
     YYLTYPE coords;
-    init_scanner("text.txt");
+
+    init_scanner("input.txt");
 
     do {
         tag = yylex(&value, &coords);
@@ -191,7 +190,6 @@ int main(int argc, const char **argv) {
     } while (0 != tag);
 
     printArray(&comments);
-
 
     return 0;
 }
