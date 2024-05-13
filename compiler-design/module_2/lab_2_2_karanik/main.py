@@ -135,8 +135,8 @@ NProgram, NFunctionDeclarations, NFunctionDeclaration, NFunctionHeader, NFunctio
 NType, NArrayType, NBrackets, NDeclarationAssignments, NDeclarationAssignment, NActualParameters, NActualParameter = \
     map(pe.NonTerminal, 'Type ArrayType Brackets DeclarationAssignments DeclarationAssignment ActualParameters ActualParameter'.split())
 
-NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp, NFactor, NPower, NArrExpr, NBottomExpr = \
-    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp AddOp Factor Power ArrExpr BottomExpr'.split())
+NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp, NFactor, NPower, NArrExpr, NBottomExpr, NFuncCallExpr = \
+    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp AddOp Factor Power ArrExpr BottomExpr FuncCallExpr'.split())
 
 KW_BOOL, KW_INT, KW_RETURN, KW_VOID, KW_CHAR, KW_LOOP, KW_THEN, KW_ELSE, KW_NULL, KW_WHILE = \
     map(make_keyword, 'bool int return void char loop then else null while'.split())
@@ -159,13 +159,22 @@ NExpr |= NAndExpr, '|', NAndExpr, lambda x, y: BinOpExpr(x, '|', y)
 NExpr |= NAndExpr, '@', NAndExpr, lambda x, y: BinOpExpr(x, '@', y)
 NAndExpr |= NCmpExpr
 NAndExpr |= NCmpExpr, '&', NCmpExpr, lambda x, y: BinOpExpr(x, '&', y)
-NCmpExpr |= NArithmExpr
-NCmpExpr |= NArithmExpr, NCmpOp, NArithmExpr, BinOpExpr
+NCmpExpr |= NFuncCallExpr
+NCmpExpr |= NFuncCallExpr, NCmpOp, NFuncCallExpr, BinOpExpr
 def make_op_lambda(op):
     return lambda: op
 
 for op in ('>', '<', '>=', '<=', '==', '!='):
     NCmpOp |= op, make_op_lambda(op)
+
+NFuncCallExpr |= NArithmExpr
+NFuncCallExpr |= IDENTIFIER, '<-', NArgs
+NArgs |= NArithmExpr
+NArgs |= NArgs, ',', NArithmExpr
+
+# {f} <- {x}+{y}, ({x}<{y})
+# {f} <- {a} < {g} <- {b}, {c}
+# ({f} <- {a}) + ({g} <- {b}, {c})
 
 NArithmExpr |= NTerm
 NArithmExpr |= NArithmExpr, NAddOp, NTerm, BinOpExpr
@@ -182,11 +191,13 @@ NPower |= NArrExpr
 NPower |= '!', NPower, lambda p: UnOpExpr('!', p)
 NPower |= '-', NPower, lambda p: UnOpExpr('-', p)
 NArrExpr |= NBottomExpr
-NArrExpr |= NArrExpr, '_', NBottomExpr, lambda x, y: BinOpExpr(x, '_', y)
-NBottomExpr |= NType
+NArrExpr |= NArrExpr, NBottomExpr, lambda x, y: BinOpExpr(x, 'at', y)
+NBottomExpr |= NType, NBottomExpr, lambda x, y: BinOpExpr(x, 'alloc', y)
 NBottomExpr |= IDENTIFIER, VariableExpr
 NBottomExpr |= NConst
 NBottomExpr |= '(', NExpr, ')'
+
+# {arr} 2 ({ix} 3)  ~~ arr[2][ix[3]]
 
 NStringConstant |= NStringConstant, STRING_SECTION
 NStringConstant |= STRING_SECTION
