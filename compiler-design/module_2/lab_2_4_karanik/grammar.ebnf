@@ -1,0 +1,39 @@
+NProgram ::= NFunctionDeclarations
+NFunctionDeclarations ::= NFunctionDeclaration+
+NFunctionDeclaration ::= NFunctionHeader '=' NStatements '.'
+NFunctionHeader ::= NFunctionHeaderTypeName ('<-' NFormalParameters)?
+NFunctionHeaderTypeName ::= (NType | KW_VOID) IDENTIFIER
+NFormalParameters ::= NFormalParameter (',' NFormalParameter)*
+NFormalParameter ::= NType IDENTIFIER
+
+NStatements ::= NStatement (';' NStatement)*
+
+NStatement ::= NType NDeclarationAssignments
+             | NExpr
+               (
+                 ':=' NExpr
+               | KW_THEN NStatements (KW_ELSE NStatements)? '.'
+               | KW_LOOP NStatements '.'
+               | '~' NExpr KW_LOOP IDENTIFIER NStatements '.'
+               )?
+             | KW_LOOP NStatements KW_WHILE NExpr '.'
+             | KW_RETURN (NExpr)?
+
+
+NDeclarationAssignments ::= NDeclarationAssignment (',' NDeclarationAssignment)*
+NDeclarationAssignment ::= IDENTIFIER (':=' NArithmExpr)?
+
+
+NType ::= (KW_INT | KW_CHAR | KW_BOOL) '[]'*
+
+NStringConstant |= STRING_SECTION STRING_SECTION*
+
+NConst ::= DECIMAL_INTEGER_CONSTANT | NON_DECIMAL_INTEGER_CONSTANT | SYMBOLIC_CONSTANT | BOOLEAN_CONSTANT
+
+# NExpr ::= NAndExpr 
+# NExpr ::= NAndExpr '|' NAndExpr
+# NExpr |= NAndExpr, '@', NAndExpr, lambda x, y: BinOpExpr(x, '@', y)
+# NAndExpr |= NCmpExpr
+# NAndExpr |= NCmpExpr, '&', NCmpExpr, lambda x, y: BinOpExpr(x, '&', y)
+# NCmpExpr |= NFuncCallExpr
+# NCmpExpr |= NFuncCallExpr, NCmpOp, NFuncCallExpr, BinOpExpr
