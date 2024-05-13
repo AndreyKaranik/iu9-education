@@ -1,10 +1,21 @@
 bool[] {foo} <- int {a}, bool {abc} =
 int {a}, {b} := 100;
-char[] {text} := "content";
-{a} := {b};
-{f} <- 2+2, {a};
+int {a} := ({f} <- {a}, {b});
+char[] {text} := "content" "123" "%BEL%" %A;
+{a} := ({f} <- {a}) + ({g} <- {b}, {c});
+{g} <- {a}+{b}, ({a}<{b});
+
 {a} < 0 then
-{b} := 10
+{b} := 0
+else {a} == 5 then
+{b} := 5
 else
-{a} := 5.;
+{b} := 10..;
+
 return true.
+
+int {f} <- int {a} =
+return {a}.
+
+int {g} <- int {a}, int {b} =
+return {a}+{b}.

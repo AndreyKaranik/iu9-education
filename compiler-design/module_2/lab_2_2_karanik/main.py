@@ -128,7 +128,7 @@ SYMBOLIC_CONSTANT = pe.Terminal('SYMBOLIC_CONSTANT',
                                 '[$](\"(.|' + ESCAPE_SEQUENCES_REGEX + ')\")|[A-F0-9]+', str)
 
 STRING_SECTION = pe.Terminal('STRING_SECTION',
-                                '(\"(.|' + ESCAPE_SEQUENCES_REGEX + ')*\")|%[A-F0-9]+', str)
+                                '(\"([^"\n]|' + ESCAPE_SEQUENCES_REGEX + ')*\")|(%[A-F0-9]+)', str)
 
 BOOLEAN_CONSTANT = pe.Terminal('BOOLEAN_CONSTANT', 'true|false', str)
 REFERENCE_NULL_CONSTANT = pe.Terminal('REFERENCE_NULL_CONSTANT', 'null', str)
@@ -209,13 +209,12 @@ NBottomExpr |= '(', NExpr, ')'
 
 # {arr} 2 ({ix} 3)  ~~ arr[2][ix[3]]
 
-NStringConstant |= NStringConstant, STRING_SECTION
+NStringConstant |= NStringConstant, STRING_SECTION, lambda s1, s2: s1 + s2
 NStringConstant |= STRING_SECTION
 
 NConst |= DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Int, 0))
 NConst |= NON_DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Int, 0))
 NConst |= SYMBOLIC_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Char, 0))
-# NConst |= NStringConstant, lambda v: ConstExpr(v, Type.Array)
 NConst |= BOOLEAN_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Bool, 0))
 
 NStatements |= NStatements, ';', NStatement, lambda sts, st: sts + [st]
