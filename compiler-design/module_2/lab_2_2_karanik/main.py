@@ -18,19 +18,9 @@ class Type(enum.Enum):
 class Expr(abc.ABC):
     pass
 
-
-# class EmptyExpr(Expr):
-#     pass
-
 @dataclass
 class Statement(abc.ABC):
     pass
-
-
-# @dataclass
-# class EmptyStatement(Statement):
-#     pass
-
 
 @dataclass
 class DeclarationStatement(Statement):
@@ -62,17 +52,32 @@ class PreWhileStatement(Statement):
     condition: Expr
     body: list[Statement]
 
+@dataclass
+class ForStatement(Statement):
+    start: Expr
+    end: Expr
+    variable: str
+    body: list[Statement]
+
 
 @dataclass
 class PostWhileStatement(Statement):
-    condition: Expr
     body: list[Statement]
+    condition: Expr
 
 
 @dataclass
 class ReturnStatement(Statement):
     expr: Expr | None
 
+@dataclass
+class VariableExpr(Expr):
+    varname: str
+
+@dataclass
+class ConstExpr(Expr):
+    value: typing.Any
+    type: Type
 
 @dataclass
 class BinOpExpr(Expr):
@@ -114,7 +119,7 @@ SYMBOLIC_CONSTANT = pe.Terminal('SYMBOLIC_CONSTANT',
                                 '[$](\"(.|' + ESCAPE_SEQUENCES_REGEX + ')\")|[A-F0-9]+', str)
 
 STRING_SECTION = pe.Terminal('STRING_SECTION',
-                                '\"\"', str)
+                                '(\"(.|' + ESCAPE_SEQUENCES_REGEX + ')*\")|%[A-F0-9]+', str)
 
 BOOLEAN_CONSTANT = pe.Terminal('BOOLEAN_CONSTANT', 'true|false', str)
 REFERENCE_NULL_CONSTANT = pe.Terminal('REFERENCE_NULL_CONSTANT', 'null', str)
@@ -130,9 +135,8 @@ NProgram, NFunctionDeclarations, NFunctionDeclaration, NFunctionHeader, NFunctio
 NType, NArrayType, NBrackets, NDeclarationAssignments, NDeclarationAssignment, NActualParameters, NActualParameter = \
     map(pe.NonTerminal, 'Type ArrayType Brackets DeclarationAssignments DeclarationAssignment ActualParameters ActualParameter'.split())
 
-NExpr,  = \
-    map(pe.NonTerminal, 'Expr'.split())
-
+NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp, NFactor, NPower, NArrExpr, NBottomExpr = \
+    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp AddOp Factor Power ArrExpr BottomExpr'.split())
 
 KW_BOOL, KW_INT, KW_RETURN, KW_VOID, KW_CHAR, KW_LOOP, KW_THEN, KW_ELSE, KW_NULL, KW_WHILE = \
     map(make_keyword, 'bool int return void char loop then else null while'.split())
@@ -150,39 +154,82 @@ NFormalParameters |= NFormalParameters, ',', NFormalParameter, lambda fps, fp: f
 NFormalParameters |= NFormalParameter, lambda fp: [fp]
 NFormalParameter |= NType, IDENTIFIER, lambda t, n: (t, n)
 
+NExpr |= NAndExpr
+NExpr |= NAndExpr, '|', NAndExpr, lambda x, y: BinOpExpr(x, '|', y)
+NExpr |= NAndExpr, '@', NAndExpr, lambda x, y: BinOpExpr(x, '@', y)
+NAndExpr |= NCmpExpr
+NAndExpr |= NCmpExpr, '&', NCmpExpr, lambda x, y: BinOpExpr(x, '&', y)
+NCmpExpr |= NArithmExpr
+NCmpExpr |= NArithmExpr, NCmpOp, NArithmExpr, BinOpExpr
+def make_op_lambda(op):
+    return lambda: op
+
+for op in ('>', '<', '>=', '<=', '==', '!='):
+    NCmpOp |= op, make_op_lambda(op)
+
+NArithmExpr |= NTerm
+NArithmExpr |= NArithmExpr, NAddOp, NTerm, BinOpExpr
+NAddOp |= '+', lambda: '+'
+NAddOp |= '-', lambda: '-'
+NTerm |= NFactor
+NTerm |= NTerm, NMulOp, NFactor, BinOpExpr
+NMulOp |= '*', lambda: '*'
+NMulOp |= '/', lambda: '/'
+NMulOp |= '%', lambda: '%'
+NFactor |= NPower
+NFactor |= NPower, '^', NFactor, lambda p, f: BinOpExpr(p, '^', f)
+NPower |= NArrExpr
+NPower |= '!', NPower, lambda p: UnOpExpr('!', p)
+NPower |= '-', NPower, lambda p: UnOpExpr('-', p)
+NArrExpr |= NBottomExpr
+NArrExpr |= NArrExpr, '_', NBottomExpr, lambda x, y: BinOpExpr(x, '_', y)
+NBottomExpr |= NType
+NBottomExpr |= IDENTIFIER, VariableExpr
+NBottomExpr |= NConst
+NBottomExpr |= '(', NExpr, ')'
+
+NStringConstant |= NStringConstant, STRING_SECTION
+NStringConstant |= STRING_SECTION
+
+NConst |= DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type.Int)
+NConst |= NON_DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type.Int)
+NConst |= SYMBOLIC_CONSTANT, lambda v: ConstExpr(v, Type.Char)
+NConst |= NStringConstant, lambda v: ConstExpr(v, Type.Array)
+NConst |= BOOLEAN_CONSTANT, lambda v: ConstExpr(v, Type.Bool)
 
 NStatements |= NStatements, ';', NStatement, lambda sts, st: sts + [st]
 NStatements |= NStatement, lambda st: [st]
-#
-# #Оператор объявления
-# NStatement |= NType, NDeclarationAssignment, ';'
-# NDeclarationAssignments |= NDeclarationAssignments, ',', NDeclarationAssignment, ';'
-# NDeclarationAssignment |= IDENTIFIER
-# NDeclarationAssignment |= IDENTIFIER, ':=', NExpr
-#
-# #Оператор присваивания
-# NStatement |= NExpr, ':=', NExpr, ';'
-#
-# #Оператор вызова функции
-# NStatement |= IDENTIFIER, '<-', NActualParameters
-# NActualParameters |= NActualParameters, ',', NActualParameter
-# NActualParameters |= NActualParameter
-# NActualParameter |= NExpr
-#
-# #Оператор выбора
-# NStatement |= NExpr, KW_THEN, NStatements, '.'
-# NStatement |= NExpr, KW_THEN, NStatements, KW_ELSE, NStatements, '.'
-#
-# #Оператор цикла с предусловием
-# NStatement |= NExpr, KW_LOOP, NStatements, '.'
-# #Второй вариант
-# NStatement |= NExpr, '~', NExpr, KW_LOOP, IDENTIFIER, '.'
-#
-# #Оператор цикла с постусловием
-# NStatement |= KW_LOOP, NStatements, KW_WHILE, NExpr, '.'
-#
+
+#Оператор объявления
+NStatement |= NType, NDeclarationAssignments, DeclarationStatement
+NDeclarationAssignments |= NDeclarationAssignment, lambda vr: [vr]
+NDeclarationAssignments |= NDeclarationAssignments, ',', NDeclarationAssignment, lambda vrs, vr: vrs + [vr]
+NDeclarationAssignment |= IDENTIFIER, lambda name: (name, None)
+NDeclarationAssignment |= IDENTIFIER, ':=', NExpr, lambda name, ex: (name, ex)
+
+#Оператор присваивания
+NStatement |= NExpr, ':=', NExpr, AssignmentStatement
+
+#Оператор вызова функции
+NStatement |= IDENTIFIER, '<-', NActualParameters, InvocationStatement
+NActualParameters |= NActualParameter, lambda ap: [ap]
+NActualParameters |= NActualParameters, ',', NActualParameter, lambda aps, ap: aps + [ap]
+NActualParameter |= NExpr
+
+#Оператор выбора
+NStatement |= NExpr, KW_THEN, NStatements, '.', lambda cond, sts: IfStatement(cond, [sts], [])
+NStatement |= NExpr, KW_THEN, NStatements, KW_ELSE, NStatements, '.', IfStatement
+
+#Оператор цикла с предусловием
+NStatement |= NExpr, KW_LOOP, NStatements, '.', PreWhileStatement
+#Второй вариант
+NStatement |= NExpr, '~', NExpr, KW_LOOP, IDENTIFIER, NStatements, '.', ForStatement
+
+#Оператор цикла с постусловием
+NStatement |= KW_LOOP, NStatements, KW_WHILE, NExpr, '.', PostWhileStatement
+
 # #Оператор завершения функции
-# NStatement |= 'return', NExpr, ReturnStatement
+NStatement |= KW_RETURN, NExpr, ReturnStatement
 NStatement |= KW_RETURN, lambda: ReturnStatement(None)
 
 #Тип

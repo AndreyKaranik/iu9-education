@@ -1,2 +1,10 @@
 bool[] {foo} <- int {a}, bool {abc} =
-return.
+int {a}, {b} := 100;
+char[] {text} := "content";
+{a} := {b};
+{f} <- 2+2, {a};
+{a} < 0 then
+{b} := 10
+else
+{a} := 5.;
+return true.
