@@ -8,11 +8,21 @@ from dataclasses import dataclass
 from pprint import pprint
 
 
-class Type(enum.Enum):
+class PrimType(enum.Enum):
     Int = 'INT'
     Char = 'CHAR'
     Bool = 'BOOL'
-    Array = 'ARRAY'
+
+# class PrimitiveType(enum.Enum):
+#     Int = 'INT'
+#     Char = 'CHAR'
+#     Bool = 'BOOL'
+
+
+@dataclass
+class Type:
+    base: PrimType
+    array_level: int
 
 
 class Expr(abc.ABC):
@@ -80,6 +90,11 @@ class ConstExpr(Expr):
     type: Type
 
 @dataclass
+class FunctionInvocationExpr(Statement):
+    function: str
+    actualParameters: list[Expr]
+
+@dataclass
 class BinOpExpr(Expr):
     left: Expr
     op: str
@@ -135,8 +150,8 @@ NProgram, NFunctionDeclarations, NFunctionDeclaration, NFunctionHeader, NFunctio
 NType, NArrayType, NBrackets, NDeclarationAssignments, NDeclarationAssignment, NActualParameters, NActualParameter = \
     map(pe.NonTerminal, 'Type ArrayType Brackets DeclarationAssignments DeclarationAssignment ActualParameters ActualParameter'.split())
 
-NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp, NFactor, NPower, NArrExpr, NBottomExpr, NFuncCallExpr = \
-    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp AddOp Factor Power ArrExpr BottomExpr FuncCallExpr'.split())
+NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp, NFactor, NPower, NArrExpr, NBottomExpr, NFuncCallExpr, NArgs = \
+    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp AddOp Factor Power ArrExpr BottomExpr FuncCallExpr Args'.split())
 
 KW_BOOL, KW_INT, KW_RETURN, KW_VOID, KW_CHAR, KW_LOOP, KW_THEN, KW_ELSE, KW_NULL, KW_WHILE = \
     map(make_keyword, 'bool int return void char loop then else null while'.split())
@@ -168,9 +183,9 @@ for op in ('>', '<', '>=', '<=', '==', '!='):
     NCmpOp |= op, make_op_lambda(op)
 
 NFuncCallExpr |= NArithmExpr
-NFuncCallExpr |= IDENTIFIER, '<-', NArgs
-NArgs |= NArithmExpr
-NArgs |= NArgs, ',', NArithmExpr
+NFuncCallExpr |= IDENTIFIER, '<-', NArgs, FunctionInvocationExpr
+NArgs |= NArithmExpr, lambda ex: [ex]
+NArgs |= NArgs, ',', NArithmExpr, lambda exs, ex: exs + [ex]
 
 # {f} <- {x}+{y}, ({x}<{y})
 # {f} <- {a} < {g} <- {b}, {c}
@@ -192,7 +207,8 @@ NPower |= '!', NPower, lambda p: UnOpExpr('!', p)
 NPower |= '-', NPower, lambda p: UnOpExpr('-', p)
 NArrExpr |= NBottomExpr
 NArrExpr |= NArrExpr, NBottomExpr, lambda x, y: BinOpExpr(x, 'at', y)
-NBottomExpr |= NType, NBottomExpr, lambda x, y: BinOpExpr(x, 'alloc', y)
+NArrExpr |= NStringConstant
+NPower |= NType, NBottomExpr, lambda x, y: BinOpExpr(x, 'alloc', y)
 NBottomExpr |= IDENTIFIER, VariableExpr
 NBottomExpr |= NConst
 NBottomExpr |= '(', NExpr, ')'
@@ -205,7 +221,7 @@ NStringConstant |= STRING_SECTION
 NConst |= DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type.Int)
 NConst |= NON_DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type.Int)
 NConst |= SYMBOLIC_CONSTANT, lambda v: ConstExpr(v, Type.Char)
-NConst |= NStringConstant, lambda v: ConstExpr(v, Type.Array)
+# NConst |= NStringConstant, lambda v: ConstExpr(v, Type.Array)
 NConst |= BOOLEAN_CONSTANT, lambda v: ConstExpr(v, Type.Bool)
 
 NStatements |= NStatements, ';', NStatement, lambda sts, st: sts + [st]
@@ -216,16 +232,20 @@ NStatement |= NType, NDeclarationAssignments, DeclarationStatement
 NDeclarationAssignments |= NDeclarationAssignment, lambda vr: [vr]
 NDeclarationAssignments |= NDeclarationAssignments, ',', NDeclarationAssignment, lambda vrs, vr: vrs + [vr]
 NDeclarationAssignment |= IDENTIFIER, lambda name: (name, None)
-NDeclarationAssignment |= IDENTIFIER, ':=', NExpr, lambda name, ex: (name, ex)
+NDeclarationAssignment |= IDENTIFIER, ':=', NArithmExpr, lambda name, ex: (name, ex)
+
+# int {a} := ({f} <- {x}, {y})
+
+# int {a} 5 := 7
 
 #Оператор присваивания
-NStatement |= NExpr, ':=', NExpr, AssignmentStatement
+NStatement |= NArrExpr, ':=', NExpr, AssignmentStatement
 
 #Оператор вызова функции
-NStatement |= IDENTIFIER, '<-', NActualParameters, InvocationStatement
+NStatement |= IDENTIFIER, '<-', NArgs, InvocationStatement
 NActualParameters |= NActualParameter, lambda ap: [ap]
 NActualParameters |= NActualParameters, ',', NActualParameter, lambda aps, ap: aps + [ap]
-NActualParameter |= NExpr
+NActualParameter |= NArithmExpr
 
 #Оператор выбора
 NStatement |= NExpr, KW_THEN, NStatements, '.', lambda cond, sts: IfStatement(cond, [sts], [])
@@ -258,6 +278,7 @@ NBrackets |= '[]'
 
 # Парсер
 parser = pe.Parser(NProgram)
+parser.print_table()
 assert parser.is_lalr_one()
 
 parser.add_skipped_domain('\\s')

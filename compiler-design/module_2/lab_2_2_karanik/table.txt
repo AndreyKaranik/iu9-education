@@ -1,0 +1,2594 @@
+C:\Users\Golum\Desktop\iu9-education\compiler-design\module_2\lab_2_2_karanik\.venv\bin\python.exe C:\Users\Golum\Desktop\iu9-education\compiler-design\module_2\lab_2_2_karanik\main.py example.l2
+State 0
+	0    $accept: . Program
+
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal void: Shift(state=10)
+	for terminal char: Shift(state=11)
+
+	for non-terminal ArrayType: go to state 1
+	for non-terminal FunctionDeclaration: go to state 2
+	for non-terminal FunctionDeclarations: go to state 3
+	for non-terminal FunctionHeader: go to state 4
+	for non-terminal FunctionHeaderTypeName: go to state 5
+	for non-terminal Program: go to state 6
+	for non-terminal Type: go to state 7
+
+State 1
+	26   Type: ArrayType .
+
+	for terminal IDENTIFIER: Reduce(rule=26)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=26)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=26)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=26)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=26)
+	for terminal '(': Reduce(rule=26)
+
+State 2
+	2    FunctionDeclarations: FunctionDeclaration .
+
+	for terminal bool: Reduce(rule=2)
+	for terminal int: Reduce(rule=2)
+	for terminal void: Reduce(rule=2)
+	for terminal char: Reduce(rule=2)
+	for terminal EOF: Reduce(rule=2)
+
+State 3
+	1    Program: FunctionDeclarations .
+	3    FunctionDeclarations: FunctionDeclarations . FunctionDeclaration
+
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal void: Shift(state=10)
+	for terminal char: Shift(state=11)
+	for terminal EOF: Reduce(rule=1)
+
+	for non-terminal ArrayType: go to state 1
+	for non-terminal FunctionDeclaration: go to state 12
+	for non-terminal FunctionHeader: go to state 4
+	for non-terminal FunctionHeaderTypeName: go to state 5
+	for non-terminal Type: go to state 7
+
+State 4
+	4    FunctionDeclaration: FunctionHeader . '=' Statements '.'
+
+	for terminal '=': Shift(state=13)
+
+State 5
+	5    FunctionHeader: FunctionHeaderTypeName .
+	6    FunctionHeader: FunctionHeaderTypeName . '<-' FormalParameters
+
+	for terminal '=': Reduce(rule=5)
+	for terminal '<-': Shift(state=14)
+
+State 6
+	0    $accept: Program .
+
+	for terminal EOF: Accept()
+
+State 7
+	9    FunctionHeaderTypeName: Type . IDENTIFIER
+
+	for terminal IDENTIFIER: Shift(state=15)
+
+State 8
+	25   Type: bool .
+	40   ArrayType: bool . Brackets
+
+	for terminal IDENTIFIER: Reduce(rule=25)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=25)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=25)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=25)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=25)
+	for terminal '(': Reduce(rule=25)
+	for terminal '[]': Shift(state=17)
+
+	for non-terminal Brackets: go to state 16
+
+State 9
+	23   Type: int .
+	38   ArrayType: int . Brackets
+
+	for terminal IDENTIFIER: Reduce(rule=23)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=23)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=23)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=23)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=23)
+	for terminal '(': Reduce(rule=23)
+	for terminal '[]': Shift(state=17)
+
+	for non-terminal Brackets: go to state 18
+
+State 10
+	10   FunctionHeaderTypeName: void . IDENTIFIER
+
+	for terminal IDENTIFIER: Shift(state=19)
+
+State 11
+	24   Type: char .
+	39   ArrayType: char . Brackets
+
+	for terminal IDENTIFIER: Reduce(rule=24)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=24)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=24)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=24)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=24)
+	for terminal '(': Reduce(rule=24)
+	for terminal '[]': Shift(state=17)
+
+	for non-terminal Brackets: go to state 20
+
+State 12
+	3    FunctionDeclarations: FunctionDeclarations FunctionDeclaration .
+
+	for terminal bool: Reduce(rule=3)
+	for terminal int: Reduce(rule=3)
+	for terminal void: Reduce(rule=3)
+	for terminal char: Reduce(rule=3)
+	for terminal EOF: Reduce(rule=3)
+
+State 13
+	4    FunctionDeclaration: FunctionHeader '=' . Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 31
+	for non-terminal Statements: go to state 32
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 14
+	6    FunctionHeader: FunctionHeaderTypeName '<-' . FormalParameters
+
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+
+	for non-terminal ArrayType: go to state 1
+	for non-terminal FormalParameter: go to state 47
+	for non-terminal FormalParameters: go to state 48
+	for non-terminal Type: go to state 49
+
+State 15
+	9    FunctionHeaderTypeName: Type IDENTIFIER .
+
+	for terminal '=': Reduce(rule=9)
+	for terminal '<-': Reduce(rule=9)
+
+State 16
+	40   ArrayType: bool Brackets .
+	51   Brackets: Brackets . '[]'
+
+	for terminal IDENTIFIER: Reduce(rule=40)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=40)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=40)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=40)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=40)
+	for terminal '(': Reduce(rule=40)
+	for terminal '[]': Shift(state=50)
+
+State 17
+	52   Brackets: '[]' .
+
+	for terminal IDENTIFIER: Reduce(rule=52)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=52)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=52)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=52)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=52)
+	for terminal '(': Reduce(rule=52)
+	for terminal '[]': Reduce(rule=52)
+
+State 18
+	38   ArrayType: int Brackets .
+	51   Brackets: Brackets . '[]'
+
+	for terminal IDENTIFIER: Reduce(rule=38)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=38)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=38)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=38)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=38)
+	for terminal '(': Reduce(rule=38)
+	for terminal '[]': Shift(state=50)
+
+State 19
+	10   FunctionHeaderTypeName: void IDENTIFIER .
+
+	for terminal '=': Reduce(rule=10)
+	for terminal '<-': Reduce(rule=10)
+
+State 20
+	39   ArrayType: char Brackets .
+	51   Brackets: Brackets . '[]'
+
+	for terminal IDENTIFIER: Reduce(rule=39)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=39)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=39)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=39)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=39)
+	for terminal '(': Reduce(rule=39)
+	for terminal '[]': Shift(state=50)
+
+State 21
+	33   Expr: AndExpr .
+	34   Expr: AndExpr . '|' AndExpr
+	35   Expr: AndExpr . '@' AndExpr
+
+	for terminal while: Reduce(rule=33)
+	for terminal loop: Reduce(rule=33)
+	for terminal then: Reduce(rule=33)
+	for terminal else: Reduce(rule=33)
+	for terminal '.': Reduce(rule=33)
+	for terminal '|': Shift(state=51)
+	for terminal '@': Shift(state=52)
+	for terminal ')': Reduce(rule=33)
+	for terminal ';': Reduce(rule=33)
+	for terminal '~': Reduce(rule=33)
+
+State 22
+	54   ArithmExpr: ArithmExpr . AddOp Term
+	65   FuncCallExpr: ArithmExpr .
+
+	for terminal while: Reduce(rule=65)
+	for terminal loop: Reduce(rule=65)
+	for terminal then: Reduce(rule=65)
+	for terminal else: Reduce(rule=65)
+	for terminal '.': Reduce(rule=65)
+	for terminal '|': Reduce(rule=65)
+	for terminal '@': Reduce(rule=65)
+	for terminal '&': Reduce(rule=65)
+	for terminal '>': Reduce(rule=65)
+	for terminal '<': Reduce(rule=65)
+	for terminal '>=': Reduce(rule=65)
+	for terminal '<=': Reduce(rule=65)
+	for terminal '==': Reduce(rule=65)
+	for terminal '!=': Reduce(rule=65)
+	for terminal '+': Shift(state=54)
+	for terminal '-': Shift(state=55)
+	for terminal ')': Reduce(rule=65)
+	for terminal ';': Reduce(rule=65)
+	for terminal '~': Reduce(rule=65)
+
+	for non-terminal AddOp: go to state 53
+
+State 23
+	14   Statement: ArrExpr . ':=' Expr
+	31   ArrExpr: ArrExpr . BottomExpr
+	80   Power: ArrExpr .
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal loop: Reduce(rule=80)
+	for terminal then: Reduce(rule=80)
+	for terminal '|': Reduce(rule=80)
+	for terminal '@': Reduce(rule=80)
+	for terminal '&': Reduce(rule=80)
+	for terminal '>': Reduce(rule=80)
+	for terminal '<': Reduce(rule=80)
+	for terminal '>=': Reduce(rule=80)
+	for terminal '<=': Reduce(rule=80)
+	for terminal '==': Reduce(rule=80)
+	for terminal '!=': Reduce(rule=80)
+	for terminal '+': Reduce(rule=80)
+	for terminal '-': Reduce(rule=80)
+	for terminal '*': Reduce(rule=80)
+	for terminal '/': Reduce(rule=80)
+	for terminal '%': Reduce(rule=80)
+	for terminal '^': Reduce(rule=80)
+	for terminal '(': Shift(state=46)
+	for terminal ':=': Shift(state=58)
+	for terminal '~': Reduce(rule=80)
+
+	for non-terminal BottomExpr: go to state 56
+	for non-terminal Const: go to state 26
+
+State 24
+	30   ArrExpr: BottomExpr .
+
+	for terminal IDENTIFIER: Reduce(rule=30)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=30)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=30)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=30)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=30)
+	for terminal while: Reduce(rule=30)
+	for terminal loop: Reduce(rule=30)
+	for terminal then: Reduce(rule=30)
+	for terminal else: Reduce(rule=30)
+	for terminal '.': Reduce(rule=30)
+	for terminal ',': Reduce(rule=30)
+	for terminal '|': Reduce(rule=30)
+	for terminal '@': Reduce(rule=30)
+	for terminal '&': Reduce(rule=30)
+	for terminal '>': Reduce(rule=30)
+	for terminal '<': Reduce(rule=30)
+	for terminal '>=': Reduce(rule=30)
+	for terminal '<=': Reduce(rule=30)
+	for terminal '==': Reduce(rule=30)
+	for terminal '!=': Reduce(rule=30)
+	for terminal '+': Reduce(rule=30)
+	for terminal '-': Reduce(rule=30)
+	for terminal '*': Reduce(rule=30)
+	for terminal '/': Reduce(rule=30)
+	for terminal '%': Reduce(rule=30)
+	for terminal '^': Reduce(rule=30)
+	for terminal '(': Reduce(rule=30)
+	for terminal ')': Reduce(rule=30)
+	for terminal ';': Reduce(rule=30)
+	for terminal ':=': Reduce(rule=30)
+	for terminal '~': Reduce(rule=30)
+
+State 25
+	48   AndExpr: CmpExpr .
+	49   AndExpr: CmpExpr . '&' CmpExpr
+
+	for terminal while: Reduce(rule=48)
+	for terminal loop: Reduce(rule=48)
+	for terminal then: Reduce(rule=48)
+	for terminal else: Reduce(rule=48)
+	for terminal '.': Reduce(rule=48)
+	for terminal '|': Reduce(rule=48)
+	for terminal '@': Reduce(rule=48)
+	for terminal '&': Shift(state=59)
+	for terminal ')': Reduce(rule=48)
+	for terminal ';': Reduce(rule=48)
+	for terminal '~': Reduce(rule=48)
+
+State 26
+	44   BottomExpr: Const .
+
+	for terminal IDENTIFIER: Reduce(rule=44)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=44)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=44)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=44)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=44)
+	for terminal while: Reduce(rule=44)
+	for terminal loop: Reduce(rule=44)
+	for terminal then: Reduce(rule=44)
+	for terminal else: Reduce(rule=44)
+	for terminal '.': Reduce(rule=44)
+	for terminal ',': Reduce(rule=44)
+	for terminal '|': Reduce(rule=44)
+	for terminal '@': Reduce(rule=44)
+	for terminal '&': Reduce(rule=44)
+	for terminal '>': Reduce(rule=44)
+	for terminal '<': Reduce(rule=44)
+	for terminal '>=': Reduce(rule=44)
+	for terminal '<=': Reduce(rule=44)
+	for terminal '==': Reduce(rule=44)
+	for terminal '!=': Reduce(rule=44)
+	for terminal '+': Reduce(rule=44)
+	for terminal '-': Reduce(rule=44)
+	for terminal '*': Reduce(rule=44)
+	for terminal '/': Reduce(rule=44)
+	for terminal '%': Reduce(rule=44)
+	for terminal '^': Reduce(rule=44)
+	for terminal '(': Reduce(rule=44)
+	for terminal ')': Reduce(rule=44)
+	for terminal ';': Reduce(rule=44)
+	for terminal ':=': Reduce(rule=44)
+	for terminal '~': Reduce(rule=44)
+
+State 27
+	16   Statement: Expr . then Statements '.'
+	17   Statement: Expr . then Statements else Statements '.'
+	18   Statement: Expr . loop Statements '.'
+	19   Statement: Expr . '~' Expr loop IDENTIFIER Statements '.'
+
+	for terminal loop: Shift(state=60)
+	for terminal then: Shift(state=61)
+	for terminal '~': Shift(state=62)
+
+State 28
+	61   Term: Factor .
+
+	for terminal while: Reduce(rule=61)
+	for terminal loop: Reduce(rule=61)
+	for terminal then: Reduce(rule=61)
+	for terminal else: Reduce(rule=61)
+	for terminal '.': Reduce(rule=61)
+	for terminal ',': Reduce(rule=61)
+	for terminal '|': Reduce(rule=61)
+	for terminal '@': Reduce(rule=61)
+	for terminal '&': Reduce(rule=61)
+	for terminal '>': Reduce(rule=61)
+	for terminal '<': Reduce(rule=61)
+	for terminal '>=': Reduce(rule=61)
+	for terminal '<=': Reduce(rule=61)
+	for terminal '==': Reduce(rule=61)
+	for terminal '!=': Reduce(rule=61)
+	for terminal '+': Reduce(rule=61)
+	for terminal '-': Reduce(rule=61)
+	for terminal '*': Reduce(rule=61)
+	for terminal '/': Reduce(rule=61)
+	for terminal '%': Reduce(rule=61)
+	for terminal ')': Reduce(rule=61)
+	for terminal ';': Reduce(rule=61)
+	for terminal '~': Reduce(rule=61)
+
+State 29
+	59   CmpExpr: FuncCallExpr .
+	60   CmpExpr: FuncCallExpr . CmpOp FuncCallExpr
+
+	for terminal while: Reduce(rule=59)
+	for terminal loop: Reduce(rule=59)
+	for terminal then: Reduce(rule=59)
+	for terminal else: Reduce(rule=59)
+	for terminal '.': Reduce(rule=59)
+	for terminal '|': Reduce(rule=59)
+	for terminal '@': Reduce(rule=59)
+	for terminal '&': Reduce(rule=59)
+	for terminal '>': Shift(state=64)
+	for terminal '<': Shift(state=65)
+	for terminal '>=': Shift(state=66)
+	for terminal '<=': Shift(state=67)
+	for terminal '==': Shift(state=68)
+	for terminal '!=': Shift(state=69)
+	for terminal ')': Reduce(rule=59)
+	for terminal ';': Reduce(rule=59)
+	for terminal '~': Reduce(rule=59)
+
+	for non-terminal CmpOp: go to state 63
+
+State 30
+	73   Factor: Power .
+	74   Factor: Power . '^' Factor
+
+	for terminal while: Reduce(rule=73)
+	for terminal loop: Reduce(rule=73)
+	for terminal then: Reduce(rule=73)
+	for terminal else: Reduce(rule=73)
+	for terminal '.': Reduce(rule=73)
+	for terminal ',': Reduce(rule=73)
+	for terminal '|': Reduce(rule=73)
+	for terminal '@': Reduce(rule=73)
+	for terminal '&': Reduce(rule=73)
+	for terminal '>': Reduce(rule=73)
+	for terminal '<': Reduce(rule=73)
+	for terminal '>=': Reduce(rule=73)
+	for terminal '<=': Reduce(rule=73)
+	for terminal '==': Reduce(rule=73)
+	for terminal '!=': Reduce(rule=73)
+	for terminal '+': Reduce(rule=73)
+	for terminal '-': Reduce(rule=73)
+	for terminal '*': Reduce(rule=73)
+	for terminal '/': Reduce(rule=73)
+	for terminal '%': Reduce(rule=73)
+	for terminal '^': Shift(state=70)
+	for terminal ')': Reduce(rule=73)
+	for terminal ';': Reduce(rule=73)
+	for terminal '~': Reduce(rule=73)
+
+State 31
+	8    Statements: Statement .
+
+	for terminal while: Reduce(rule=8)
+	for terminal else: Reduce(rule=8)
+	for terminal '.': Reduce(rule=8)
+	for terminal ';': Reduce(rule=8)
+
+State 32
+	4    FunctionDeclaration: FunctionHeader '=' Statements . '.'
+	7    Statements: Statements . ';' Statement
+
+	for terminal '.': Shift(state=71)
+	for terminal ';': Shift(state=72)
+
+State 33
+	32   ArrExpr: StringConstant .
+	46   StringConstant: StringConstant . STRING_SECTION
+
+	for terminal IDENTIFIER: Reduce(rule=32)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=32)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=32)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=32)
+	for terminal STRING_SECTION: Shift(state=73)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=32)
+	for terminal while: Reduce(rule=32)
+	for terminal loop: Reduce(rule=32)
+	for terminal then: Reduce(rule=32)
+	for terminal else: Reduce(rule=32)
+	for terminal '.': Reduce(rule=32)
+	for terminal ',': Reduce(rule=32)
+	for terminal '|': Reduce(rule=32)
+	for terminal '@': Reduce(rule=32)
+	for terminal '&': Reduce(rule=32)
+	for terminal '>': Reduce(rule=32)
+	for terminal '<': Reduce(rule=32)
+	for terminal '>=': Reduce(rule=32)
+	for terminal '<=': Reduce(rule=32)
+	for terminal '==': Reduce(rule=32)
+	for terminal '!=': Reduce(rule=32)
+	for terminal '+': Reduce(rule=32)
+	for terminal '-': Reduce(rule=32)
+	for terminal '*': Reduce(rule=32)
+	for terminal '/': Reduce(rule=32)
+	for terminal '%': Reduce(rule=32)
+	for terminal '^': Reduce(rule=32)
+	for terminal '(': Reduce(rule=32)
+	for terminal ')': Reduce(rule=32)
+	for terminal ';': Reduce(rule=32)
+	for terminal ':=': Reduce(rule=32)
+	for terminal '~': Reduce(rule=32)
+
+State 34
+	53   ArithmExpr: Term .
+	62   Term: Term . MulOp Factor
+
+	for terminal while: Reduce(rule=53)
+	for terminal loop: Reduce(rule=53)
+	for terminal then: Reduce(rule=53)
+	for terminal else: Reduce(rule=53)
+	for terminal '.': Reduce(rule=53)
+	for terminal ',': Reduce(rule=53)
+	for terminal '|': Reduce(rule=53)
+	for terminal '@': Reduce(rule=53)
+	for terminal '&': Reduce(rule=53)
+	for terminal '>': Reduce(rule=53)
+	for terminal '<': Reduce(rule=53)
+	for terminal '>=': Reduce(rule=53)
+	for terminal '<=': Reduce(rule=53)
+	for terminal '==': Reduce(rule=53)
+	for terminal '!=': Reduce(rule=53)
+	for terminal '+': Reduce(rule=53)
+	for terminal '-': Reduce(rule=53)
+	for terminal '*': Shift(state=75)
+	for terminal '/': Shift(state=76)
+	for terminal '%': Shift(state=77)
+	for terminal ')': Reduce(rule=53)
+	for terminal ';': Reduce(rule=53)
+	for terminal '~': Reduce(rule=53)
+
+	for non-terminal MulOp: go to state 74
+
+State 35
+	13   Statement: Type . DeclarationAssignments
+	83   Power: Type . BottomExpr
+
+	for terminal IDENTIFIER: Shift(state=81)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal BottomExpr: go to state 78
+	for non-terminal Const: go to state 26
+	for non-terminal DeclarationAssignment: go to state 79
+	for non-terminal DeclarationAssignments: go to state 80
+
+State 36
+	15   Statement: IDENTIFIER . '<-' ActualParameters
+	43   BottomExpr: IDENTIFIER .
+	66   FuncCallExpr: IDENTIFIER . '<-' Args
+
+	for terminal IDENTIFIER: Reduce(rule=43)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=43)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=43)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=43)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=43)
+	for terminal loop: Reduce(rule=43)
+	for terminal then: Reduce(rule=43)
+	for terminal '<-': Shift(state=82)
+	for terminal '|': Reduce(rule=43)
+	for terminal '@': Reduce(rule=43)
+	for terminal '&': Reduce(rule=43)
+	for terminal '>': Reduce(rule=43)
+	for terminal '<': Reduce(rule=43)
+	for terminal '>=': Reduce(rule=43)
+	for terminal '<=': Reduce(rule=43)
+	for terminal '==': Reduce(rule=43)
+	for terminal '!=': Reduce(rule=43)
+	for terminal '+': Reduce(rule=43)
+	for terminal '-': Reduce(rule=43)
+	for terminal '*': Reduce(rule=43)
+	for terminal '/': Reduce(rule=43)
+	for terminal '%': Reduce(rule=43)
+	for terminal '^': Reduce(rule=43)
+	for terminal '(': Reduce(rule=43)
+	for terminal ':=': Reduce(rule=43)
+	for terminal '~': Reduce(rule=43)
+
+State 37
+	56   Const: NON_DECIMAL_INTEGER_CONSTANT .
+
+	for terminal IDENTIFIER: Reduce(rule=56)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=56)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=56)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=56)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=56)
+	for terminal while: Reduce(rule=56)
+	for terminal loop: Reduce(rule=56)
+	for terminal then: Reduce(rule=56)
+	for terminal else: Reduce(rule=56)
+	for terminal '.': Reduce(rule=56)
+	for terminal ',': Reduce(rule=56)
+	for terminal '|': Reduce(rule=56)
+	for terminal '@': Reduce(rule=56)
+	for terminal '&': Reduce(rule=56)
+	for terminal '>': Reduce(rule=56)
+	for terminal '<': Reduce(rule=56)
+	for terminal '>=': Reduce(rule=56)
+	for terminal '<=': Reduce(rule=56)
+	for terminal '==': Reduce(rule=56)
+	for terminal '!=': Reduce(rule=56)
+	for terminal '+': Reduce(rule=56)
+	for terminal '-': Reduce(rule=56)
+	for terminal '*': Reduce(rule=56)
+	for terminal '/': Reduce(rule=56)
+	for terminal '%': Reduce(rule=56)
+	for terminal '^': Reduce(rule=56)
+	for terminal '(': Reduce(rule=56)
+	for terminal ')': Reduce(rule=56)
+	for terminal ';': Reduce(rule=56)
+	for terminal ':=': Reduce(rule=56)
+	for terminal '~': Reduce(rule=56)
+
+State 38
+	55   Const: DECIMAL_INTEGER_CONSTANT .
+
+	for terminal IDENTIFIER: Reduce(rule=55)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=55)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=55)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=55)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=55)
+	for terminal while: Reduce(rule=55)
+	for terminal loop: Reduce(rule=55)
+	for terminal then: Reduce(rule=55)
+	for terminal else: Reduce(rule=55)
+	for terminal '.': Reduce(rule=55)
+	for terminal ',': Reduce(rule=55)
+	for terminal '|': Reduce(rule=55)
+	for terminal '@': Reduce(rule=55)
+	for terminal '&': Reduce(rule=55)
+	for terminal '>': Reduce(rule=55)
+	for terminal '<': Reduce(rule=55)
+	for terminal '>=': Reduce(rule=55)
+	for terminal '<=': Reduce(rule=55)
+	for terminal '==': Reduce(rule=55)
+	for terminal '!=': Reduce(rule=55)
+	for terminal '+': Reduce(rule=55)
+	for terminal '-': Reduce(rule=55)
+	for terminal '*': Reduce(rule=55)
+	for terminal '/': Reduce(rule=55)
+	for terminal '%': Reduce(rule=55)
+	for terminal '^': Reduce(rule=55)
+	for terminal '(': Reduce(rule=55)
+	for terminal ')': Reduce(rule=55)
+	for terminal ';': Reduce(rule=55)
+	for terminal ':=': Reduce(rule=55)
+	for terminal '~': Reduce(rule=55)
+
+State 39
+	57   Const: SYMBOLIC_CONSTANT .
+
+	for terminal IDENTIFIER: Reduce(rule=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=57)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=57)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=57)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=57)
+	for terminal while: Reduce(rule=57)
+	for terminal loop: Reduce(rule=57)
+	for terminal then: Reduce(rule=57)
+	for terminal else: Reduce(rule=57)
+	for terminal '.': Reduce(rule=57)
+	for terminal ',': Reduce(rule=57)
+	for terminal '|': Reduce(rule=57)
+	for terminal '@': Reduce(rule=57)
+	for terminal '&': Reduce(rule=57)
+	for terminal '>': Reduce(rule=57)
+	for terminal '<': Reduce(rule=57)
+	for terminal '>=': Reduce(rule=57)
+	for terminal '<=': Reduce(rule=57)
+	for terminal '==': Reduce(rule=57)
+	for terminal '!=': Reduce(rule=57)
+	for terminal '+': Reduce(rule=57)
+	for terminal '-': Reduce(rule=57)
+	for terminal '*': Reduce(rule=57)
+	for terminal '/': Reduce(rule=57)
+	for terminal '%': Reduce(rule=57)
+	for terminal '^': Reduce(rule=57)
+	for terminal '(': Reduce(rule=57)
+	for terminal ')': Reduce(rule=57)
+	for terminal ';': Reduce(rule=57)
+	for terminal ':=': Reduce(rule=57)
+	for terminal '~': Reduce(rule=57)
+
+State 40
+	47   StringConstant: STRING_SECTION .
+
+	for terminal IDENTIFIER: Reduce(rule=47)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=47)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=47)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=47)
+	for terminal STRING_SECTION: Reduce(rule=47)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=47)
+	for terminal while: Reduce(rule=47)
+	for terminal loop: Reduce(rule=47)
+	for terminal then: Reduce(rule=47)
+	for terminal else: Reduce(rule=47)
+	for terminal '.': Reduce(rule=47)
+	for terminal ',': Reduce(rule=47)
+	for terminal '|': Reduce(rule=47)
+	for terminal '@': Reduce(rule=47)
+	for terminal '&': Reduce(rule=47)
+	for terminal '>': Reduce(rule=47)
+	for terminal '<': Reduce(rule=47)
+	for terminal '>=': Reduce(rule=47)
+	for terminal '<=': Reduce(rule=47)
+	for terminal '==': Reduce(rule=47)
+	for terminal '!=': Reduce(rule=47)
+	for terminal '+': Reduce(rule=47)
+	for terminal '-': Reduce(rule=47)
+	for terminal '*': Reduce(rule=47)
+	for terminal '/': Reduce(rule=47)
+	for terminal '%': Reduce(rule=47)
+	for terminal '^': Reduce(rule=47)
+	for terminal '(': Reduce(rule=47)
+	for terminal ')': Reduce(rule=47)
+	for terminal ';': Reduce(rule=47)
+	for terminal ':=': Reduce(rule=47)
+	for terminal '~': Reduce(rule=47)
+
+State 41
+	58   Const: BOOLEAN_CONSTANT .
+
+	for terminal IDENTIFIER: Reduce(rule=58)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=58)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=58)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=58)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=58)
+	for terminal while: Reduce(rule=58)
+	for terminal loop: Reduce(rule=58)
+	for terminal then: Reduce(rule=58)
+	for terminal else: Reduce(rule=58)
+	for terminal '.': Reduce(rule=58)
+	for terminal ',': Reduce(rule=58)
+	for terminal '|': Reduce(rule=58)
+	for terminal '@': Reduce(rule=58)
+	for terminal '&': Reduce(rule=58)
+	for terminal '>': Reduce(rule=58)
+	for terminal '<': Reduce(rule=58)
+	for terminal '>=': Reduce(rule=58)
+	for terminal '<=': Reduce(rule=58)
+	for terminal '==': Reduce(rule=58)
+	for terminal '!=': Reduce(rule=58)
+	for terminal '+': Reduce(rule=58)
+	for terminal '-': Reduce(rule=58)
+	for terminal '*': Reduce(rule=58)
+	for terminal '/': Reduce(rule=58)
+	for terminal '%': Reduce(rule=58)
+	for terminal '^': Reduce(rule=58)
+	for terminal '(': Reduce(rule=58)
+	for terminal ')': Reduce(rule=58)
+	for terminal ';': Reduce(rule=58)
+	for terminal ':=': Reduce(rule=58)
+	for terminal '~': Reduce(rule=58)
+
+State 42
+	21   Statement: return . Expr
+	22   Statement: return .
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal while: Reduce(rule=22)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal else: Reduce(rule=22)
+	for terminal '.': Reduce(rule=22)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+	for terminal ';': Reduce(rule=22)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 84
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 43
+	20   Statement: loop . Statements while Expr '.'
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 31
+	for non-terminal Statements: go to state 87
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 44
+	82   Power: '-' . Power
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Power: go to state 88
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Type: go to state 85
+
+State 45
+	81   Power: '!' . Power
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Power: go to state 89
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Type: go to state 85
+
+State 46
+	45   BottomExpr: '(' . Expr ')'
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 90
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 47
+	12   FormalParameters: FormalParameter .
+
+	for terminal '=': Reduce(rule=12)
+	for terminal ',': Reduce(rule=12)
+
+State 48
+	6    FunctionHeader: FunctionHeaderTypeName '<-' FormalParameters .
+	11   FormalParameters: FormalParameters . ',' FormalParameter
+
+	for terminal '=': Reduce(rule=6)
+	for terminal ',': Shift(state=91)
+
+State 49
+	27   FormalParameter: Type . IDENTIFIER
+
+	for terminal IDENTIFIER: Shift(state=92)
+
+State 50
+	51   Brackets: Brackets '[]' .
+
+	for terminal IDENTIFIER: Reduce(rule=51)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=51)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=51)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=51)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=51)
+	for terminal '(': Reduce(rule=51)
+	for terminal '[]': Reduce(rule=51)
+
+State 51
+	34   Expr: AndExpr '|' . AndExpr
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 93
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 52
+	35   Expr: AndExpr '@' . AndExpr
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 94
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 53
+	54   ArithmExpr: ArithmExpr AddOp . Term
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 95
+	for non-terminal Type: go to state 85
+
+State 54
+	63   AddOp: '+' .
+
+	for terminal IDENTIFIER: Reduce(rule=63)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=63)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=63)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=63)
+	for terminal STRING_SECTION: Reduce(rule=63)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=63)
+	for terminal bool: Reduce(rule=63)
+	for terminal int: Reduce(rule=63)
+	for terminal char: Reduce(rule=63)
+	for terminal '-': Reduce(rule=63)
+	for terminal '!': Reduce(rule=63)
+	for terminal '(': Reduce(rule=63)
+
+State 55
+	64   AddOp: '-' .
+
+	for terminal IDENTIFIER: Reduce(rule=64)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=64)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=64)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=64)
+	for terminal STRING_SECTION: Reduce(rule=64)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=64)
+	for terminal bool: Reduce(rule=64)
+	for terminal int: Reduce(rule=64)
+	for terminal char: Reduce(rule=64)
+	for terminal '-': Reduce(rule=64)
+	for terminal '!': Reduce(rule=64)
+	for terminal '(': Reduce(rule=64)
+
+State 56
+	31   ArrExpr: ArrExpr BottomExpr .
+
+	for terminal IDENTIFIER: Reduce(rule=31)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=31)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=31)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=31)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=31)
+	for terminal while: Reduce(rule=31)
+	for terminal loop: Reduce(rule=31)
+	for terminal then: Reduce(rule=31)
+	for terminal else: Reduce(rule=31)
+	for terminal '.': Reduce(rule=31)
+	for terminal ',': Reduce(rule=31)
+	for terminal '|': Reduce(rule=31)
+	for terminal '@': Reduce(rule=31)
+	for terminal '&': Reduce(rule=31)
+	for terminal '>': Reduce(rule=31)
+	for terminal '<': Reduce(rule=31)
+	for terminal '>=': Reduce(rule=31)
+	for terminal '<=': Reduce(rule=31)
+	for terminal '==': Reduce(rule=31)
+	for terminal '!=': Reduce(rule=31)
+	for terminal '+': Reduce(rule=31)
+	for terminal '-': Reduce(rule=31)
+	for terminal '*': Reduce(rule=31)
+	for terminal '/': Reduce(rule=31)
+	for terminal '%': Reduce(rule=31)
+	for terminal '^': Reduce(rule=31)
+	for terminal '(': Reduce(rule=31)
+	for terminal ')': Reduce(rule=31)
+	for terminal ';': Reduce(rule=31)
+	for terminal ':=': Reduce(rule=31)
+	for terminal '~': Reduce(rule=31)
+
+State 57
+	43   BottomExpr: IDENTIFIER .
+
+	for terminal IDENTIFIER: Reduce(rule=43)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=43)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=43)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=43)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=43)
+	for terminal while: Reduce(rule=43)
+	for terminal loop: Reduce(rule=43)
+	for terminal then: Reduce(rule=43)
+	for terminal else: Reduce(rule=43)
+	for terminal '.': Reduce(rule=43)
+	for terminal ',': Reduce(rule=43)
+	for terminal '|': Reduce(rule=43)
+	for terminal '@': Reduce(rule=43)
+	for terminal '&': Reduce(rule=43)
+	for terminal '>': Reduce(rule=43)
+	for terminal '<': Reduce(rule=43)
+	for terminal '>=': Reduce(rule=43)
+	for terminal '<=': Reduce(rule=43)
+	for terminal '==': Reduce(rule=43)
+	for terminal '!=': Reduce(rule=43)
+	for terminal '+': Reduce(rule=43)
+	for terminal '-': Reduce(rule=43)
+	for terminal '*': Reduce(rule=43)
+	for terminal '/': Reduce(rule=43)
+	for terminal '%': Reduce(rule=43)
+	for terminal '^': Reduce(rule=43)
+	for terminal '(': Reduce(rule=43)
+	for terminal ')': Reduce(rule=43)
+	for terminal ';': Reduce(rule=43)
+	for terminal ':=': Reduce(rule=43)
+	for terminal '~': Reduce(rule=43)
+
+State 58
+	14   Statement: ArrExpr ':=' . Expr
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 96
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 59
+	49   AndExpr: CmpExpr '&' . CmpExpr
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 97
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 60
+	18   Statement: Expr loop . Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 31
+	for non-terminal Statements: go to state 98
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 61
+	16   Statement: Expr then . Statements '.'
+	17   Statement: Expr then . Statements else Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 31
+	for non-terminal Statements: go to state 99
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 62
+	19   Statement: Expr '~' . Expr loop IDENTIFIER Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 100
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 63
+	60   CmpExpr: FuncCallExpr CmpOp . FuncCallExpr
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 101
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 64
+	67   CmpOp: '>' .
+
+	for terminal IDENTIFIER: Reduce(rule=67)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=67)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=67)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=67)
+	for terminal STRING_SECTION: Reduce(rule=67)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=67)
+	for terminal bool: Reduce(rule=67)
+	for terminal int: Reduce(rule=67)
+	for terminal char: Reduce(rule=67)
+	for terminal '-': Reduce(rule=67)
+	for terminal '!': Reduce(rule=67)
+	for terminal '(': Reduce(rule=67)
+
+State 65
+	68   CmpOp: '<' .
+
+	for terminal IDENTIFIER: Reduce(rule=68)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=68)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=68)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=68)
+	for terminal STRING_SECTION: Reduce(rule=68)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=68)
+	for terminal bool: Reduce(rule=68)
+	for terminal int: Reduce(rule=68)
+	for terminal char: Reduce(rule=68)
+	for terminal '-': Reduce(rule=68)
+	for terminal '!': Reduce(rule=68)
+	for terminal '(': Reduce(rule=68)
+
+State 66
+	69   CmpOp: '>=' .
+
+	for terminal IDENTIFIER: Reduce(rule=69)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=69)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=69)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=69)
+	for terminal STRING_SECTION: Reduce(rule=69)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=69)
+	for terminal bool: Reduce(rule=69)
+	for terminal int: Reduce(rule=69)
+	for terminal char: Reduce(rule=69)
+	for terminal '-': Reduce(rule=69)
+	for terminal '!': Reduce(rule=69)
+	for terminal '(': Reduce(rule=69)
+
+State 67
+	70   CmpOp: '<=' .
+
+	for terminal IDENTIFIER: Reduce(rule=70)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=70)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=70)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=70)
+	for terminal STRING_SECTION: Reduce(rule=70)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=70)
+	for terminal bool: Reduce(rule=70)
+	for terminal int: Reduce(rule=70)
+	for terminal char: Reduce(rule=70)
+	for terminal '-': Reduce(rule=70)
+	for terminal '!': Reduce(rule=70)
+	for terminal '(': Reduce(rule=70)
+
+State 68
+	71   CmpOp: '==' .
+
+	for terminal IDENTIFIER: Reduce(rule=71)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=71)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=71)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=71)
+	for terminal STRING_SECTION: Reduce(rule=71)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=71)
+	for terminal bool: Reduce(rule=71)
+	for terminal int: Reduce(rule=71)
+	for terminal char: Reduce(rule=71)
+	for terminal '-': Reduce(rule=71)
+	for terminal '!': Reduce(rule=71)
+	for terminal '(': Reduce(rule=71)
+
+State 69
+	72   CmpOp: '!=' .
+
+	for terminal IDENTIFIER: Reduce(rule=72)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=72)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=72)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=72)
+	for terminal STRING_SECTION: Reduce(rule=72)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=72)
+	for terminal bool: Reduce(rule=72)
+	for terminal int: Reduce(rule=72)
+	for terminal char: Reduce(rule=72)
+	for terminal '-': Reduce(rule=72)
+	for terminal '!': Reduce(rule=72)
+	for terminal '(': Reduce(rule=72)
+
+State 70
+	74   Factor: Power '^' . Factor
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 102
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Type: go to state 85
+
+State 71
+	4    FunctionDeclaration: FunctionHeader '=' Statements '.' .
+
+	for terminal bool: Reduce(rule=4)
+	for terminal int: Reduce(rule=4)
+	for terminal void: Reduce(rule=4)
+	for terminal char: Reduce(rule=4)
+	for terminal EOF: Reduce(rule=4)
+
+State 72
+	7    Statements: Statements ';' . Statement
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 103
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 73
+	46   StringConstant: StringConstant STRING_SECTION .
+
+	for terminal IDENTIFIER: Reduce(rule=46)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=46)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=46)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=46)
+	for terminal STRING_SECTION: Reduce(rule=46)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=46)
+	for terminal while: Reduce(rule=46)
+	for terminal loop: Reduce(rule=46)
+	for terminal then: Reduce(rule=46)
+	for terminal else: Reduce(rule=46)
+	for terminal '.': Reduce(rule=46)
+	for terminal ',': Reduce(rule=46)
+	for terminal '|': Reduce(rule=46)
+	for terminal '@': Reduce(rule=46)
+	for terminal '&': Reduce(rule=46)
+	for terminal '>': Reduce(rule=46)
+	for terminal '<': Reduce(rule=46)
+	for terminal '>=': Reduce(rule=46)
+	for terminal '<=': Reduce(rule=46)
+	for terminal '==': Reduce(rule=46)
+	for terminal '!=': Reduce(rule=46)
+	for terminal '+': Reduce(rule=46)
+	for terminal '-': Reduce(rule=46)
+	for terminal '*': Reduce(rule=46)
+	for terminal '/': Reduce(rule=46)
+	for terminal '%': Reduce(rule=46)
+	for terminal '^': Reduce(rule=46)
+	for terminal '(': Reduce(rule=46)
+	for terminal ')': Reduce(rule=46)
+	for terminal ';': Reduce(rule=46)
+	for terminal ':=': Reduce(rule=46)
+	for terminal '~': Reduce(rule=46)
+
+State 74
+	62   Term: Term MulOp . Factor
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 104
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Type: go to state 85
+
+State 75
+	75   MulOp: '*' .
+
+	for terminal IDENTIFIER: Reduce(rule=75)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=75)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=75)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=75)
+	for terminal STRING_SECTION: Reduce(rule=75)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=75)
+	for terminal bool: Reduce(rule=75)
+	for terminal int: Reduce(rule=75)
+	for terminal char: Reduce(rule=75)
+	for terminal '-': Reduce(rule=75)
+	for terminal '!': Reduce(rule=75)
+	for terminal '(': Reduce(rule=75)
+
+State 76
+	76   MulOp: '/' .
+
+	for terminal IDENTIFIER: Reduce(rule=76)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=76)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=76)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=76)
+	for terminal STRING_SECTION: Reduce(rule=76)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=76)
+	for terminal bool: Reduce(rule=76)
+	for terminal int: Reduce(rule=76)
+	for terminal char: Reduce(rule=76)
+	for terminal '-': Reduce(rule=76)
+	for terminal '!': Reduce(rule=76)
+	for terminal '(': Reduce(rule=76)
+
+State 77
+	77   MulOp: '%' .
+
+	for terminal IDENTIFIER: Reduce(rule=77)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=77)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=77)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=77)
+	for terminal STRING_SECTION: Reduce(rule=77)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=77)
+	for terminal bool: Reduce(rule=77)
+	for terminal int: Reduce(rule=77)
+	for terminal char: Reduce(rule=77)
+	for terminal '-': Reduce(rule=77)
+	for terminal '!': Reduce(rule=77)
+	for terminal '(': Reduce(rule=77)
+
+State 78
+	83   Power: Type BottomExpr .
+
+	for terminal while: Reduce(rule=83)
+	for terminal loop: Reduce(rule=83)
+	for terminal then: Reduce(rule=83)
+	for terminal else: Reduce(rule=83)
+	for terminal '.': Reduce(rule=83)
+	for terminal ',': Reduce(rule=83)
+	for terminal '|': Reduce(rule=83)
+	for terminal '@': Reduce(rule=83)
+	for terminal '&': Reduce(rule=83)
+	for terminal '>': Reduce(rule=83)
+	for terminal '<': Reduce(rule=83)
+	for terminal '>=': Reduce(rule=83)
+	for terminal '<=': Reduce(rule=83)
+	for terminal '==': Reduce(rule=83)
+	for terminal '!=': Reduce(rule=83)
+	for terminal '+': Reduce(rule=83)
+	for terminal '-': Reduce(rule=83)
+	for terminal '*': Reduce(rule=83)
+	for terminal '/': Reduce(rule=83)
+	for terminal '%': Reduce(rule=83)
+	for terminal '^': Reduce(rule=83)
+	for terminal ')': Reduce(rule=83)
+	for terminal ';': Reduce(rule=83)
+	for terminal '~': Reduce(rule=83)
+
+State 79
+	28   DeclarationAssignments: DeclarationAssignment .
+
+	for terminal while: Reduce(rule=28)
+	for terminal else: Reduce(rule=28)
+	for terminal '.': Reduce(rule=28)
+	for terminal ',': Reduce(rule=28)
+	for terminal ';': Reduce(rule=28)
+
+State 80
+	13   Statement: Type DeclarationAssignments .
+	29   DeclarationAssignments: DeclarationAssignments . ',' DeclarationAssignment
+
+	for terminal while: Reduce(rule=13)
+	for terminal else: Reduce(rule=13)
+	for terminal '.': Reduce(rule=13)
+	for terminal ',': Shift(state=105)
+	for terminal ';': Reduce(rule=13)
+
+State 81
+	41   DeclarationAssignment: IDENTIFIER .
+	42   DeclarationAssignment: IDENTIFIER . ':=' ArithmExpr
+	43   BottomExpr: IDENTIFIER .
+
+	for terminal while: Reduce(rule=41)
+	for terminal loop: Reduce(rule=43)
+	for terminal then: Reduce(rule=43)
+	for terminal else: Reduce(rule=41)
+	for terminal '.': Reduce(rule=41)
+	for terminal ',': Reduce(rule=41)
+	for terminal '|': Reduce(rule=43)
+	for terminal '@': Reduce(rule=43)
+	for terminal '&': Reduce(rule=43)
+	for terminal '>': Reduce(rule=43)
+	for terminal '<': Reduce(rule=43)
+	for terminal '>=': Reduce(rule=43)
+	for terminal '<=': Reduce(rule=43)
+	for terminal '==': Reduce(rule=43)
+	for terminal '!=': Reduce(rule=43)
+	for terminal '+': Reduce(rule=43)
+	for terminal '-': Reduce(rule=43)
+	for terminal '*': Reduce(rule=43)
+	for terminal '/': Reduce(rule=43)
+	for terminal '%': Reduce(rule=43)
+	for terminal '^': Reduce(rule=43)
+	for terminal ';': Reduce(rule=41)
+	for terminal ':=': Shift(state=106)
+	for terminal '~': Reduce(rule=43)
+
+State 82
+	15   Statement: IDENTIFIER '<-' . ActualParameters
+	66   FuncCallExpr: IDENTIFIER '<-' . Args
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ActualParameter: go to state 107
+	for non-terminal ActualParameters: go to state 108
+	for non-terminal Args: go to state 109
+	for non-terminal ArithmExpr: go to state 110
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 83
+	31   ArrExpr: ArrExpr . BottomExpr
+	80   Power: ArrExpr .
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal while: Reduce(rule=80)
+	for terminal loop: Reduce(rule=80)
+	for terminal then: Reduce(rule=80)
+	for terminal else: Reduce(rule=80)
+	for terminal '.': Reduce(rule=80)
+	for terminal ',': Reduce(rule=80)
+	for terminal '|': Reduce(rule=80)
+	for terminal '@': Reduce(rule=80)
+	for terminal '&': Reduce(rule=80)
+	for terminal '>': Reduce(rule=80)
+	for terminal '<': Reduce(rule=80)
+	for terminal '>=': Reduce(rule=80)
+	for terminal '<=': Reduce(rule=80)
+	for terminal '==': Reduce(rule=80)
+	for terminal '!=': Reduce(rule=80)
+	for terminal '+': Reduce(rule=80)
+	for terminal '-': Reduce(rule=80)
+	for terminal '*': Reduce(rule=80)
+	for terminal '/': Reduce(rule=80)
+	for terminal '%': Reduce(rule=80)
+	for terminal '^': Reduce(rule=80)
+	for terminal '(': Shift(state=46)
+	for terminal ')': Reduce(rule=80)
+	for terminal ';': Reduce(rule=80)
+	for terminal '~': Reduce(rule=80)
+
+	for non-terminal BottomExpr: go to state 56
+	for non-terminal Const: go to state 26
+
+State 84
+	21   Statement: return Expr .
+
+	for terminal while: Reduce(rule=21)
+	for terminal else: Reduce(rule=21)
+	for terminal '.': Reduce(rule=21)
+	for terminal ';': Reduce(rule=21)
+
+State 85
+	83   Power: Type . BottomExpr
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal BottomExpr: go to state 78
+	for non-terminal Const: go to state 26
+
+State 86
+	43   BottomExpr: IDENTIFIER .
+	66   FuncCallExpr: IDENTIFIER . '<-' Args
+
+	for terminal IDENTIFIER: Reduce(rule=43)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=43)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=43)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=43)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=43)
+	for terminal while: Reduce(rule=43)
+	for terminal loop: Reduce(rule=43)
+	for terminal then: Reduce(rule=43)
+	for terminal else: Reduce(rule=43)
+	for terminal '.': Reduce(rule=43)
+	for terminal '<-': Shift(state=111)
+	for terminal '|': Reduce(rule=43)
+	for terminal '@': Reduce(rule=43)
+	for terminal '&': Reduce(rule=43)
+	for terminal '>': Reduce(rule=43)
+	for terminal '<': Reduce(rule=43)
+	for terminal '>=': Reduce(rule=43)
+	for terminal '<=': Reduce(rule=43)
+	for terminal '==': Reduce(rule=43)
+	for terminal '!=': Reduce(rule=43)
+	for terminal '+': Reduce(rule=43)
+	for terminal '-': Reduce(rule=43)
+	for terminal '*': Reduce(rule=43)
+	for terminal '/': Reduce(rule=43)
+	for terminal '%': Reduce(rule=43)
+	for terminal '^': Reduce(rule=43)
+	for terminal '(': Reduce(rule=43)
+	for terminal ')': Reduce(rule=43)
+	for terminal ';': Reduce(rule=43)
+	for terminal '~': Reduce(rule=43)
+
+State 87
+	7    Statements: Statements . ';' Statement
+	20   Statement: loop Statements . while Expr '.'
+
+	for terminal while: Shift(state=112)
+	for terminal ';': Shift(state=72)
+
+State 88
+	82   Power: '-' Power .
+
+	for terminal while: Reduce(rule=82)
+	for terminal loop: Reduce(rule=82)
+	for terminal then: Reduce(rule=82)
+	for terminal else: Reduce(rule=82)
+	for terminal '.': Reduce(rule=82)
+	for terminal ',': Reduce(rule=82)
+	for terminal '|': Reduce(rule=82)
+	for terminal '@': Reduce(rule=82)
+	for terminal '&': Reduce(rule=82)
+	for terminal '>': Reduce(rule=82)
+	for terminal '<': Reduce(rule=82)
+	for terminal '>=': Reduce(rule=82)
+	for terminal '<=': Reduce(rule=82)
+	for terminal '==': Reduce(rule=82)
+	for terminal '!=': Reduce(rule=82)
+	for terminal '+': Reduce(rule=82)
+	for terminal '-': Reduce(rule=82)
+	for terminal '*': Reduce(rule=82)
+	for terminal '/': Reduce(rule=82)
+	for terminal '%': Reduce(rule=82)
+	for terminal '^': Reduce(rule=82)
+	for terminal ')': Reduce(rule=82)
+	for terminal ';': Reduce(rule=82)
+	for terminal '~': Reduce(rule=82)
+
+State 89
+	81   Power: '!' Power .
+
+	for terminal while: Reduce(rule=81)
+	for terminal loop: Reduce(rule=81)
+	for terminal then: Reduce(rule=81)
+	for terminal else: Reduce(rule=81)
+	for terminal '.': Reduce(rule=81)
+	for terminal ',': Reduce(rule=81)
+	for terminal '|': Reduce(rule=81)
+	for terminal '@': Reduce(rule=81)
+	for terminal '&': Reduce(rule=81)
+	for terminal '>': Reduce(rule=81)
+	for terminal '<': Reduce(rule=81)
+	for terminal '>=': Reduce(rule=81)
+	for terminal '<=': Reduce(rule=81)
+	for terminal '==': Reduce(rule=81)
+	for terminal '!=': Reduce(rule=81)
+	for terminal '+': Reduce(rule=81)
+	for terminal '-': Reduce(rule=81)
+	for terminal '*': Reduce(rule=81)
+	for terminal '/': Reduce(rule=81)
+	for terminal '%': Reduce(rule=81)
+	for terminal '^': Reduce(rule=81)
+	for terminal ')': Reduce(rule=81)
+	for terminal ';': Reduce(rule=81)
+	for terminal '~': Reduce(rule=81)
+
+State 90
+	45   BottomExpr: '(' Expr . ')'
+
+	for terminal ')': Shift(state=113)
+
+State 91
+	11   FormalParameters: FormalParameters ',' . FormalParameter
+
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+
+	for non-terminal ArrayType: go to state 1
+	for non-terminal FormalParameter: go to state 114
+	for non-terminal Type: go to state 49
+
+State 92
+	27   FormalParameter: Type IDENTIFIER .
+
+	for terminal '=': Reduce(rule=27)
+	for terminal ',': Reduce(rule=27)
+
+State 93
+	34   Expr: AndExpr '|' AndExpr .
+
+	for terminal while: Reduce(rule=34)
+	for terminal loop: Reduce(rule=34)
+	for terminal then: Reduce(rule=34)
+	for terminal else: Reduce(rule=34)
+	for terminal '.': Reduce(rule=34)
+	for terminal ')': Reduce(rule=34)
+	for terminal ';': Reduce(rule=34)
+	for terminal '~': Reduce(rule=34)
+
+State 94
+	35   Expr: AndExpr '@' AndExpr .
+
+	for terminal while: Reduce(rule=35)
+	for terminal loop: Reduce(rule=35)
+	for terminal then: Reduce(rule=35)
+	for terminal else: Reduce(rule=35)
+	for terminal '.': Reduce(rule=35)
+	for terminal ')': Reduce(rule=35)
+	for terminal ';': Reduce(rule=35)
+	for terminal '~': Reduce(rule=35)
+
+State 95
+	54   ArithmExpr: ArithmExpr AddOp Term .
+	62   Term: Term . MulOp Factor
+
+	for terminal while: Reduce(rule=54)
+	for terminal loop: Reduce(rule=54)
+	for terminal then: Reduce(rule=54)
+	for terminal else: Reduce(rule=54)
+	for terminal '.': Reduce(rule=54)
+	for terminal ',': Reduce(rule=54)
+	for terminal '|': Reduce(rule=54)
+	for terminal '@': Reduce(rule=54)
+	for terminal '&': Reduce(rule=54)
+	for terminal '>': Reduce(rule=54)
+	for terminal '<': Reduce(rule=54)
+	for terminal '>=': Reduce(rule=54)
+	for terminal '<=': Reduce(rule=54)
+	for terminal '==': Reduce(rule=54)
+	for terminal '!=': Reduce(rule=54)
+	for terminal '+': Reduce(rule=54)
+	for terminal '-': Reduce(rule=54)
+	for terminal '*': Shift(state=75)
+	for terminal '/': Shift(state=76)
+	for terminal '%': Shift(state=77)
+	for terminal ')': Reduce(rule=54)
+	for terminal ';': Reduce(rule=54)
+	for terminal '~': Reduce(rule=54)
+
+	for non-terminal MulOp: go to state 74
+
+State 96
+	14   Statement: ArrExpr ':=' Expr .
+
+	for terminal while: Reduce(rule=14)
+	for terminal else: Reduce(rule=14)
+	for terminal '.': Reduce(rule=14)
+	for terminal ';': Reduce(rule=14)
+
+State 97
+	49   AndExpr: CmpExpr '&' CmpExpr .
+
+	for terminal while: Reduce(rule=49)
+	for terminal loop: Reduce(rule=49)
+	for terminal then: Reduce(rule=49)
+	for terminal else: Reduce(rule=49)
+	for terminal '.': Reduce(rule=49)
+	for terminal '|': Reduce(rule=49)
+	for terminal '@': Reduce(rule=49)
+	for terminal ')': Reduce(rule=49)
+	for terminal ';': Reduce(rule=49)
+	for terminal '~': Reduce(rule=49)
+
+State 98
+	7    Statements: Statements . ';' Statement
+	18   Statement: Expr loop Statements . '.'
+
+	for terminal '.': Shift(state=115)
+	for terminal ';': Shift(state=72)
+
+State 99
+	7    Statements: Statements . ';' Statement
+	16   Statement: Expr then Statements . '.'
+	17   Statement: Expr then Statements . else Statements '.'
+
+	for terminal else: Shift(state=116)
+	for terminal '.': Shift(state=117)
+	for terminal ';': Shift(state=72)
+
+State 100
+	19   Statement: Expr '~' Expr . loop IDENTIFIER Statements '.'
+
+	for terminal loop: Shift(state=118)
+
+State 101
+	60   CmpExpr: FuncCallExpr CmpOp FuncCallExpr .
+
+	for terminal while: Reduce(rule=60)
+	for terminal loop: Reduce(rule=60)
+	for terminal then: Reduce(rule=60)
+	for terminal else: Reduce(rule=60)
+	for terminal '.': Reduce(rule=60)
+	for terminal '|': Reduce(rule=60)
+	for terminal '@': Reduce(rule=60)
+	for terminal '&': Reduce(rule=60)
+	for terminal ')': Reduce(rule=60)
+	for terminal ';': Reduce(rule=60)
+	for terminal '~': Reduce(rule=60)
+
+State 102
+	74   Factor: Power '^' Factor .
+
+	for terminal while: Reduce(rule=74)
+	for terminal loop: Reduce(rule=74)
+	for terminal then: Reduce(rule=74)
+	for terminal else: Reduce(rule=74)
+	for terminal '.': Reduce(rule=74)
+	for terminal ',': Reduce(rule=74)
+	for terminal '|': Reduce(rule=74)
+	for terminal '@': Reduce(rule=74)
+	for terminal '&': Reduce(rule=74)
+	for terminal '>': Reduce(rule=74)
+	for terminal '<': Reduce(rule=74)
+	for terminal '>=': Reduce(rule=74)
+	for terminal '<=': Reduce(rule=74)
+	for terminal '==': Reduce(rule=74)
+	for terminal '!=': Reduce(rule=74)
+	for terminal '+': Reduce(rule=74)
+	for terminal '-': Reduce(rule=74)
+	for terminal '*': Reduce(rule=74)
+	for terminal '/': Reduce(rule=74)
+	for terminal '%': Reduce(rule=74)
+	for terminal ')': Reduce(rule=74)
+	for terminal ';': Reduce(rule=74)
+	for terminal '~': Reduce(rule=74)
+
+State 103
+	7    Statements: Statements ';' Statement .
+
+	for terminal while: Reduce(rule=7)
+	for terminal else: Reduce(rule=7)
+	for terminal '.': Reduce(rule=7)
+	for terminal ';': Reduce(rule=7)
+
+State 104
+	62   Term: Term MulOp Factor .
+
+	for terminal while: Reduce(rule=62)
+	for terminal loop: Reduce(rule=62)
+	for terminal then: Reduce(rule=62)
+	for terminal else: Reduce(rule=62)
+	for terminal '.': Reduce(rule=62)
+	for terminal ',': Reduce(rule=62)
+	for terminal '|': Reduce(rule=62)
+	for terminal '@': Reduce(rule=62)
+	for terminal '&': Reduce(rule=62)
+	for terminal '>': Reduce(rule=62)
+	for terminal '<': Reduce(rule=62)
+	for terminal '>=': Reduce(rule=62)
+	for terminal '<=': Reduce(rule=62)
+	for terminal '==': Reduce(rule=62)
+	for terminal '!=': Reduce(rule=62)
+	for terminal '+': Reduce(rule=62)
+	for terminal '-': Reduce(rule=62)
+	for terminal '*': Reduce(rule=62)
+	for terminal '/': Reduce(rule=62)
+	for terminal '%': Reduce(rule=62)
+	for terminal ')': Reduce(rule=62)
+	for terminal ';': Reduce(rule=62)
+	for terminal '~': Reduce(rule=62)
+
+State 105
+	29   DeclarationAssignments: DeclarationAssignments ',' . DeclarationAssignment
+
+	for terminal IDENTIFIER: Shift(state=120)
+
+	for non-terminal DeclarationAssignment: go to state 119
+
+State 106
+	42   DeclarationAssignment: IDENTIFIER ':=' . ArithmExpr
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArithmExpr: go to state 121
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 107
+	36   ActualParameters: ActualParameter .
+
+	for terminal while: Reduce(rule=36)
+	for terminal else: Reduce(rule=36)
+	for terminal '.': Reduce(rule=36)
+	for terminal ',': Reduce(rule=36)
+	for terminal ';': Reduce(rule=36)
+
+State 108
+	15   Statement: IDENTIFIER '<-' ActualParameters .
+	37   ActualParameters: ActualParameters . ',' ActualParameter
+
+	for terminal while: Reduce(rule=15)
+	for terminal else: Reduce(rule=15)
+	for terminal '.': Reduce(rule=15)
+	for terminal ',': Shift(state=122)
+	for terminal ';': Reduce(rule=15)
+
+State 109
+	66   FuncCallExpr: IDENTIFIER '<-' Args .
+	79   Args: Args . ',' ArithmExpr
+
+	for terminal while: Reduce(rule=66)
+	for terminal loop: Reduce(rule=66)
+	for terminal then: Reduce(rule=66)
+	for terminal else: Reduce(rule=66)
+	for terminal '.': Reduce(rule=66)
+	for terminal ',': Shift(state=123)
+	for terminal '|': Reduce(rule=66)
+	for terminal '@': Reduce(rule=66)
+	for terminal '&': Reduce(rule=66)
+	for terminal '>': Reduce(rule=66)
+	for terminal '<': Reduce(rule=66)
+	for terminal '>=': Reduce(rule=66)
+	for terminal '<=': Reduce(rule=66)
+	for terminal '==': Reduce(rule=66)
+	for terminal '!=': Reduce(rule=66)
+	for terminal ')': Reduce(rule=66)
+	for terminal ';': Reduce(rule=66)
+	for terminal '~': Reduce(rule=66)
+
+State 110
+	50   ActualParameter: ArithmExpr .
+	54   ArithmExpr: ArithmExpr . AddOp Term
+	78   Args: ArithmExpr .
+
+	for terminal while: Reduce(rule=50)
+	for terminal loop: Reduce(rule=78)
+	for terminal then: Reduce(rule=78)
+	for terminal else: Reduce(rule=50)
+	for terminal '.': Reduce(rule=50)
+	for terminal ',': Reduce(rule=50), Reduce(rule=78)
+	for terminal '|': Reduce(rule=78)
+	for terminal '@': Reduce(rule=78)
+	for terminal '&': Reduce(rule=78)
+	for terminal '>': Reduce(rule=78)
+	for terminal '<': Reduce(rule=78)
+	for terminal '>=': Reduce(rule=78)
+	for terminal '<=': Reduce(rule=78)
+	for terminal '==': Reduce(rule=78)
+	for terminal '!=': Reduce(rule=78)
+	for terminal '+': Shift(state=54)
+	for terminal '-': Shift(state=55)
+	for terminal ';': Reduce(rule=50)
+	for terminal '~': Reduce(rule=78)
+
+	for non-terminal AddOp: go to state 53
+
+State 111
+	66   FuncCallExpr: IDENTIFIER '<-' . Args
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal Args: go to state 109
+	for non-terminal ArithmExpr: go to state 124
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 112
+	20   Statement: loop Statements while . Expr '.'
+
+	for terminal IDENTIFIER: Shift(state=86)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 125
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 113
+	45   BottomExpr: '(' Expr ')' .
+
+	for terminal IDENTIFIER: Reduce(rule=45)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Reduce(rule=45)
+	for terminal DECIMAL_INTEGER_CONSTANT: Reduce(rule=45)
+	for terminal SYMBOLIC_CONSTANT: Reduce(rule=45)
+	for terminal BOOLEAN_CONSTANT: Reduce(rule=45)
+	for terminal while: Reduce(rule=45)
+	for terminal loop: Reduce(rule=45)
+	for terminal then: Reduce(rule=45)
+	for terminal else: Reduce(rule=45)
+	for terminal '.': Reduce(rule=45)
+	for terminal ',': Reduce(rule=45)
+	for terminal '|': Reduce(rule=45)
+	for terminal '@': Reduce(rule=45)
+	for terminal '&': Reduce(rule=45)
+	for terminal '>': Reduce(rule=45)
+	for terminal '<': Reduce(rule=45)
+	for terminal '>=': Reduce(rule=45)
+	for terminal '<=': Reduce(rule=45)
+	for terminal '==': Reduce(rule=45)
+	for terminal '!=': Reduce(rule=45)
+	for terminal '+': Reduce(rule=45)
+	for terminal '-': Reduce(rule=45)
+	for terminal '*': Reduce(rule=45)
+	for terminal '/': Reduce(rule=45)
+	for terminal '%': Reduce(rule=45)
+	for terminal '^': Reduce(rule=45)
+	for terminal '(': Reduce(rule=45)
+	for terminal ')': Reduce(rule=45)
+	for terminal ';': Reduce(rule=45)
+	for terminal ':=': Reduce(rule=45)
+	for terminal '~': Reduce(rule=45)
+
+State 114
+	11   FormalParameters: FormalParameters ',' FormalParameter .
+
+	for terminal '=': Reduce(rule=11)
+	for terminal ',': Reduce(rule=11)
+
+State 115
+	18   Statement: Expr loop Statements '.' .
+
+	for terminal while: Reduce(rule=18)
+	for terminal else: Reduce(rule=18)
+	for terminal '.': Reduce(rule=18)
+	for terminal ';': Reduce(rule=18)
+
+State 116
+	17   Statement: Expr then Statements else . Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 31
+	for non-terminal Statements: go to state 126
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 117
+	16   Statement: Expr then Statements '.' .
+
+	for terminal while: Reduce(rule=16)
+	for terminal else: Reduce(rule=16)
+	for terminal '.': Reduce(rule=16)
+	for terminal ';': Reduce(rule=16)
+
+State 118
+	19   Statement: Expr '~' Expr loop . IDENTIFIER Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=127)
+
+State 119
+	29   DeclarationAssignments: DeclarationAssignments ',' DeclarationAssignment .
+
+	for terminal while: Reduce(rule=29)
+	for terminal else: Reduce(rule=29)
+	for terminal '.': Reduce(rule=29)
+	for terminal ',': Reduce(rule=29)
+	for terminal ';': Reduce(rule=29)
+
+State 120
+	41   DeclarationAssignment: IDENTIFIER .
+	42   DeclarationAssignment: IDENTIFIER . ':=' ArithmExpr
+
+	for terminal while: Reduce(rule=41)
+	for terminal else: Reduce(rule=41)
+	for terminal '.': Reduce(rule=41)
+	for terminal ',': Reduce(rule=41)
+	for terminal ';': Reduce(rule=41)
+	for terminal ':=': Shift(state=106)
+
+State 121
+	42   DeclarationAssignment: IDENTIFIER ':=' ArithmExpr .
+	54   ArithmExpr: ArithmExpr . AddOp Term
+
+	for terminal while: Reduce(rule=42)
+	for terminal else: Reduce(rule=42)
+	for terminal '.': Reduce(rule=42)
+	for terminal ',': Reduce(rule=42)
+	for terminal '+': Shift(state=54)
+	for terminal '-': Shift(state=55)
+	for terminal ';': Reduce(rule=42)
+
+	for non-terminal AddOp: go to state 53
+
+State 122
+	37   ActualParameters: ActualParameters ',' . ActualParameter
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ActualParameter: go to state 128
+	for non-terminal ArithmExpr: go to state 129
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 123
+	79   Args: Args ',' . ArithmExpr
+
+	for terminal IDENTIFIER: Shift(state=57)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal char: Shift(state=11)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal ArithmExpr: go to state 130
+	for non-terminal ArrExpr: go to state 83
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal Const: go to state 26
+	for non-terminal Factor: go to state 28
+	for non-terminal Power: go to state 30
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 85
+
+State 124
+	54   ArithmExpr: ArithmExpr . AddOp Term
+	78   Args: ArithmExpr .
+
+	for terminal while: Reduce(rule=78)
+	for terminal loop: Reduce(rule=78)
+	for terminal then: Reduce(rule=78)
+	for terminal else: Reduce(rule=78)
+	for terminal '.': Reduce(rule=78)
+	for terminal ',': Reduce(rule=78)
+	for terminal '|': Reduce(rule=78)
+	for terminal '@': Reduce(rule=78)
+	for terminal '&': Reduce(rule=78)
+	for terminal '>': Reduce(rule=78)
+	for terminal '<': Reduce(rule=78)
+	for terminal '>=': Reduce(rule=78)
+	for terminal '<=': Reduce(rule=78)
+	for terminal '==': Reduce(rule=78)
+	for terminal '!=': Reduce(rule=78)
+	for terminal '+': Shift(state=54)
+	for terminal '-': Shift(state=55)
+	for terminal ')': Reduce(rule=78)
+	for terminal ';': Reduce(rule=78)
+	for terminal '~': Reduce(rule=78)
+
+	for non-terminal AddOp: go to state 53
+
+State 125
+	20   Statement: loop Statements while Expr . '.'
+
+	for terminal '.': Shift(state=131)
+
+State 126
+	7    Statements: Statements . ';' Statement
+	17   Statement: Expr then Statements else Statements . '.'
+
+	for terminal '.': Shift(state=132)
+	for terminal ';': Shift(state=72)
+
+State 127
+	19   Statement: Expr '~' Expr loop IDENTIFIER . Statements '.'
+
+	for terminal IDENTIFIER: Shift(state=36)
+	for terminal NON_DECIMAL_INTEGER_CONSTANT: Shift(state=37)
+	for terminal DECIMAL_INTEGER_CONSTANT: Shift(state=38)
+	for terminal SYMBOLIC_CONSTANT: Shift(state=39)
+	for terminal STRING_SECTION: Shift(state=40)
+	for terminal BOOLEAN_CONSTANT: Shift(state=41)
+	for terminal bool: Shift(state=8)
+	for terminal int: Shift(state=9)
+	for terminal return: Shift(state=42)
+	for terminal char: Shift(state=11)
+	for terminal loop: Shift(state=43)
+	for terminal '-': Shift(state=44)
+	for terminal '!': Shift(state=45)
+	for terminal '(': Shift(state=46)
+
+	for non-terminal AndExpr: go to state 21
+	for non-terminal ArithmExpr: go to state 22
+	for non-terminal ArrExpr: go to state 23
+	for non-terminal ArrayType: go to state 1
+	for non-terminal BottomExpr: go to state 24
+	for non-terminal CmpExpr: go to state 25
+	for non-terminal Const: go to state 26
+	for non-terminal Expr: go to state 27
+	for non-terminal Factor: go to state 28
+	for non-terminal FuncCallExpr: go to state 29
+	for non-terminal Power: go to state 30
+	for non-terminal Statement: go to state 31
+	for non-terminal Statements: go to state 133
+	for non-terminal StringConstant: go to state 33
+	for non-terminal Term: go to state 34
+	for non-terminal Type: go to state 35
+
+State 128
+	37   ActualParameters: ActualParameters ',' ActualParameter .
+
+	for terminal while: Reduce(rule=37)
+	for terminal else: Reduce(rule=37)
+	for terminal '.': Reduce(rule=37)
+	for terminal ',': Reduce(rule=37)
+	for terminal ';': Reduce(rule=37)
+
+State 129
+	50   ActualParameter: ArithmExpr .
+	54   ArithmExpr: ArithmExpr . AddOp Term
+
+	for terminal while: Reduce(rule=50)
+	for terminal else: Reduce(rule=50)
+	for terminal '.': Reduce(rule=50)
+	for terminal ',': Reduce(rule=50)
+	for terminal '+': Shift(state=54)
+	for terminal '-': Shift(state=55)
+	for terminal ';': Reduce(rule=50)
+
+	for non-terminal AddOp: go to state 53
+
+State 130
+	54   ArithmExpr: ArithmExpr . AddOp Term
+	79   Args: Args ',' ArithmExpr .
+
+	for terminal while: Reduce(rule=79)
+	for terminal loop: Reduce(rule=79)
+	for terminal then: Reduce(rule=79)
+	for terminal else: Reduce(rule=79)
+	for terminal '.': Reduce(rule=79)
+	for terminal ',': Reduce(rule=79)
+	for terminal '|': Reduce(rule=79)
+	for terminal '@': Reduce(rule=79)
+	for terminal '&': Reduce(rule=79)
+	for terminal '>': Reduce(rule=79)
+	for terminal '<': Reduce(rule=79)
+	for terminal '>=': Reduce(rule=79)
+	for terminal '<=': Reduce(rule=79)
+	for terminal '==': Reduce(rule=79)
+	for terminal '!=': Reduce(rule=79)
+	for terminal '+': Shift(state=54)
+	for terminal '-': Shift(state=55)
+	for terminal ')': Reduce(rule=79)
+	for terminal ';': Reduce(rule=79)
+	for terminal '~': Reduce(rule=79)
+
+	for non-terminal AddOp: go to state 53
+
+State 131
+	20   Statement: loop Statements while Expr '.' .
+
+	for terminal while: Reduce(rule=20)
+	for terminal else: Reduce(rule=20)
+	for terminal '.': Reduce(rule=20)
+	for terminal ';': Reduce(rule=20)
+
+State 132
+	17   Statement: Expr then Statements else Statements '.' .
+
+	for terminal while: Reduce(rule=17)
+	for terminal else: Reduce(rule=17)
+	for terminal '.': Reduce(rule=17)
+	for terminal ';': Reduce(rule=17)
+
+State 133
+	7    Statements: Statements . ';' Statement
+	19   Statement: Expr '~' Expr loop IDENTIFIER Statements . '.'
+
+	for terminal '.': Shift(state=134)
+	for terminal ';': Shift(state=72)
+
+State 134
+	19   Statement: Expr '~' Expr loop IDENTIFIER Statements '.' .
+
+	for terminal while: Reduce(rule=19)
+	for terminal else: Reduce(rule=19)
+	for terminal '.': Reduce(rule=19)
+	for terminal ';': Reduce(rule=19)
+
+Traceback (most recent call last):
+  File "C:\Users\Golum\Desktop\iu9-education\compiler-design\module_2\lab_2_2_karanik\main.py", line 278, in <module>
+    assert parser.is_lalr_one()
+AssertionError
+
+Process finished with exit code 1
