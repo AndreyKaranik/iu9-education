@@ -13,12 +13,6 @@ class PrimType(enum.Enum):
     Char = 'CHAR'
     Bool = 'BOOL'
 
-# class PrimitiveType(enum.Enum):
-#     Int = 'INT'
-#     Char = 'CHAR'
-#     Bool = 'BOOL'
-
-
 @dataclass
 class Type:
     base: PrimType
@@ -207,7 +201,7 @@ NPower |= '!', NPower, lambda p: UnOpExpr('!', p)
 NPower |= '-', NPower, lambda p: UnOpExpr('-', p)
 NArrExpr |= NBottomExpr
 NArrExpr |= NArrExpr, NBottomExpr, lambda x, y: BinOpExpr(x, 'at', y)
-NArrExpr |= NStringConstant
+NArrExpr |= NStringConstant, lambda v: ConstExpr(v, Type(PrimType.Char, 1))
 NPower |= NType, NBottomExpr, lambda x, y: BinOpExpr(x, 'alloc', y)
 NBottomExpr |= IDENTIFIER, VariableExpr
 NBottomExpr |= NConst
@@ -218,11 +212,11 @@ NBottomExpr |= '(', NExpr, ')'
 NStringConstant |= NStringConstant, STRING_SECTION
 NStringConstant |= STRING_SECTION
 
-NConst |= DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type.Int)
-NConst |= NON_DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type.Int)
-NConst |= SYMBOLIC_CONSTANT, lambda v: ConstExpr(v, Type.Char)
+NConst |= DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Int, 0))
+NConst |= NON_DECIMAL_INTEGER_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Int, 0))
+NConst |= SYMBOLIC_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Char, 0))
 # NConst |= NStringConstant, lambda v: ConstExpr(v, Type.Array)
-NConst |= BOOLEAN_CONSTANT, lambda v: ConstExpr(v, Type.Bool)
+NConst |= BOOLEAN_CONSTANT, lambda v: ConstExpr(v, Type(PrimType.Bool, 0))
 
 NStatements |= NStatements, ';', NStatement, lambda sts, st: sts + [st]
 NStatements |= NStatement, lambda st: [st]
@@ -264,21 +258,21 @@ NStatement |= KW_RETURN, NExpr, ReturnStatement
 NStatement |= KW_RETURN, lambda: ReturnStatement(None)
 
 #Тип
-NType |= KW_INT, lambda: Type.Int
-NType |= KW_CHAR, lambda: Type.Char
-NType |= KW_BOOL, lambda: Type.Bool
-NType |= NArrayType, lambda: Type.Array
+NType |= KW_INT, lambda: Type(PrimType.Int, 0)
+NType |= KW_CHAR, lambda: Type(PrimType.Char, 0)
+NType |= KW_BOOL, lambda: Type(PrimType.Bool, 0)
+NType |= NArrayType
 #Ссылочный тип
-NArrayType |= KW_INT, NBrackets
-NArrayType |= KW_CHAR, NBrackets
-NArrayType |= KW_BOOL, NBrackets
-NBrackets |= NBrackets, '[]'
-NBrackets |= '[]'
+NArrayType |= KW_INT, NBrackets, lambda n: Type(PrimType.Int, n)
+NArrayType |= KW_CHAR, NBrackets, lambda n: Type(PrimType.Char, n)
+NArrayType |= KW_BOOL, NBrackets, lambda n: Type(PrimType.Bool, n)
+NBrackets |= NBrackets, '[]', lambda n: n + 1
+NBrackets |= '[]', lambda: 1
 
 
 # Парсер
 parser = pe.Parser(NProgram)
-parser.print_table()
+# parser.print_table()
 assert parser.is_lalr_one()
 
 parser.add_skipped_domain('\\s')
