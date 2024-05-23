@@ -1,0 +1,8 @@
+psql -U postgres
+
+\i 'C:/Users/Golum/Desktop/iu9-education/course-work-2024/server/init.sql'
+
+
+
+java -jar ChargingStationsServer-1.0.jar
+
