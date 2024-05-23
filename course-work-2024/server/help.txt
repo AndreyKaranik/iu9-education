@@ -1,0 +1,38 @@
+1. curl -X GET 127.0.0.1:8080/users
+2. curl -X POST 127.0.0.1:8080/users
+
+
+
+3. curl -X GET 127.0.0.1:8080/charging-stations
+Response-Code: 200
+Response-Body:
+[
+    {
+        "id": 0,
+        "name": "blue",
+        "address": "Moscow",
+        "description_id": 0
+    }
+]
+
+4. curl -X GET 127.0.0.1:8080/charging-stations/{id}/description
+
+//curl -X POST -H "Authorization: Basic {token}" 127.0.0.1:8080/charge
+
+5. curl -X POST 127.0.0.1:8080/charge
+6. curl -X GET 127.0.0.1:8080/orders/{id}/charging-information
+
+
+
+
+windows:
+psql -U postgres
+
+linux:
+sudo -i -u postgres
+
+\i 'C:/Users/Golum/Desktop/iu9-education/course-work-2024/server/init.sql'
+
+java -jar ChargingStationsServer-1.0.jar
+
+

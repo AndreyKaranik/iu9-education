@@ -1,28 +1,42 @@
 \c postgres
 
 DROP DATABASE IF EXISTS charging_stations_database;
-CREATE DATABASE charging_stations_database WITH ENCODING 'UTF8';
+
+CREATE DATABASE charging_stations_database
+    WITH
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.UTF-8' --'Russian_Russia.1251'
+    LC_CTYPE = 'en_US.UTF-8' --'Russian_Russia.1251'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    TEMPLATE template0;
 
 \c charging_stations_database
 
-
 CREATE TABLE companies (
-    company_id SERIAL PRIMARY KEY,
-    company_name VARCHAR(32) NOT NULL,
-    company_address VARCHAR(256) NOT NULL
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(32) NOT NULL,
+    address VARCHAR(256) NOT NULL
 );
 
 CREATE TABLE charging_stations (
-    charging_station_id SERIAL PRIMARY KEY,
-    charging_station_name VARCHAR(32) NOT NULL,
-    charging_station_address VARCHAR(256) NOT NULL,
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(32) NOT NULL,
+    address VARCHAR(256) NOT NULL,
     company_id INT NOT NULL,
-    FOREIGN KEY (company_id) REFERENCES companies(company_id),
-    charging_station_opening_hours VARCHAR(5) NOT NULL,
-    charging_station_description VARCHAR(512) NULL
+    FOREIGN KEY (id) REFERENCES companies(id),
+    opening_hours VARCHAR(5) NOT NULL,
+    description VARCHAR(512)
 );
 
-INSERT INTO companies (company_name, company_address)
-VALUES ('Zavod-Z', 'улица Z'),
+
+INSERT INTO companies (name, address)
+VALUES ('Завод-X', 'Moscow city'),
         ('Zavod-Y', 'город Москва');
+
+INSERT INTO charging_stations (name, address, company_id, opening_hours, description)
+VALUES ('BrusilovStation', 'город Москва, улица Брусилова', 1, '8-22', 'The best station'),
+        ('RokossovskyStation', 'Moscow city, улица', 1, '0-24', NULL);
 
