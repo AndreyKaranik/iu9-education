@@ -5,7 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.ApiService
 import com.example.chargingstations.model.ChargingStation
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.awaitResponse
@@ -24,16 +27,17 @@ class MainActivityViewModel : ViewModel() {
     private val apiService = retrofit.create(ApiService::class.java)
 
     init {
-        fetchUsers()
+        fetchChargingStations()
     }
 
-    private fun fetchUsers() {
+    private fun fetchChargingStations() {
         viewModelScope.launch {
             try {
                 val response = apiService.getChargingStations().awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _chargingStations.value = it
+                        updateSearchQuery("")
                     }
                 } else {
                     Log.e("E", "error")
@@ -43,5 +47,24 @@ class MainActivityViewModel : ViewModel() {
                 Log.e("E", "exception")
             }
         }
+    }
+
+    private val _searchQuery = MutableStateFlow(" ")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    val filteredChargingStations: StateFlow<List<ChargingStation>> = _searchQuery
+        .map { query ->
+            if (query.isBlank()) {
+                _chargingStations.value
+            } else {
+                _chargingStations.value.filter { chargingStation ->
+                    chargingStation.name.contains(query, ignoreCase = true) || chargingStation.address.contains(query, ignoreCase = true)
+                }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, _chargingStations.value)
+
+    fun updateSearchQuery(newQuery: String) {
+        _searchQuery.value = newQuery
     }
 }
