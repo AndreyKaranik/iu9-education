@@ -1,9 +1,9 @@
-1. curl -X GET 127.0.0.1:8080/users
-2. curl -X POST 127.0.0.1:8080/users
+1. curl -X GET 127.0.0.1:8000/users
+2. curl -X POST 127.0.0.1:8000/users
 
 
 
-3. curl -X GET 127.0.0.1:8080/charging-stations
+3. curl -X GET 127.0.0.1:8000/charging-stations
 Response-Code: 200
 Response-Body:
 [
@@ -15,12 +15,12 @@ Response-Body:
     }
 ]
 
-4. curl -X GET 127.0.0.1:8080/charging-stations/{id}/description
+4. curl -X GET 127.0.0.1:8000/charging-stations/{id}/description
 
 //curl -X POST -H "Authorization: Basic {token}" 127.0.0.1:8080/charge
 
-5. curl -X POST 127.0.0.1:8080/charge
-6. curl -X GET 127.0.0.1:8080/orders/{id}/charging-information
+5. curl -X POST 127.0.0.1:8000/charge
+6. curl -X GET 127.0.0.1:8000/orders/{id}/charging-information
 
 
 
@@ -38,5 +38,7 @@ java -jar ChargingStationsServer-1.0.jar
 sudo mv /root/init.sql /var/lib/postgresql/
 
 sudo chmod 644 /var/lib/postgresql/init.sql
+
+curl -X GET 89.111.172.144:8000/charging-stations -v
 
 

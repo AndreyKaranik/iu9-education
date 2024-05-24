@@ -17,7 +17,7 @@ class MainActivityViewModel : ViewModel() {
     val chargingStations: StateFlow<List<ChargingStation>> = _chargingStations
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("https://89.111.172.144:8000/")
+        .baseUrl("http://89.111.172.144:8000/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
