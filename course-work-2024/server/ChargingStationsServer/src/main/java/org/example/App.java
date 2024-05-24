@@ -71,7 +71,6 @@ public class App {
                             object.put("opening_hours", hours);
                             object.put("description", description);
                             array.put(object);
-                            System.out.println(address);
                         }
                         String response = array.toString();
                         ArrayList<String> list = new ArrayList<>();

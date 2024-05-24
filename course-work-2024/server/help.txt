@@ -35,4 +35,8 @@ sudo -i -u postgres
 
 java -jar ChargingStationsServer-1.0.jar
 
+sudo mv /root/init.sql /var/lib/postgresql/
+
+sudo chmod 644 /var/lib/postgresql/init.sql
+
 
