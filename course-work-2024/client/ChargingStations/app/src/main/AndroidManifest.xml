@@ -18,6 +18,11 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:theme="@style/Theme.ChargingStations">
+        </activity>
+        <activity
+            android:name=".SplashScreenActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ChargingStations">
             <intent-filter>

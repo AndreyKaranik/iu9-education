@@ -1,5 +1,6 @@
 package com.example.chargingstations.viewmodel
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.ApiService
@@ -19,6 +20,12 @@ class MainActivityViewModel : ViewModel() {
     private val _chargingStations = MutableStateFlow<List<ChargingStation>>(emptyList())
     val chargingStations: StateFlow<List<ChargingStation>> = _chargingStations
 
+    private val _loading = MutableStateFlow(false)
+    val loading: StateFlow<Boolean> = _loading
+
+    private val _searchQuery = MutableStateFlow(" ")
+    val searchQuery: StateFlow<String> = _searchQuery
+
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://89.111.172.144:8000/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -27,6 +34,7 @@ class MainActivityViewModel : ViewModel() {
     private val apiService = retrofit.create(ApiService::class.java)
 
     init {
+        _loading.value = true
         fetchChargingStations()
     }
 
@@ -46,11 +54,9 @@ class MainActivityViewModel : ViewModel() {
                 e.printStackTrace()
                 Log.e("E", "exception")
             }
+            _loading.value = false
         }
     }
-
-    private val _searchQuery = MutableStateFlow(" ")
-    val searchQuery: StateFlow<String> = _searchQuery
 
     val filteredChargingStations: StateFlow<List<ChargingStation>> = _searchQuery
         .map { query ->

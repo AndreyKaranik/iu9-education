@@ -27,7 +27,7 @@ CREATE TABLE charging_stations (
     address VARCHAR(256) NOT NULL,
     company_id INT NOT NULL,
     FOREIGN KEY (company_id) REFERENCES companies(id),
-    opening_hours VARCHAR(5) NOT NULL,
+    opening_hours VARCHAR(10) NOT NULL,
     description VARCHAR(512)
 );
 

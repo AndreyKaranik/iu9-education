@@ -41,4 +41,10 @@ sudo chmod 644 /var/lib/postgresql/init.sql
 
 curl -X GET 89.111.172.144:8000/charging-stations -v
 
+ssh root@89.111.172.144
+
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" root@89.111.172.144:/root
+
+
+
 

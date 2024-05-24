@@ -4,7 +4,7 @@ data class ChargingStation (
     val id: Int,
     val name: String,
     val address: String,
-    val companyId: Int,
-    val openingHours: String,
+    val company_id: Int,
+    val opening_hours: String,
     val description: String?
 )
