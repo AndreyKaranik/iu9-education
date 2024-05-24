@@ -67,4 +67,8 @@ class MainActivityViewModel : ViewModel() {
     fun updateSearchQuery(newQuery: String) {
         _searchQuery.value = newQuery
     }
+
+    fun getChargingStation(chargingStationId: Int) : ChargingStation? {
+        return chargingStations.value.find { it.id == chargingStationId }
+    }
 }
