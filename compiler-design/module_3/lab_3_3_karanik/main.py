@@ -136,13 +136,13 @@ class DeclarationStatement(Statement):
                 raise RepeatedVariable(coord, var)
             else:
                 if expr is not None:
-                    coord.check(vars)
+                    expr.check(vars)
                     if self.type == expr.type:
                         vars[var] = expr.type
                     else:
                         raise BinBadType(coord, self.type, ':=', expr.type)
                 else:
-                    vars[var] = expr.type
+                    vars[var] = None
 
 
 
@@ -182,6 +182,8 @@ class IfStatement(Statement):
     then_branch: list[Statement]
     else_branch: list[Statement]
     def check(self, vars):
+        self.condition.check(vars)
+        
         pass
 
 
@@ -208,6 +210,12 @@ class PostWhileStatement(Statement):
     condition: Expr
     def check(self, vars):
         pass
+
+
+def check_statement_list(body: list[Statement], vars_):
+    vars_ = dict(vars_)
+    for stmt in body:
+        stmt.check(vars_)
 
 
 @dataclass
@@ -290,7 +298,7 @@ class BinOpExpr(Expr):
                 raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
         elif self.op in ('^', '*', '/', '%'):
             if self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Int, 0):
-                self.type = Type(PrimType.Bool, 0)
+                self.type = Type(PrimType.Int, 0)
             else:
                 raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
         elif self.op == '+':
@@ -346,7 +354,7 @@ class UnOpExpr(Expr):
         return action
     def check(self, vars):
         self.expr.check(vars)
-        if self.op == '-' and self.expr.type != Type(PrimType.Int, 0):
+        if self.op == '-' and self.expr.type not in (Type(PrimType.Int, 0), Type(PrimType.Char, 0)):
             raise UnBadType(self.op_coord, self.op, self.expr.type)
         if self.op == '!' and self.expr.type != Type(PrimType.Bool, 0):
             raise UnBadType(self.op_coord, self.op, self.expr.type)
@@ -521,7 +529,7 @@ NStatement |= NType, NDeclarationAssignments, DeclarationStatement
 NDeclarationAssignments |= NDeclarationAssignment, lambda vr: [vr]
 NDeclarationAssignments |= NDeclarationAssignments, ',', NDeclarationAssignment, lambda vrs, vr: vrs + [vr]
 NDeclarationAssignment |= IDENTIFIER, pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], None))
-NDeclarationAssignment |= IDENTIFIER, ':=', NArithmExpr, lambda name, ex: (name, ex)
+NDeclarationAssignment |= IDENTIFIER, ':=', NArithmExpr, pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], attrs[1]))
 
 # int {a} := ({f} <- {x}, {y})
 
@@ -576,5 +584,3 @@ for filename in sys.argv[1:]:
             pprint(tree)
     except pe.Error as e:
         print(f'Ошибка {e.pos}: {e.message}')
-    except Exception as e:
-        print('Исключение', e)
