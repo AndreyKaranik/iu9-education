@@ -1,5 +1,6 @@
 int {f} <- int {a} =
-return {a}.
+int {b}, {c} := ((4 * 10) > 0);
+return {param}.
 
 int {Main} <- char[][] {args} =
-return {a}.
+return 2 + 2.

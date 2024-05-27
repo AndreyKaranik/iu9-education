@@ -79,7 +79,6 @@ class UnBadType(SemanticError):
     def message(self):
         return f'Несовместимый тип: {self.op} {self.type}'
 
-
 class NotBoolCond(SemanticError):
     def __init__(self, pos, type_):
         self.pos = pos
@@ -117,22 +116,64 @@ class Type:
 
 
 class Expr(abc.ABC):
-    pass
+    @abc.abstractmethod
+    def check(self, vars):
+        pass
 
 @dataclass
 class Statement(abc.ABC):
-    pass
+    @abc.abstractmethod
+    def check(self, vars):
+        pass
 
 @dataclass
 class DeclarationStatement(Statement):
     type: Type
-    variables: list[(str, Expr | None)]
+    variables: list[(str, pe.Position, Expr | None)]
+    # @pe.ExAction
+    # def create(attrs, coords, res_coord):
+    #     var, expr = attrs
+    #     cvar, cass, cexpr = coords
+    #     return DeclarationStatement(var, cass.start, expr)
+    def check(self, vars):
+        for var, coord, expr in self.variables:
+            if var in vars:
+                raise RepeatedVariable(pe.Position(0, 1, 1), var[0])
+            else:
+                if expr is not None:
+                    var[1].check(vars)
+                    if self.type == var[1].type:
+                        vars[var[0]] = var[1]
+                    else:
+                        raise BinBadType(pe.Position(0, 1, 1), self.type, ':=', var[1].type)
+                else:
+                    vars[var[0]] = var[1]
+
 
 
 @dataclass
 class AssignmentStatement(Statement):
     leftExpr: Expr
+    var_coord: pe.Position
     rightExpr: Expr
+
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        var, expr = attrs
+        cvar, cass, cexpr = coords
+        return AssignmentStatement(var, cass.start, expr)
+
+    def check(self, vars):
+        if self.variable not in vars:
+            raise UnknownVar(self.variable, self.var_coord)
+
+        self.rightExpr.check(vars)
+        if vars[self.variable] == self.expr.type:
+            return
+        if vars[self.variable] == Type.Real and self.expr.type == Type.Integer:
+            return
+
+        raise BinBadType(self.var_coord, vars[self.variable], ':=', self.expr.type)
 
 
 @dataclass
@@ -140,18 +181,25 @@ class InvocationStatement(Statement):
     function: str
     actualParameters: list[Expr]
 
+    def check(self, vars):
+        pass
+
 
 @dataclass
 class IfStatement(Statement):
     condition: Expr
     then_branch: list[Statement]
     else_branch: list[Statement]
+    def check(self, vars):
+        pass
 
 
 @dataclass
 class PreWhileStatement(Statement):
     condition: Expr
     body: list[Statement]
+    def check(self, vars):
+        pass
 
 @dataclass
 class ForStatement(Statement):
@@ -159,29 +207,49 @@ class ForStatement(Statement):
     end: Expr
     variable: str
     body: list[Statement]
+    def check(self, vars):
+        pass
 
 
 @dataclass
 class PostWhileStatement(Statement):
     body: list[Statement]
     condition: Expr
+    def check(self, vars):
+        pass
 
 
 @dataclass
 class ReturnStatement(Statement):
     expr: Expr | None
+    def check(self, vars):
+        pass
 
 @dataclass
 class VariableExpr(Expr):
     varname: str
+    var_coord: pe.Position
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        varname, = attrs
+        cvarname, = coords
+        return VariableExpr(varname, cvarname)
+
+    def check(self, vars):
+        try:
+            self.type = vars[self.varname]
+        except KeyError:
+            raise UnknownVar(self.var_coord, self.varname)
 
 @dataclass
 class ConstExpr(Expr):
     value: typing.Any
     type: Type
+    def check(self, vars):
+        pass
 
 @dataclass
-class FunctionInvocationExpr(Statement):
+class FunctionInvocationExpr(Expr):
     function: str
     actualParameters: list[Expr]
 
@@ -189,13 +257,62 @@ class FunctionInvocationExpr(Statement):
 class BinOpExpr(Expr):
     left: Expr
     op: str
+    op_coord: pe.Position
     right: Expr
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        left, op, right = attrs
+        cleft, cop, cright = coords
+        return BinOpExpr(left, op, cop.start, right)
+    def check(self, vars):
+        self.left.check(vars)
+        self.right.check(vars)
+
+        common_type = None
+        is_numeric = lambda t: (t == Type(PrimType.Int, 0))
+
+        if self.left.type == self.right.type:
+            common_type = self.left.type
+
+        self.type = None
+        if self.op in ('<', '>', '<=', '>=', '=', '<>'):
+            if common_type != None:
+                self.type = Type(PrimType.Bool, 0)
+        elif self.op in ('$', '|'):
+            if common_type == Type(PrimType.Bool, 0):
+                self.type = Type(PrimType.Bool, 0)
+        elif self.op in ('/', '%'):
+            if common_type == Type(PrimType.Int, 0):
+                self.type = Type(PrimType.Int, 0)
+        elif self.op in ('+', '-', '*', '**'):
+            if is_numeric(common_type):
+                self.type = common_type
+
+        if self.type == None:
+            raise BinBadType(self.op_coord, self.left.type,
+                             self.op, self.right.type)
 
 
 @dataclass
 class UnOpExpr(Expr):
     op: str
+    op_coord: pe.Position
     expr: Expr
+    @staticmethod
+    def create(op):
+        @pe.ExAction
+        def action(attrs, coords, res_coords):
+            expr, = attrs
+            cop, cexpr = coords
+            return UnOpExpr(op, cop.start, expr)
+        return action
+    def check(self, vars):
+        self.expr.check(vars)
+        if self.op == '-' and self.expr.type != Type(PrimType.Int, 0):
+            raise UnBadType(self.op_coord, self.op, self.expr.type)
+        if self.op == '!' and self.expr.type != Type(PrimType.Bool, 0):
+            raise UnBadType(self.op_coord, self.op, self.expr.type)
+        self.type = self.expr.type
 
 @dataclass
 class FunctionHeader:
@@ -216,6 +333,16 @@ class FunctionDeclaration:
     header: FunctionHeader
     body: list[Statement]
 
+    def check(self):
+        vars = {}
+        for p in self.header.formalParameters:
+            vars[p[1]] = p[0]
+
+        for statement in self.body:
+            statement.check(vars)
+
+        print(vars)
+
 @dataclass
 class Program:
     functionDeclarations: list[FunctionDeclaration]
@@ -232,7 +359,7 @@ class Program:
                 functionDeclarationNames[functionDeclaration.header.name] = functionDeclaration.header.type
 
         if mainFunction:
-            if mainFunction.header.type.base != PrimType.Int or mainFunction.header.type.array_level != 0:
+            if mainFunction.header.type.base != Type(PrimType.Int, 0):
                 raise MainFunctionIncorrect(mainFunction.header.type_coord)
             else:
                 if len(mainFunction.header.formalParameters) == 1:
@@ -243,6 +370,8 @@ class Program:
         else:
             raise MainFunctionNotFound(pe.Position(0, 1, 1))
 
+        for functionDeclaration in self.functionDeclarations:
+            functionDeclaration.check()
 
 
 ESCAPE_SEQUENCES_REGEX = '%BEL%|%BS%|%TAB%|%LF%|%VT%|%FF%|%CR%|%\"%|%%'
@@ -294,15 +423,14 @@ NFormalParameters |= NFormalParameter, lambda fp: [fp]
 NFormalParameter |= NType, IDENTIFIER, lambda t, n: (t, n)
 
 NExpr |= NAndExpr
-NExpr |= NAndExpr, '|', NAndExpr, lambda x, y: BinOpExpr(x, '|', y)
-NExpr |= NAndExpr, '@', NAndExpr, lambda x, y: BinOpExpr(x, '@', y)
+NExpr |= NAndExpr, '|', NAndExpr, BinOpExpr.create  # lambda x, y: BinOpExpr(x, '|', y)
+NExpr |= NAndExpr, '@', NAndExpr, BinOpExpr.create  # lambda x, y: BinOpExpr(x, '@', y)
 NAndExpr |= NCmpExpr
-NAndExpr |= NCmpExpr, '&', NCmpExpr, lambda x, y: BinOpExpr(x, '&', y)
+NAndExpr |= NCmpExpr, '&', NCmpExpr, BinOpExpr.create   # lambda x, y: BinOpExpr(x, '&', y)
 NCmpExpr |= NFuncCallExpr
-NCmpExpr |= NFuncCallExpr, NCmpOp, NFuncCallExpr, BinOpExpr
+NCmpExpr |= NFuncCallExpr, NCmpOp, NFuncCallExpr, BinOpExpr.create  # BinOpExpr
 def make_op_lambda(op):
     return lambda: op
-
 for op in ('>', '<', '>=', '<=', '==', '!='):
     NCmpOp |= op, make_op_lambda(op)
 
@@ -316,24 +444,24 @@ NArgs |= NArgs, ',', NArithmExpr, lambda exs, ex: exs + [ex]
 # ({f} <- {a}) + ({g} <- {b}, {c})
 
 NArithmExpr |= NTerm
-NArithmExpr |= NArithmExpr, NAddOp, NTerm, BinOpExpr
+NArithmExpr |= NArithmExpr, NAddOp, NTerm, BinOpExpr.create  # BinOpExpr
 NAddOp |= '+', lambda: '+'
 NAddOp |= '-', lambda: '-'
 NTerm |= NFactor
-NTerm |= NTerm, NMulOp, NFactor, BinOpExpr
+NTerm |= NTerm, NMulOp, NFactor, BinOpExpr.create  # BinOpExpr
 NMulOp |= '*', lambda: '*'
 NMulOp |= '/', lambda: '/'
 NMulOp |= '%', lambda: '%'
 NFactor |= NPower
-NFactor |= NPower, '^', NFactor, lambda p, f: BinOpExpr(p, '^', f)
+NFactor |= NPower, '^', NFactor, BinOpExpr.create  # lambda p, f: BinOpExpr(p, '^', f)
 NPower |= NArrExpr
-NPower |= '!', NPower, lambda p: UnOpExpr('!', p)
-NPower |= '-', NPower, lambda p: UnOpExpr('-', p)
+NPower |= '!', NPower, UnOpExpr.create('!')  # lambda p: UnOpExpr('!', p)
+NPower |= '-', NPower, UnOpExpr.create('-')  # lambda p: UnOpExpr('-', p)
 NArrExpr |= NBottomExpr
-NArrExpr |= NArrExpr, NBottomExpr, lambda x, y: BinOpExpr(x, 'at', y)
+NArrExpr |= NArrExpr, NBottomExpr, BinOpExpr.create  # lambda x, y: BinOpExpr(x, 'at', y)
 NArrExpr |= NStringConstant, lambda v: ConstExpr(v, Type(PrimType.Char, 1))
-NPower |= NType, NBottomExpr, lambda x, y: BinOpExpr(x, 'alloc', y)
-NBottomExpr |= IDENTIFIER, VariableExpr
+NPower |= NType, NBottomExpr,  BinOpExpr.create  # lambda x, y: BinOpExpr(x, 'alloc', y)
+NBottomExpr |= IDENTIFIER, VariableExpr.create  # VariableExpr
 NBottomExpr |= NConst
 NBottomExpr |= '(', NExpr, ')'
 
@@ -354,7 +482,7 @@ NStatements |= NStatement, lambda st: [st]
 NStatement |= NType, NDeclarationAssignments, DeclarationStatement
 NDeclarationAssignments |= NDeclarationAssignment, lambda vr: [vr]
 NDeclarationAssignments |= NDeclarationAssignments, ',', NDeclarationAssignment, lambda vrs, vr: vrs + [vr]
-NDeclarationAssignment |= IDENTIFIER, lambda name: (name, None)
+NDeclarationAssignment |= IDENTIFIER, pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], None))
 NDeclarationAssignment |= IDENTIFIER, ':=', NArithmExpr, lambda name, ex: (name, ex)
 
 # int {a} := ({f} <- {x}, {y})
@@ -362,14 +490,10 @@ NDeclarationAssignment |= IDENTIFIER, ':=', NArithmExpr, lambda name, ex: (name,
 # int {a} 5 := 7
 
 #Оператор присваивания
-NStatement |= NArrExpr, ':=', NExpr, AssignmentStatement
+NStatement |= NArrExpr, ':=', NExpr, AssignmentStatement.create  # AssignmentStatement
 
 #Оператор вызова функции
 NStatement |= IDENTIFIER, '<-', NArgs, InvocationStatement
-# NActualParameters |= NActualParameter, lambda ap: [ap]
-# NActualParameters |= NActualParameters, ',', NActualParameter, lambda aps, ap: aps + [ap]
-# NActualParameter |= NArithmExpr
-
 #Оператор выбора
 NStatement |= NExpr, KW_THEN, NStatements, '.', lambda cond, sts: IfStatement(cond, [sts], [])
 NStatement |= NExpr, KW_THEN, NStatements, KW_ELSE, NStatements, '.', IfStatement
