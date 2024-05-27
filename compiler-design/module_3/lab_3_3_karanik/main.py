@@ -130,24 +130,19 @@ class Statement(abc.ABC):
 class DeclarationStatement(Statement):
     type: Type
     variables: list[(str, pe.Position, Expr | None)]
-    # @pe.ExAction
-    # def create(attrs, coords, res_coord):
-    #     var, expr = attrs
-    #     cvar, cass, cexpr = coords
-    #     return DeclarationStatement(var, cass.start, expr)
     def check(self, vars):
         for var, coord, expr in self.variables:
             if var in vars:
-                raise RepeatedVariable(pe.Position(0, 1, 1), var[0])
+                raise RepeatedVariable(coord, var)
             else:
                 if expr is not None:
-                    var[1].check(vars)
-                    if self.type == var[1].type:
-                        vars[var[0]] = var[1]
+                    coord.check(vars)
+                    if self.type == expr.type:
+                        vars[var] = expr.type
                     else:
-                        raise BinBadType(pe.Position(0, 1, 1), self.type, ':=', var[1].type)
+                        raise BinBadType(coord, self.type, ':=', expr.type)
                 else:
-                    vars[var[0]] = var[1]
+                    vars[var] = expr.type
 
 
 
@@ -164,16 +159,12 @@ class AssignmentStatement(Statement):
         return AssignmentStatement(var, cass.start, expr)
 
     def check(self, vars):
-        if self.variable not in vars:
-            raise UnknownVar(self.variable, self.var_coord)
-
+        self.leftExpr.check(vars)
         self.rightExpr.check(vars)
-        if vars[self.variable] == self.expr.type:
+        if self.leftExpr.type == Type(PrimType.Int, 0) and self.rightExpr.type in (Type(PrimType.Int, 0), Type(PrimType.Char, 0)):
             return
-        if vars[self.variable] == Type.Real and self.expr.type == Type.Integer:
-            return
-
-        raise BinBadType(self.var_coord, vars[self.variable], ':=', self.expr.type)
+        elif self.leftExpr.type != self.rightExpr.type:
+            raise BinBadType(self.var_coord, self.leftExpr.type, ':=', self.rightExpr.type)
 
 
 @dataclass
@@ -268,25 +259,72 @@ class BinOpExpr(Expr):
         self.left.check(vars)
         self.right.check(vars)
 
-        common_type = None
-        is_numeric = lambda t: (t == Type(PrimType.Int, 0))
-
-        if self.left.type == self.right.type:
-            common_type = self.left.type
-
         self.type = None
-        if self.op in ('<', '>', '<=', '>=', '=', '<>'):
-            if common_type != None:
+        if self.op in ('<', '>', '<=', '>='):
+            if self.left.type.array_level == 0 and self.right.type.array_level == 0:
+                if self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Char, 0) or \
+                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Char, 0):
+                    self.type = Type(PrimType.Bool, 0)
+                else:
+                    raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+            else:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+        elif self.op in ('==', '!='):
+            if self.left.type.array_level == 0 and self.right.type.array_level == 0:
+                if self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Char, 0) or \
+                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Char, 0) or \
+                        self.left.type == Type(PrimType.Bool, 0) == self.right.type == Type(PrimType.Bool, 0):
+                    self.type = Type(PrimType.Bool, 0)
+                else:
+                    raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+            elif self.left.type.array_level != self.right.type.array_level:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+        elif self.op in ('&', '|', '@'):
+            if self.left.type == Type(PrimType.Bool, 0) == self.right.type == Type(PrimType.Bool, 0):
                 self.type = Type(PrimType.Bool, 0)
-        elif self.op in ('$', '|'):
-            if common_type == Type(PrimType.Bool, 0):
+            else:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+        elif self.op in ('^', '*', '/', '%'):
+            if self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Int, 0):
                 self.type = Type(PrimType.Bool, 0)
-        elif self.op in ('/', '%'):
-            if common_type == Type(PrimType.Int, 0):
-                self.type = Type(PrimType.Int, 0)
-        elif self.op in ('+', '-', '*', '**'):
-            if is_numeric(common_type):
-                self.type = common_type
+            else:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+        elif self.op == '+':
+            if self.left.type.array_level == 0 and self.right.type.array_level == 0:
+                if self.left.type.base == PrimType.Int and self.right.type.base == PrimType.Int:
+                    self.type = Type(PrimType.Int, 0)
+                elif self.left.type.base == PrimType.Int and self.right.type.base == PrimType.Char:
+                    self.type = Type(PrimType.Char, 0)
+                elif self.left.type.base == PrimType.Char and self.right.type.base == PrimType.Int:
+                    self.type = Type(PrimType.Char, 0)
+                else:
+                    raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+            else:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+        elif self.op == '-':
+            if self.left.type.array_level == 0 and self.right.type.array_level == 0:
+                if self.left.type.base == PrimType.Int and self.right.type.base == PrimType.Int:
+                    self.type = Type(PrimType.Int, 0)
+                elif self.left.type.base == PrimType.Char and self.right.type.base == PrimType.Char:
+                    self.type = Type(PrimType.Int, 0)
+                elif self.left.type.base == PrimType.Char and self.right.type.base == PrimType.Int:
+                    self.type = Type(PrimType.Char, 0)
+                else:
+                    raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+            else:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+        elif self.op == 'at':
+            if self.left.type.array_level > 0 and self.right.type.array_level == 0:
+                if self.right.type.base == PrimType.Int or self.right.type.base == PrimType.Char:
+                    self.type = Type(self.left.type.base, 0)
+                else:
+                    raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
+            else:
+                raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
 
         if self.type == None:
             raise BinBadType(self.op_coord, self.left.type,
@@ -359,7 +397,7 @@ class Program:
                 functionDeclarationNames[functionDeclaration.header.name] = functionDeclaration.header.type
 
         if mainFunction:
-            if mainFunction.header.type.base != Type(PrimType.Int, 0):
+            if mainFunction.header.type != Type(PrimType.Int, 0):
                 raise MainFunctionIncorrect(mainFunction.header.type_coord)
             else:
                 if len(mainFunction.header.formalParameters) == 1:
