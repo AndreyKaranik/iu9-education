@@ -1,5 +1,12 @@
 int {f} <- int {a} =
-int {b}, {c} := ((4 * 10) > 0);
+int {b}, {c} := 10;
+{c} > 5 then
+    {c} := 0
+else
+    int {d} := 0;
+    {d} := 5.;
+
+{d} := 5;
 return {param}.
 
 int {Main} <- char[][] {args} =

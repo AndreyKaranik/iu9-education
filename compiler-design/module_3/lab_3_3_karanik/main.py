@@ -171,7 +171,6 @@ class AssignmentStatement(Statement):
 class InvocationStatement(Statement):
     function: str
     actualParameters: list[Expr]
-
     def check(self, vars):
         pass
 
@@ -179,37 +178,88 @@ class InvocationStatement(Statement):
 @dataclass
 class IfStatement(Statement):
     condition: Expr
+    cond_coord: pe.Fragment
     then_branch: list[Statement]
     else_branch: list[Statement]
+
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        cond, then_branch, else_branch = attrs
+        ccond, cthen, cbody, celse, cbody2, cdot = coords
+        return IfStatement(cond, ccond, then_branch, else_branch)
     def check(self, vars):
         self.condition.check(vars)
-        
-        pass
+        if self.condition.type == Type(PrimType.Bool, 0):
+            check_statement_list(self.then_branch, vars)
+            check_statement_list(self.else_branch, vars)
+        else:
+            raise NotBoolCond(self.cond_coord, self.condition.type)
+
 
 
 @dataclass
 class PreWhileStatement(Statement):
     condition: Expr
+    cond_coord: pe.Fragment
     body: list[Statement]
+
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        cond, body = attrs
+        ccond, cloop, cbody, cdot = coords
+        return PreWhileStatement(cond, ccond, body)
+
     def check(self, vars):
-        pass
+        self.condition.check(vars)
+        if self.condition.type == Type(PrimType.Bool, 0):
+            check_statement_list(self.body, vars)
+        else:
+            raise NotBoolCond(self.cond_coord, self.condition.type)
 
 @dataclass
 class ForStatement(Statement):
     start: Expr
+    start_coord: pe.Fragment
     end: Expr
     variable: str
+    end_coord: pe.Fragment
     body: list[Statement]
+
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        varname, start, end, body = attrs
+        cfor_kw, cvar, cass, cstart, cto_kw, cend, cdo_kw, cbody = coords
+        return ForStatement(varname, cvar.start, start, cstart, end, cend, body)
+
     def check(self, vars):
-        pass
+        if self.variable not in vars:
+            raise UnknownVar(self.variable, self.var_coord)
+        NotIntFor.check(vars[self.variable], self.var_coord)
+        self.start.check(vars)
+        NotIntFor.check(self.start.type, self.start_coord)
+        self.end.check(vars)
+        NotIntFor.check(self.end.type, self.end_coord)
+        self.body.check(vars)
 
 
 @dataclass
 class PostWhileStatement(Statement):
     body: list[Statement]
+    cond_coord: pe.Fragment
     condition: Expr
+
+    @pe.ExAction
+    def create(attrs, coords, res_coord):
+        cond, body = attrs
+        cloop, cbody, cwhile, ccond, cdot = coords
+        return PostWhileStatement(cond, ccond, body)
+
     def check(self, vars):
-        pass
+        self.condition.check(vars)
+        if self.condition.type == Type(PrimType.Bool, 0):
+            check_statement_list(self.body, vars)
+        else:
+            raise NotBoolCond(self.cond_coord, self.condition.type)
 
 
 def check_statement_list(body: list[Statement], vars_):
@@ -542,15 +592,15 @@ NStatement |= NArrExpr, ':=', NExpr, AssignmentStatement.create  # AssignmentSta
 NStatement |= IDENTIFIER, '<-', NArgs, InvocationStatement
 #Оператор выбора
 NStatement |= NExpr, KW_THEN, NStatements, '.', lambda cond, sts: IfStatement(cond, [sts], [])
-NStatement |= NExpr, KW_THEN, NStatements, KW_ELSE, NStatements, '.', IfStatement
+NStatement |= NExpr, KW_THEN, NStatements, KW_ELSE, NStatements, '.', IfStatement.create  # IfStatement
 
 #Оператор цикла с предусловием
-NStatement |= NExpr, KW_LOOP, NStatements, '.', PreWhileStatement
+NStatement |= NExpr, KW_LOOP, NStatements, '.', PreWhileStatement.create  # PreWhileStatement
 #Второй вариант
 NStatement |= NExpr, '~', NExpr, KW_LOOP, IDENTIFIER, NStatements, '.', ForStatement
 
 #Оператор цикла с постусловием
-NStatement |= KW_LOOP, NStatements, KW_WHILE, NExpr, '.', PostWhileStatement
+NStatement |= KW_LOOP, NStatements, KW_WHILE, NExpr, '.', PostWhileStatement.create  # PostWhileStatement
 
 # #Оператор завершения функции
 NStatement |= KW_RETURN, NExpr, ReturnStatement
