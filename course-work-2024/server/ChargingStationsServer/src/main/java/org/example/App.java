@@ -6,7 +6,9 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -21,14 +23,28 @@ public class App {
     private static final String USER = "postgres";
     private static final String PASSWORD = "postgres";
 
-    private final static boolean IS_LOCAL = false;
-
     public static void main(String[] args) throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress(IS_LOCAL ? "localhost" : "0.0.0.0",8000), 0); // new InetSocketAddress("localhost",8080)
+        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0",8000), 0); // new InetSocketAddress("localhost",8080)
         server.createContext("/", new MyHandler());
         server.setExecutor(null);
         server.start();
         System.out.println("The server has started successfully.");
+    }
+
+    private static Map<String, String> parseQueryParams(String query) {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query != null && !query.isEmpty()) {
+            String[] pairs = query.split("&");
+            for (String pair : pairs) {
+                String[] keyValue = pair.split("=");
+                if (keyValue.length > 1) {
+                    queryParams.put(keyValue[0], keyValue[1]);
+                } else {
+                    queryParams.put(keyValue[0], "");
+                }
+            }
+        }
+        return queryParams;
     }
 
     static class MyHandler implements HttpHandler {
@@ -41,6 +57,17 @@ public class App {
             System.out.println(new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
 
             if (httpExchange.getRequestMethod().equals("GET")) {
+                Map<String, String> queryParams = parseQueryParams(httpExchange.getRequestURI().getQuery());
+                System.out.println("Query Parameters:");
+                for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+                    System.out.println(entry.getKey() + " = " + entry.getValue());
+                }
+                if (queryParams.containsKey("lang")) {
+                    System.out.println("HERE: " + queryParams.get("lang"));
+                }
+                // /charging-stations?lang=ru&simplify=true - example
+                // .getRequestURI().getPath() -> "/charging-stations"
+                // .getRequestURI().getQuery() -> "lang=ru&simplify=true"
                 if (httpExchange.getRequestURI().toString().equals("/charging-stations")) {
                     Connection conn = null;
                     Statement stmt = null;

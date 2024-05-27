@@ -20,7 +20,7 @@ Response-Body:
 //curl -X POST -H "Authorization: Basic {token}" 127.0.0.1:8080/charge
 
 5. curl -X POST 127.0.0.1:8000/charge
-6. curl -X GET 127.0.0.1:8000/orders/{id}/charging-information
+6. curl -X GET "127.0.0.1:8000/orders/{id}/charging-information"
 
 
 
@@ -39,7 +39,7 @@ sudo mv /root/init.sql /var/lib/postgresql/
 
 sudo chmod 644 /var/lib/postgresql/init.sql
 
-curl -X GET 89.111.172.144:8000/charging-stations -v
+curl -X GET "89.111.172.144:8000/charging-stations" -v
 
 ssh root@89.111.172.144
 

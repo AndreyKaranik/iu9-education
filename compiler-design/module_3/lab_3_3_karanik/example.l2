@@ -1,0 +1,5 @@
+int {f} <- int {a} =
+return {a}.
+
+int {Main} <- char[][] {args} =
+return {a}.
