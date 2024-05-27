@@ -6,7 +6,10 @@ else
     int {d} := 0;
     {d} := 5.;
 
-{d} := 5;
+int {i} := 0;
+1 ~ 10 loop {i}
+    {a} := 10.;
+
 return {param}.
 
 int {Main} <- char[][] {args} =

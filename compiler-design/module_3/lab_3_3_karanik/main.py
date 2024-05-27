@@ -100,7 +100,7 @@ class NotIntFor(SemanticError):
 
     @staticmethod
     def check(type_, pos):
-        if type_ != Type.Integer:
+        if type_ not in (Type(PrimType.Int, 0), Type(PrimType.Char, 0)):
             raise NotIntFor(pos, type_)
 
 
@@ -222,24 +222,23 @@ class ForStatement(Statement):
     start_coord: pe.Fragment
     end: Expr
     variable: str
+    var_coord: pe.Position
     end_coord: pe.Fragment
     body: list[Statement]
 
     @pe.ExAction
     def create(attrs, coords, res_coord):
-        varname, start, end, body = attrs
-        cfor_kw, cvar, cass, cstart, cto_kw, cend, cdo_kw, cbody = coords
-        return ForStatement(varname, cvar.start, start, cstart, end, cend, body)
+        start, end, varname, body = attrs
+        cstart, ctilde, cend, cloop, cvar, cbody, cdot = coords
+        return ForStatement(start, cstart, end, cend, varname, cvar.start, body)
 
     def check(self, vars):
-        if self.variable not in vars:
-            raise UnknownVar(self.variable, self.var_coord)
-        NotIntFor.check(vars[self.variable], self.var_coord)
         self.start.check(vars)
         NotIntFor.check(self.start.type, self.start_coord)
         self.end.check(vars)
         NotIntFor.check(self.end.type, self.end_coord)
-        self.body.check(vars)
+        check_statement_list(self.body, vars)
+
 
 
 @dataclass
@@ -437,8 +436,6 @@ class FunctionDeclaration:
         for statement in self.body:
             statement.check(vars)
 
-        print(vars)
-
 @dataclass
 class Program:
     functionDeclarations: list[FunctionDeclaration]
@@ -597,7 +594,7 @@ NStatement |= NExpr, KW_THEN, NStatements, KW_ELSE, NStatements, '.', IfStatemen
 #Оператор цикла с предусловием
 NStatement |= NExpr, KW_LOOP, NStatements, '.', PreWhileStatement.create  # PreWhileStatement
 #Второй вариант
-NStatement |= NExpr, '~', NExpr, KW_LOOP, IDENTIFIER, NStatements, '.', ForStatement
+NStatement |= NExpr, '~', NExpr, KW_LOOP, IDENTIFIER, NStatements, '.', ForStatement.create  # ForStatement
 
 #Оператор цикла с постусловием
 NStatement |= KW_LOOP, NStatements, KW_WHILE, NExpr, '.', PostWhileStatement.create  # PostWhileStatement
