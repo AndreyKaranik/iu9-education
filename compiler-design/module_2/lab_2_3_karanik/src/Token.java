@@ -2,10 +2,12 @@ public class Token {
 
     private String value;
     private DomainTag tag;
+    private String terminalTag;
 
-    public Token(String value, DomainTag tag) {
+    public Token(String value, DomainTag tag, String terminalTag) {
         this.value = value;
         this.tag = tag;
+        this.terminalTag = terminalTag;
     }
 
     public String getValue() {
@@ -14,5 +16,9 @@ public class Token {
 
     public DomainTag getTag() {
         return tag;
+    }
+
+    public String getTerminalTag() {
+        return terminalTag;
     }
 }

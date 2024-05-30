@@ -16,7 +16,7 @@ class Scanner {
 
     public Token nextToken() {
         if (pos >= input.length()) {
-            return new Token("$", DomainTag.END);
+            return new Token("$", DomainTag.END, "$");
         }
 
         Matcher matcher = PATTERN.matcher(input);
@@ -26,29 +26,29 @@ class Scanner {
             return determineToken(token);
         }
 
-        return new Token("", DomainTag.NONE);
+        return new Token("", DomainTag.NONE, "");
     }
 
     private Token determineToken(String token) {
         if (token.matches("\"[^\"]*\"")) {
-            return new Token(token, DomainTag.TERMINAL);
+            return new Token(token, DomainTag.TERMINAL, "terminal");
         } else if (token.matches("[^\\s\\[\\]:,@\"{}]+(?:[\\s,]|$)")) {
-            return new Token(token, DomainTag.NONTERMINAL);
+            return new Token(token, DomainTag.NONTERMINAL, "nonterminal");
         } else if (token.matches("\\{[A-Z]+\\}")) {
-            return new Token(token, DomainTag.START_SYMBOL);
+            return new Token(token, DomainTag.START_SYMBOL, "start");
         } else if (token.equals("[")) {
-            return new Token(token, DomainTag.LEFT_BRACKET);
+            return new Token(token, DomainTag.LEFT_BRACKET, "[");
         } else if (token.equals("]")) {
-            return new Token(token, DomainTag.RIGHT_BRACKET);
+            return new Token(token, DomainTag.RIGHT_BRACKET, "]");
         } else if (token.equals(":")) {
-            return new Token(token, DomainTag.COLON);
+            return new Token(token, DomainTag.COLON, ":");
         } else if (token.equals("@")) {
-            return new Token(token, DomainTag.EMPTY_STRING);
+            return new Token(token, DomainTag.EMPTY_STRING, "@");
         } else if (token.equals(",")) {
-            return new Token(token, DomainTag.COMMA);
+            return new Token(token, DomainTag.COMMA, ",");
         } else if (token.trim().isEmpty()) {
             return nextToken();
         }
-        return new Token(token, DomainTag.NONE);
+        return new Token(token, DomainTag.NONE, "");
     }
 }

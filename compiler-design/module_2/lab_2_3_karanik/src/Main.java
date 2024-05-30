@@ -160,10 +160,46 @@ public class Main {
                 "    [ T' : \"*\" F T' : @ ]\n" +
                 "    [ F  : \"n\" : \"(\" E \")\" ]");
 
-        Token token;
-        while ((token = scanner.nextToken()).getTag() != DomainTag.END) {
-            System.out.println(token.getValue() + " " + token.getTag());
-        }
+//        Token token;
+//        while ((token = scanner.nextToken()).getTag() != DomainTag.END) {
+//            System.out.println(token.getValue() + " " + token.getTag());
+//        }
 
+        TopDownParse(scanner, table);
+
+    }
+
+    static void TopDownParse(Scanner scanner, Table table) {
+        List<Rule> result = new ArrayList<>();
+        Stack<Symbol> stack = new Stack<>();
+        stack.push(new Symbol(DomainTag.END, "$", false));
+        stack.push(new Symbol(DomainTag.NONE, "Grammar", true));
+        Token a = scanner.nextToken();
+        do {
+            Symbol x = stack.peek();
+            if (!x.isNonterminal()) {
+                if (x.getTag() == a.getTag()) {
+                    stack.pop();
+                    a = scanner.nextToken();
+                } else {
+                    throw new RuntimeException("ERROR1");
+                }
+            } else if (table.get(x.getValue(), a.getTerminalTag()) != null) {
+                stack.pop();
+                Rule rule = (Rule) table.get(x.getValue(), a.getTerminalTag());
+                for (int i = rule.getRight().size() - 1; i >= 0; i--) {
+                    if (!rule.getRight().get(i).getValue().equals("eps")) {
+                        stack.push(rule.getRight().get(i));
+                    }
+                }
+                result.add(rule);
+            } else {
+                throw new RuntimeException("ERROR2");
+            }
+        } while (a.getTag() != DomainTag.END);
+
+        for (Rule rule : result) {
+            System.out.println(rule);
+        }
     }
 }

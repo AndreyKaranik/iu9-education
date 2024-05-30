@@ -22,6 +22,17 @@ public class Table<R, C, V> {
         data.add(newRow);
     }
 
+    public V get(R rowHeader, C colHeader) {
+        int rowIndex = rowHeaders.indexOf(rowHeader);
+        int colIndex = columnHeaders.indexOf(colHeader);
+
+        if (rowIndex == -1 || colIndex == -1) {
+            throw new IllegalArgumentException("Invalid row or column header.");
+        }
+
+        return data.get(rowIndex).get(colIndex);
+    }
+
     public void setValue(R rowHeader, C colHeader, V value) {
         int rowIndex = rowHeaders.indexOf(rowHeader);
         int colIndex = columnHeaders.indexOf(colHeader);
