@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Main {
@@ -37,7 +40,7 @@ public class Main {
         return rules;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         String grammar = "Grammar -> Definitions Rules\n" +
                 "Definitions -> start Definitions' | nonterminal , Definitions\n" +
                 "Definitions' -> , nonterminal Definitions' | eps\n" +
@@ -150,26 +153,14 @@ public class Main {
         table2.setValue("N", "s", rules2.get(18));
         table2.setValue("N", "n", rules2.get(17));
 
-
-
-//        String input = "T, T', {E}, E', F\n" +
-//                "    [ E  : T E' ]\n" +
-//                "    [ E' : \"+\" T E' : @ ]\n" +
-//                "    [ T  : F T' ]\n" +
-//                "    [ T' : \"*\" F T' : @ ]\n" +
-//                "    [ F  : \"n\" : \"(\" E \")\" ]";
-
-        String input = "{S}, A" +
-                "[ S : \"-\" A ]" +
-                "[ A : \"n\" ]";
-
+        String input = new String(Files.readAllBytes(Paths.get("input.txt")));
         Scanner scanner = new Scanner(input);
 
         TopDownParse(scanner, table);
 
     }
 
-    static void TopDownParse(Scanner scanner, Table table) {
+    public static void TopDownParse(Scanner scanner, Table table) {
         List<Rule> result = new ArrayList<>();
         Stack<Symbol> stack = new Stack<>();
         stack.push(new Symbol(DomainTag.END, "$", false));
@@ -198,18 +189,14 @@ public class Main {
             }
         } while (a.getTag() != DomainTag.END);
 
-//        for (Rule rule : result) {
-//            System.out.println(rule);
-//        }
-
         Queue<Rule> queue = new ArrayDeque<>(result);
 
         OutputTree tree = new OutputTree(new OutputTree.Node(result.get(0).getLeft().getValue()));
-        foo(tree.getRoot(), queue);
+        buildTree(tree.getRoot(), queue);
         System.out.println(tree.toGraphviz());
     }
 
-    public static void foo(OutputTree.Node node, Queue<Rule> queue) {
+    public static void buildTree(OutputTree.Node node, Queue<Rule> queue) {
         Rule rule = queue.poll();
         if (rule == null) {
             return;
@@ -219,7 +206,7 @@ public class Main {
                 if (!symbol.getValue().equals("eps")) {
                     OutputTree.Node newNode = new OutputTree.Node(symbol.getValue());
                     node.add(newNode);
-                    foo(newNode, queue);
+                    buildTree(newNode, queue);
                 } else {
                     node.add(new OutputTree.Node(symbol.getValue()));
                 }
