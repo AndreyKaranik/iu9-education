@@ -64,9 +64,21 @@ public class OutputTree {
     }
 
     private void generateEdges(Node node, Map<Node, String> nodeIds, StringBuilder sb) {
+        List<String> childrenIds = new ArrayList<>();
         for (Node child : node.getNodes()) {
             sb.append("  ").append(nodeIds.get(node)).append(" -> ").append(nodeIds.get(child)).append(";\n");
+            childrenIds.add(nodeIds.get(child));
             generateEdges(child, nodeIds, sb);
+        }
+        if (childrenIds.size() > 1) {
+            sb.append("  { rank=same; ");
+            for (int i = 0; i < childrenIds.size(); i++) {
+                sb.append(childrenIds.get(i));
+                if (i < childrenIds.size() - 1) {
+                    sb.append(" -> ");
+                }
+            }
+            sb.append(" [style=invis]; }\n");
         }
     }
 }

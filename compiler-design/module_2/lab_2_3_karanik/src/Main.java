@@ -160,15 +160,10 @@ public class Main {
 //                "    [ F  : \"n\" : \"(\" E \")\" ]";
 
         String input = "{S}, A" +
-                "[ S : A * ]" +
-                "[ A : a ]";
+                "[ S : \"-\" A ]" +
+                "[ A : \"n\" ]";
 
         Scanner scanner = new Scanner(input);
-
-//        Token token;
-//        while ((token = scanner.nextToken()).getTag() != DomainTag.END) {
-//            System.out.println(token.getValue() + " " + token.getTag());
-//        }
 
         TopDownParse(scanner, table);
 
@@ -203,9 +198,9 @@ public class Main {
             }
         } while (a.getTag() != DomainTag.END);
 
-        for (Rule rule : result) {
-            System.out.println(rule);
-        }
+//        for (Rule rule : result) {
+//            System.out.println(rule);
+//        }
 
         Queue<Rule> queue = new ArrayDeque<>(result);
 
