@@ -120,7 +120,6 @@ public class Main {
         table.setValue(map.get("I"), map.get("@"), rules.get(16));
         table.setValue(map.get("N"), map.get("s"), rules.get(18));
         table.setValue(map.get("N"), map.get("n"), rules.get(17));
-        table.print();
 
         table2.setValue("S", "s", rules2.get(0));
         table2.setValue("S", "n", rules2.get(0));
@@ -150,15 +149,21 @@ public class Main {
         table2.setValue("I", "@", rules2.get(16));
         table2.setValue("N", "s", rules2.get(18));
         table2.setValue("N", "n", rules2.get(17));
-        table2.print();
 
 
-        Scanner scanner = new Scanner("T, T', {E}, E', F\n" +
-                "    [ E  : T E' ]\n" +
-                "    [ E' : \"+\" T E' : @ ]\n" +
-                "    [ T  : F T' ]\n" +
-                "    [ T' : \"*\" F T' : @ ]\n" +
-                "    [ F  : \"n\" : \"(\" E \")\" ]");
+
+//        String input = "T, T', {E}, E', F\n" +
+//                "    [ E  : T E' ]\n" +
+//                "    [ E' : \"+\" T E' : @ ]\n" +
+//                "    [ T  : F T' ]\n" +
+//                "    [ T' : \"*\" F T' : @ ]\n" +
+//                "    [ F  : \"n\" : \"(\" E \")\" ]";
+
+        String input = "{S}, A" +
+                "[ S : A * ]" +
+                "[ A : a ]";
+
+        Scanner scanner = new Scanner(input);
 
 //        Token token;
 //        while ((token = scanner.nextToken()).getTag() != DomainTag.END) {
@@ -201,5 +206,32 @@ public class Main {
         for (Rule rule : result) {
             System.out.println(rule);
         }
+
+        Queue<Rule> queue = new ArrayDeque<>(result);
+
+        OutputTree tree = new OutputTree(new OutputTree.Node(result.get(0).getLeft().getValue()));
+        foo(tree.getRoot(), queue);
+        System.out.println(tree.toGraphviz());
+    }
+
+    public static void foo(OutputTree.Node node, Queue<Rule> queue) {
+        Rule rule = queue.poll();
+        if (rule == null) {
+            return;
+        }
+        for (Symbol symbol : rule.getRight()) {
+            if (symbol.isNonterminal()) {
+                if (!symbol.getValue().equals("eps")) {
+                    OutputTree.Node newNode = new OutputTree.Node(symbol.getValue());
+                    node.add(newNode);
+                    foo(newNode, queue);
+                } else {
+                    node.add(new OutputTree.Node(symbol.getValue()));
+                }
+            } else {
+                node.add(new OutputTree.Node(symbol.getValue()));
+            }
+        }
+
     }
 }
