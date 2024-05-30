@@ -1,25 +1,6 @@
 import java.util.*;
 
 public class Main {
-
-    class Token {
-
-        private String value;
-        private DomainTag tag;
-
-        public Token(String value, DomainTag tag) {
-            this.value = value;
-            this.tag = tag;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public DomainTag getTag() {
-            return tag;
-        }
-    }
     public static List<Rule> parseGrammar(String grammar) {
         List<Rule> rules = new ArrayList<>();
         String[] lines = grammar.split("\n");
@@ -171,6 +152,18 @@ public class Main {
         table2.setValue("N", "n", rules2.get(17));
         table2.print();
 
+
+        Scanner scanner = new Scanner("T, T', {E}, E', F\n" +
+                "    [ E  : T E' ]\n" +
+                "    [ E' : \"+\" T E' : @ ]\n" +
+                "    [ T  : F T' ]\n" +
+                "    [ T' : \"*\" F T' : @ ]\n" +
+                "    [ F  : \"n\" : \"(\" E \")\" ]");
+
+        Token token;
+        while ((token = scanner.nextToken()).getTag() != DomainTag.END) {
+            System.out.println(token.getValue() + " " + token.getTag());
+        }
 
     }
 }
