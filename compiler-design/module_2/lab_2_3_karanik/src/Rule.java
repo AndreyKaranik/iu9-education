@@ -20,16 +20,10 @@ public class Rule {
 
     @Override
     public String toString() {
-        return left.getValue() + " -> " + right.toString();
-    }
-
-    public String toSpecificString() {
-        String str = GrammarConverter.convert(left.getValue());
-
-        List<String> list = new ArrayList<>();
+        StringBuilder builder = new StringBuilder();
         for (Symbol symbol : right) {
-            list.add(GrammarConverter.convert(symbol.getValue()));
+            builder.append(symbol.toString()).append(' ');
         }
-        return str + " -> " + list;
+        return left.getValue() + " -> " + builder.toString();
     }
 }

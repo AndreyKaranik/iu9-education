@@ -2,11 +2,8 @@ import java.util.*;
 
 public class Main {
 
-    enum DomainTag {
-        TERMINAL, NONTERMINAL, START_SYMBOL, COMMA, LEFT_BRACKET, RIGHT_BRACKET, COLON, EMPTY_STRING, NONE
-    }
-
     class Token {
+
         private String value;
         private DomainTag tag;
 
@@ -36,7 +33,7 @@ public class Main {
             String[] rightParts = parts[1].trim().split("\\|");
 
             for (String rightPart : rightParts) {
-                List<String> right = Arrays.asList(rightPart.trim().split("\\s+"));
+                String[] right = rightPart.trim().split("\\s+");
                 Symbol lt = new Symbol(DomainTag.NONE, left,true);
                 List<Symbol> symbols = new ArrayList<>();
                 for (String rt : right) {
@@ -60,7 +57,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        TwoKeyMap<String, String, Rule> table = new TwoKeyMap<>();
         String grammar = "Grammar -> Definitions Rules\n" +
                 "Definitions -> start Definitions' | nonterminal , Definitions\n" +
                 "Definitions' -> , nonterminal Definitions' | eps\n" +
@@ -74,11 +70,10 @@ public class Main {
                 "Symbol -> terminal | Nonterminal | @\n" +
                 "Nonterminal -> nonterminal | start";
 
+        String grammar2 = GrammarConverter.convert(grammar);
+
         List<Rule> rules = parseGrammar(grammar);
-        for (int i = 0; i < rules.size(); i++) {
-            //System.out.println(i + ": " + rules.get(i));
-            System.out.println(i + ": " + rules.get(i).toSpecificString());
-        }
+        List<Rule> rules2 = parseGrammar(grammar2);
 
         Map<String, String> map = new HashMap<>();
         map.put("S", "Grammar");
@@ -93,48 +88,88 @@ public class Main {
         map.put("H", "Sequence");
         map.put("I", "Symbol");
         map.put("N", "Nonterminal");
-        map.put("','", ",");
-        map.put("':'", ":");
-        map.put("'@'", "@");
+        map.put(",", ",");
+        map.put(":", ":");
+        map.put("[", "[");
+        map.put("]", "]");
+        map.put("@", "@");
         map.put("n", "nonterminal");
         map.put("t", "terminal");
         map.put("s", "start");
+        map.put("$", "$");
 
+        Table<String, String, Rule> table = new Table<>();
+        Table<String, String, Rule> table2 = new Table<>();
 
-        table.put(map.get("S"), map.get("s"), rules.get(0));
-        table.put(map.get("S"), map.get("n"), rules.get(0));
-        table.put(map.get("A"), map.get("s"), rules.get(1));
-        table.put(map.get("A"), map.get("n"), rules.get(2));
-        table.put(map.get("C"), map.get(","), rules.get(3));
-        table.put(map.get("C"), map.get("["), rules.get(4));
-        table.put(map.get("B"), map.get("["), rules.get(5));
-        table.put(map.get("D"), map.get("["), rules.get(6));
+        for (char row : "SACBDEGFHJIN".toCharArray()) {
+            table.addRow(map.get(String.valueOf(row)));
+            table2.addRow(String.valueOf(row));
+        }
 
-        table.put(map.get("E"), map.get(":"), rules.get(7));
-        table.put(map.get("G"), map.get("]"), rules.get(9));
-        table.put(map.get("G"), map.get(":"), rules.get(8));
-        table.put(map.get("F"), map.get(":"), rules.get(10));
+        for (char column : "sn,[]:t@$".toCharArray()) {
+            table.addColumn(map.get(String.valueOf(column)));
+            table2.addColumn(String.valueOf(column));
+        }
 
-        table.put(map.get("H"), map.get("s"), rules.get(11));
-        table.put(map.get("H"), map.get("n"), rules.get(11));
-        table.put(map.get("H"), map.get("t"), rules.get(11));
-        table.put(map.get("H"), map.get("@"), rules.get(11));
+        table.setValue(map.get("S"), map.get("s"), rules.get(0));
+        table.setValue(map.get("S"), map.get("n"), rules.get(0));
+        table.setValue(map.get("A"), map.get("s"), rules.get(1));
+        table.setValue(map.get("A"), map.get("n"), rules.get(2));
+        table.setValue(map.get("C"), map.get(","), rules.get(3));
+        table.setValue(map.get("C"), map.get("["), rules.get(4));
+        table.setValue(map.get("B"), map.get("["), rules.get(5));
+        table.setValue(map.get("D"), map.get("["), rules.get(6));
+        table.setValue(map.get("E"), map.get(":"), rules.get(7));
+        table.setValue(map.get("G"), map.get("]"), rules.get(9));
+        table.setValue(map.get("G"), map.get(":"), rules.get(8));
+        table.setValue(map.get("F"), map.get(":"), rules.get(10));
+        table.setValue(map.get("H"), map.get("s"), rules.get(11));
+        table.setValue(map.get("H"), map.get("n"), rules.get(11));
+        table.setValue(map.get("H"), map.get("t"), rules.get(11));
+        table.setValue(map.get("H"), map.get("@"), rules.get(11));
+        table.setValue(map.get("J"), map.get("s"), rules.get(12));
+        table.setValue(map.get("J"), map.get("n"), rules.get(12));
+        table.setValue(map.get("J"), map.get("]"), rules.get(13));
+        table.setValue(map.get("J"), map.get(":"), rules.get(13));
+        table.setValue(map.get("J"), map.get("t"), rules.get(12));
+        table.setValue(map.get("J"), map.get("@"), rules.get(12));
+        table.setValue(map.get("I"), map.get("s"), rules.get(15));
+        table.setValue(map.get("I"), map.get("n"), rules.get(15));
+        table.setValue(map.get("I"), map.get("t"), rules.get(14));
+        table.setValue(map.get("I"), map.get("@"), rules.get(16));
+        table.setValue(map.get("N"), map.get("s"), rules.get(18));
+        table.setValue(map.get("N"), map.get("n"), rules.get(17));
+        table.print();
 
-        table.put(map.get("J"), map.get("s"), rules.get(12));
-        table.put(map.get("J"), map.get("n"), rules.get(12));
-        table.put(map.get("J"), map.get("]"), rules.get(13));
-        table.put(map.get("J"), map.get(":"), rules.get(13));
-        table.put(map.get("J"), map.get("t"), rules.get(12));
-        table.put(map.get("J"), map.get("@"), rules.get(12));
-
-
-        table.put(map.get("I"), map.get("s"), rules.get(15));
-        table.put(map.get("I"), map.get("n"), rules.get(15));
-        table.put(map.get("I"), map.get("t"), rules.get(14));
-        table.put(map.get("I"), map.get("@"), rules.get(16));
-
-        table.put(map.get("N"), map.get("s"), rules.get(18));
-        table.put(map.get("N"), map.get("n"), rules.get(17));
+        table2.setValue("S", "s", rules2.get(0));
+        table2.setValue("S", "n", rules2.get(0));
+        table2.setValue("A", "s", rules2.get(1));
+        table2.setValue("A", "n", rules2.get(2));
+        table2.setValue("C", ",", rules2.get(3));
+        table2.setValue("C", "[", rules2.get(4));
+        table2.setValue("B", "[", rules2.get(5));
+        table2.setValue("D", "[", rules2.get(6));
+        table2.setValue("E", ":", rules2.get(7));
+        table2.setValue("G", "]", rules2.get(9));
+        table2.setValue("G", ":", rules2.get(8));
+        table2.setValue("F", ":", rules2.get(10));
+        table2.setValue("H", "s", rules2.get(11));
+        table2.setValue("H", "n", rules2.get(11));
+        table2.setValue("H", "t", rules2.get(11));
+        table2.setValue("H", "@", rules2.get(11));
+        table2.setValue("J", "s", rules2.get(12));
+        table2.setValue("J", "n", rules2.get(12));
+        table2.setValue("J", "]", rules2.get(13));
+        table2.setValue("J", ":", rules2.get(13));
+        table2.setValue("J", "t", rules2.get(12));
+        table2.setValue("J", "@", rules2.get(12));
+        table2.setValue("I", "s", rules2.get(15));
+        table2.setValue("I", "n", rules2.get(15));
+        table2.setValue("I", "t", rules2.get(14));
+        table2.setValue("I", "@", rules2.get(16));
+        table2.setValue("N", "s", rules2.get(18));
+        table2.setValue("N", "n", rules2.get(17));
+        table2.print();
 
 
     }

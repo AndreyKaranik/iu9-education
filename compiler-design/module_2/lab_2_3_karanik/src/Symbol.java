@@ -1,15 +1,15 @@
 class Symbol {
-    private Main.DomainTag tag;
+    private DomainTag tag;
 
     private String value;
     private boolean isNonterminal;
-    public Symbol(Main.DomainTag tag, String value, boolean isNonterminal) {
+    public Symbol(DomainTag tag, String value, boolean isNonterminal) {
         this.tag = tag;
         this.value = value;
         this.isNonterminal = isNonterminal;
     }
 
-    public Main.DomainTag getTag() {
+    public DomainTag getTag() {
         return tag;
     }
 

@@ -10,21 +10,7 @@ public class GrammarConverter {
     [ F  : "n" : "(" E ")" ]
      */
 
-    /* кол-во {E} не отслеживается
-    Grammar -> Definitions Rules
-    Definitions -> nonterminal Definitions'
-    Definitions' -> , nonterminal Definitions' | eps
-    Rules -> Rule Rules
-    Rule -> [ nonterminal Rule' ]
-    Rule' -> Variant Variants
-    Variants -> Variant Variants | eps
-    Variant -> : Sequence
-    Sequence -> Symbol Sequence'
-    Sequence' -> Symbol Sequence' | eps
-    Symbol -> terminal | nonterminal | @
-     */
-
-    /* {E} ровно 1
+    /*
     Grammar -> Definitions Rules
     Definitions -> start Definitions' | nonterminal , Definitions
     Definitions' -> , nonterminal Definitions' | eps
@@ -56,8 +42,8 @@ public class GrammarConverter {
 
      */
 
-    public static String convert(String symbol) {
-        String result = symbol
+    public static String convert(String s) {
+        String result = s
                 .replace("Grammar", "S")
                 .replace("Definitions'", "C")
                 .replace("Definitions", "A")
@@ -70,9 +56,6 @@ public class GrammarConverter {
                 .replace("Sequence", "H")
                 .replace("Symbol", "I")
                 .replace("Nonterminal", "N")
-                .replace(",", "','")
-                .replace(":", "':'")
-                .replace("@", "'@'")
                 .replace("nonterminal", "n")
                 .replace("terminal", "t")
                 .replace("start", "s");
@@ -80,7 +63,7 @@ public class GrammarConverter {
     }
 
 
-    public static String convertGrammar(String grammar) {
+    public static String convertSpecificGrammar(String grammar) {
         String result = grammar
                 .replace("Grammar", "S")
                 .replace("Definitions'", "C")
