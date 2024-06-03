@@ -29,10 +29,10 @@ NStringConstant ::= STRING_SECTION STRING_SECTION*
 
 NConst ::= DECIMAL_INTEGER_CONSTANT | NON_DECIMAL_INTEGER_CONSTANT | SYMBOLIC_CONSTANT | BOOLEAN_CONSTANT
 
-NExpr ::= NAndExpr ('|' NAndExpr | '@' NAndExpr)?
-NAndExpr ::= NCmpExpr ('&' NCmpExpr)?
-NCmpExpr ::= NFuncCallExpr (NCmpOp NFuncCallExpr)?
-NCmpOp ::= '>' | '<' | '>=' | '<=' | '==' | '!='
+NExpr ::= NAndExpr ('|' NAndExpr | '@' NAndExpr)*
+NAndExpr ::= NCmpExpr ('&' NCmpExpr)*
+NCmpExpr ::= NFuncCallExpr (NCmpOp NFuncCallExpr)*
+NCmpOp :: EQ_OP | ORD_OP  # EQ_OP = /[!=]=/, ORD_OP = [<>]=?
 NFuncCallExpr ::= NArithmExpr | (IDENTIFIER '<-' NArgs)
 NArgs ::= NArithmExpr (',' NArithmExpr)*
 NArithmExpr ::= NTerm (('+' | '-') NTerm)*

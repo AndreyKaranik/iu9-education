@@ -55,10 +55,7 @@ public class Main {
                 "Symbol -> terminal | nonterminal | @\n" +
                 "Axiom -> { nonterminal }";
 
-        String grammar2 = GrammarConverter.convert(grammar);
-
         List<Rule> rules = parseGrammar(grammar);
-        List<Rule> rules2 = parseGrammar(grammar2);
 
         Map<String, String> map = new HashMap<>();
         map.put("S", "Grammar");
@@ -121,33 +118,6 @@ public class Main {
         table.setValue(map.get("I"), map.get("t"), rules.get(14));
         table.setValue(map.get("I"), map.get("@"), rules.get(16));
         table.setValue(map.get("X"), map.get("{"), rules.get(17));
-
-        table.print();
-
-        table2.setValue("S", "n", rules2.get(0));
-        table2.setValue("S", "{", rules2.get(0));
-        table2.setValue("A", "n", rules2.get(2));
-        table2.setValue("A", "{", rules2.get(1));
-        table2.setValue("C", ",", rules2.get(3));
-        table2.setValue("C", "[", rules2.get(4));
-        table2.setValue("B", "[", rules2.get(5));
-        table2.setValue("D", "[", rules2.get(6));
-        table2.setValue("E", ":", rules2.get(7));
-        table2.setValue("G", "]", rules2.get(9));
-        table2.setValue("G", ":", rules2.get(8));
-        table2.setValue("F", ":", rules2.get(10));
-        table2.setValue("H", "n", rules2.get(11));
-        table2.setValue("H", "t", rules2.get(11));
-        table2.setValue("H", "@", rules2.get(11));
-        table2.setValue("J", "n", rules2.get(12));
-        table2.setValue("J", "]", rules2.get(13));
-        table2.setValue("J", ":", rules2.get(13));
-        table2.setValue("J", "t", rules2.get(12));
-        table2.setValue("J", "@", rules2.get(12));
-        table2.setValue("I", "n", rules2.get(15));
-        table2.setValue("I", "t", rules2.get(14));
-        table2.setValue("I", "@", rules2.get(16));
-        table2.setValue("X", "{", rules2.get(17));
 
 
         String input = new String(Files.readAllBytes(Paths.get("input.txt")));
