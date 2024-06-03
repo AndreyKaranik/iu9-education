@@ -23,17 +23,21 @@ NStatement ::= NType NDeclarationAssignments
 NDeclarationAssignments ::= NDeclarationAssignment (',' NDeclarationAssignment)*
 NDeclarationAssignment ::= IDENTIFIER (':=' NArithmExpr)?
 
-
 NType ::= (KW_INT | KW_CHAR | KW_BOOL) '[]'*
 
-NStringConstant |= STRING_SECTION STRING_SECTION*
+NStringConstant ::= STRING_SECTION STRING_SECTION*
 
 NConst ::= DECIMAL_INTEGER_CONSTANT | NON_DECIMAL_INTEGER_CONSTANT | SYMBOLIC_CONSTANT | BOOLEAN_CONSTANT
 
-# NExpr ::= NAndExpr 
-# NExpr ::= NAndExpr '|' NAndExpr
-# NExpr |= NAndExpr, '@', NAndExpr, lambda x, y: BinOpExpr(x, '@', y)
-# NAndExpr |= NCmpExpr
-# NAndExpr |= NCmpExpr, '&', NCmpExpr, lambda x, y: BinOpExpr(x, '&', y)
-# NCmpExpr |= NFuncCallExpr
-# NCmpExpr |= NFuncCallExpr, NCmpOp, NFuncCallExpr, BinOpExpr
+NExpr ::= NAndExpr ('|' NAndExpr | '@' NAndExpr)?
+NAndExpr ::= NCmpExpr ('&' NCmpExpr)?
+NCmpExpr ::= NFuncCallExpr (NCmpOp NFuncCallExpr)?
+NCmpOp ::= '>' | '<' | '>=' | '<=' | '==' | '!='
+NFuncCallExpr ::= NArithmExpr | (IDENTIFIER '<-' NArgs)
+NArgs ::= NArithmExpr (',' NArithmExpr)*
+NArithmExpr ::= NTerm (('+' | '-') NTerm)*
+NTerm ::= NFactor (('*' | '/' | '%') NFactor)*
+NFactor ::= NPower ('^' NFactor)?
+NPower ::= NArrExpr | (('!' | '-') NPower) | (NType NBottomExpr)
+NArrExpr ::= NBottomExpr | (NArrExpr NBottomExpr) | NStringConstant
+NBottomExpr ::= IDENTIFIER | NConst | ('(' NExpr ')')
