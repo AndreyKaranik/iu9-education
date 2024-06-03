@@ -17,8 +17,6 @@ class Scanner {
 
     private final static String BOOLEAN_CONSTANT_REGEX = "(true|false)";
 
-    private final static String REFERENCE_NULL_CONSTANT = "(null)";
-
     private final static String OR_XOR_OP_REGEX = "[|@]";
     private final static String AND_OP_REGEX = "[&]";
     private final static String EQ_OP_REGEX = "([!=]=)";
@@ -36,13 +34,31 @@ class Scanner {
     private final static String BRACKETS_REGEX = "(\\[])";
     private final static String LEFT_PAR_REGEX = "[(]";
     private final static String RIGHT_PAR_REGEX = "[)]";
+    private final static String SEMICOLON_REGEX = ";";
+    private final static String KW_INT_REGEX = "(int)";
+    private final static String KW_BOOL_REGEX = "(bool)";
+    private final static String KW_RETURN_REGEX = "(return)";
+    private final static String KW_VOID_REGEX = "(void)";
+    private final static String KW_CHAR_REGEX = "(char)";
+    private final static String KW_LOOP_REGEX = "(loop)";
+    private final static String KW_THEN_REGEX = "(then)";
+    private final static String KW_ELSE_REGEX = "(else)";
+    private final static String KW_NULL_REGEX = "(null)";
+    private final static String KW_WHILE_REGEX = "(while)";
+    private final static String SPACES_REGEX = "(\\s+)";
+    private final static String COMMENTS_REGEX = "((##.*$)|(#.*#))";
+
 
     private static final Pattern PATTERN = Pattern.compile(
             IDENTIFIER_REGEX + "|" + DECIMAL_INTEGER_CONSTANT_REGEX + "|" + NON_DECIMAL_INTEGER_CONSTANT_REGEX + "|" +
                     SYMBOLIC_CONSTANT_REGEX + "|" + STRING_SECTION_REGEX + "|" + BOOLEAN_CONSTANT_REGEX + "|" +
-                    REFERENCE_NULL_CONSTANT + "|" + OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + ORD_OP_REGEX + "|" + PLUS_MINUS_OP_REGEX + "|" +
+                    OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + LEFT_ARROW_REGEX + "|" + PLUS_MINUS_OP_REGEX + "|" +
                     MUL_DIV_REM_OP_REGEX + "|" + POWER_OP_REGEX + "|" + NOT_MINUS_OP_REGEX + "|" + EQUAL_REGEX + "|" + ASSIGN_REGEX + "|" + DOT_REGEX + "|" +
-                    LEFT_ARROW_REGEX + "|" + COMMA_REGEX + "|" + TILDE_REGEX + "|" + BRACKETS_REGEX + "|" + LEFT_PAR_REGEX + "|" + RIGHT_PAR_REGEX
+                    ORD_OP_REGEX + "|" + COMMA_REGEX + "|" + TILDE_REGEX + "|" + BRACKETS_REGEX + "|" + LEFT_PAR_REGEX + "|" + RIGHT_PAR_REGEX + "|" + SEMICOLON_REGEX + "|" +
+                    KW_INT_REGEX + "|" + KW_BOOL_REGEX + "|" + KW_RETURN_REGEX + "|" +
+                    KW_VOID_REGEX + "|" + KW_CHAR_REGEX + "|" + KW_LOOP_REGEX + "|" +
+                    KW_THEN_REGEX + "|" + KW_ELSE_REGEX + "|" + KW_NULL_REGEX + "|" + KW_WHILE_REGEX + "|" +
+                    SPACES_REGEX + "|" + COMMENTS_REGEX + "|."
     );
 
     public Scanner(String input) {
@@ -81,8 +97,6 @@ class Scanner {
             return new Token(token, DomainTag.STRING_SECTION, fragmentPosition);
         } else if (token.matches(BOOLEAN_CONSTANT_REGEX)) {
             return new Token(token, DomainTag.BOOLEAN_CONSTANT, fragmentPosition);
-        } else if (token.matches(REFERENCE_NULL_CONSTANT)) {
-            return new Token(token, DomainTag.REFERENCE_NULL_CONSTANT, fragmentPosition);
         } else if (token.matches(OR_XOR_OP_REGEX)) {
             return new Token(token, DomainTag.OR_XOR_OP, fragmentPosition);
         } else if (token.matches(AND_OP_REGEX)) {
@@ -117,7 +131,31 @@ class Scanner {
             return new Token(token, DomainTag.LEFT_PAR, fragmentPosition);
         } else if (token.matches(RIGHT_PAR_REGEX)) {
             return new Token(token, DomainTag.RIGHT_PAR, fragmentPosition);
-        } else if (token.trim().isEmpty()) {
+        } else if (token.matches(SEMICOLON_REGEX)) {
+            return new Token(token, DomainTag.SEMICOLON, fragmentPosition);
+        } else if (token.matches(KW_INT_REGEX)) {
+            return new Token(token, DomainTag.KW_INT, fragmentPosition);
+        } else if (token.matches(KW_BOOL_REGEX)) {
+            return new Token(token, DomainTag.KW_BOOL, fragmentPosition);
+        } else if (token.matches(KW_RETURN_REGEX)) {
+            return new Token(token, DomainTag.KW_RETURN, fragmentPosition);
+        } else if (token.matches(KW_VOID_REGEX)) {
+            return new Token(token, DomainTag.KW_VOID, fragmentPosition);
+        } else if (token.matches(KW_CHAR_REGEX)) {
+            return new Token(token, DomainTag.KW_CHAR, fragmentPosition);
+        } else if (token.matches(KW_LOOP_REGEX)) {
+            return new Token(token, DomainTag.KW_LOOP, fragmentPosition);
+        } else if (token.matches(KW_THEN_REGEX)) {
+            return new Token(token, DomainTag.KW_THEN, fragmentPosition);
+        } else if (token.matches(KW_ELSE_REGEX)) {
+            return new Token(token, DomainTag.KW_ELSE, fragmentPosition);
+        } else if (token.matches(KW_NULL_REGEX)) {
+            return new Token(token, DomainTag.KW_NULL, fragmentPosition);
+        } else if (token.matches(KW_WHILE_REGEX)) {
+            return new Token(token, DomainTag.KW_WHILE, fragmentPosition);
+        } else if (token.matches(COMMENTS_REGEX)) {
+            return nextToken();
+        } else if (token.matches(SPACES_REGEX)) {
             return nextToken();
         }
         throw new RuntimeException("LEX_ERROR: " + fragmentPosition);

@@ -236,9 +236,6 @@ NStatement |= NArrExpr, ':=', NExpr, AssignmentStatement
 
 #Оператор вызова функции
 NStatement |= IDENTIFIER, '<-', NArgs, InvocationStatement
-# NActualParameters |= NActualParameter, lambda ap: [ap]
-# NActualParameters |= NActualParameters, ',', NActualParameter, lambda aps, ap: aps + [ap]
-# NActualParameter |= NArithmExpr
 
 #Оператор выбора
 NStatement |= NExpr, KW_THEN, NStatements, '.', lambda cond, sts: IfStatement(cond, [sts], [])

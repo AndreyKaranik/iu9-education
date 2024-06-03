@@ -1,3 +1,4 @@
+#comment#
 int {f} <- int {a} =
 int {b}, {c} := 10;
 {c} > 5 then

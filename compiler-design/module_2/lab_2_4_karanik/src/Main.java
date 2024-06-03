@@ -12,7 +12,7 @@ public class Main {
 
         Token a = scanner.nextToken();
         while (a.getTag() != DomainTag.END) {
-            System.out.println(a.getTag());
+            System.out.println(a.getValue() + " " + a.getTag());
             a = scanner.nextToken();
         }
     }
