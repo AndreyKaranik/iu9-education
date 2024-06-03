@@ -2,7 +2,6 @@ public class Token {
 
     private String value;
     private DomainTag tag;
-
     private FragmentPosition fragmentPosition;
 
     public Token(String value, DomainTag tag, FragmentPosition fragmentPosition) {
