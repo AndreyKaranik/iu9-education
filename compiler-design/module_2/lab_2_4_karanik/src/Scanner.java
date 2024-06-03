@@ -9,11 +9,11 @@ class Scanner {
 
     private final static String IDENTIFIER_REGEX = "(\\{(\\w|[ ])+\\})";
     private final static String DECIMAL_INTEGER_CONSTANT_REGEX = "([0-9]+)";
-    private final static String NON_DECIMAL_INTEGER_CONSTANT_REGEX = "([A-Z0-9])+([$]([2-9]|[12][0-9]|3[0-6]))?";
+    private final static String NON_DECIMAL_INTEGER_CONSTANT_REGEX = "(([A-Z0-9])+([$]([2-9]|[12][0-9]|3[0-6]))?)";
 
     private final static String SYMBOLIC_CONSTANT_REGEX = "([$](\"(.|" + ESCAPE_SEQUENCES_REGEX + ")\")|[A-F0-9]+)";
 
-    private final static String STRING_SECTION_REGEX = "(\"([^\"\n]|" + ESCAPE_SEQUENCES_REGEX + ")*\")|(%[A-F0-9]+)";
+    private final static String STRING_SECTION_REGEX = "((\"([^\"\n]|" + ESCAPE_SEQUENCES_REGEX + ")*\")|(%[A-F0-9]+))";
 
     private final static String BOOLEAN_CONSTANT_REGEX = "(true|false)";
 
@@ -23,25 +23,24 @@ class Scanner {
     private final static String AND_OP_REGEX = "[&]";
     private final static String EQ_OP_REGEX = "([!=]=)";
     private final static String ORD_OP_REGEX = "([<>]=?)";
-    private final static String PLUS_MINUS_OP_REGEX = "[+-]";
+    private final static String PLUS_MINUS_OP_REGEX = "[-+]";
     private final static String MUL_DIV_REM_OP_REGEX = "[*/%]";
-    private final static String POWER_OP_REGEX = "[^]";
-    private final static String NOT_MINUS_OP_REGEX = "[!-]";
+    private final static String POWER_OP_REGEX = "\\^";
+    private final static String NOT_MINUS_OP_REGEX = "[-!]";
     private final static String EQUAL_REGEX = "[=]";
     private final static String ASSIGN_REGEX = "(:=)";
     private final static String DOT_REGEX = "[.]";
     private final static String LEFT_ARROW_REGEX = "(<-)";
     private final static String COMMA_REGEX = ",";
     private final static String TILDE_REGEX = "~";
-    private final static String BRACKETS_REGEX = "(\\[\\])";
+    private final static String BRACKETS_REGEX = "(\\[])";
     private final static String LEFT_PAR_REGEX = "[(]";
     private final static String RIGHT_PAR_REGEX = "[)]";
 
     private static final Pattern PATTERN = Pattern.compile(
             IDENTIFIER_REGEX + "|" + DECIMAL_INTEGER_CONSTANT_REGEX + "|" + NON_DECIMAL_INTEGER_CONSTANT_REGEX + "|" +
                     SYMBOLIC_CONSTANT_REGEX + "|" + STRING_SECTION_REGEX + "|" + BOOLEAN_CONSTANT_REGEX + "|" +
-                    REFERENCE_NULL_CONSTANT + "|" +
-                    OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + ORD_OP_REGEX + "|" + PLUS_MINUS_OP_REGEX + "|" +
+                    REFERENCE_NULL_CONSTANT + "|" + OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + ORD_OP_REGEX + "|" + PLUS_MINUS_OP_REGEX + "|" +
                     MUL_DIV_REM_OP_REGEX + "|" + POWER_OP_REGEX + "|" + NOT_MINUS_OP_REGEX + "|" + EQUAL_REGEX + "|" + ASSIGN_REGEX + "|" + DOT_REGEX + "|" +
                     LEFT_ARROW_REGEX + "|" + COMMA_REGEX + "|" + TILDE_REGEX + "|" + BRACKETS_REGEX + "|" + LEFT_PAR_REGEX + "|" + RIGHT_PAR_REGEX
     );
