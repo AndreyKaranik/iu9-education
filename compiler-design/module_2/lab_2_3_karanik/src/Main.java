@@ -168,7 +168,7 @@ public class Main {
                     stack.pop();
                     a = scanner.nextToken();
                 } else {
-                    throw new RuntimeException("ERROR1");
+                    throw new RuntimeException("ERROR1: " + a.getFragmentPosition());
                 }
             } else if (table.get(x.getValue(), a.getTerminalTag()) != null) {
                 stack.pop();
@@ -180,7 +180,7 @@ public class Main {
                 }
                 result.add(rule);
             } else {
-                throw new RuntimeException("ERROR2");
+                throw new RuntimeException("ERROR2: " + a.getFragmentPosition());
             }
         } while (a.getTag() != DomainTag.END);
 

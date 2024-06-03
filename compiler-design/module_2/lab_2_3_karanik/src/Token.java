@@ -4,10 +4,13 @@ public class Token {
     private DomainTag tag;
     private String terminalTag;
 
-    public Token(String value, DomainTag tag, String terminalTag) {
+    private FragmentPosition fragmentPosition;
+
+    public Token(String value, DomainTag tag, String terminalTag, FragmentPosition fragmentPosition) {
         this.value = value;
         this.tag = tag;
         this.terminalTag = terminalTag;
+        this.fragmentPosition = fragmentPosition;
     }
 
     public String getValue() {
@@ -20,5 +23,9 @@ public class Token {
 
     public String getTerminalTag() {
         return terminalTag;
+    }
+
+    public FragmentPosition getFragmentPosition() {
+        return fragmentPosition;
     }
 }
