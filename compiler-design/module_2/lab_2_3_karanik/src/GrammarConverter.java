@@ -12,17 +12,17 @@ public class GrammarConverter {
 
     /*
     Grammar -> Definitions Rules
-    Definitions -> start Definitions' | nonterminal , Definitions
+    Definitions -> Axiom Definitions' | nonterminal , Definitions
     Definitions' -> , nonterminal Definitions' | eps
     Rules -> Rule Rules
-    Rule -> [ Nonterminal Rule' ]
+    Rule -> [ nonterminal Rule' ]
     Rule' -> Variant Variants
     Variants -> Variant Variants | eps
     Variant -> : Sequence
     Sequence -> Symbol Sequence'
     Sequence' -> Symbol Sequence' | eps
-    Symbol -> terminal | Nonterminal | @
-    Nonterminal -> nonterminal | start
+    Symbol -> terminal | nonterminal | @
+    Axiom -> { nonterminal }
      */
 
     /*
@@ -32,13 +32,13 @@ public class GrammarConverter {
     B = Rules
     C = Definitions'
     D = Rule
-    N = Nonterminal
     E = Rule'
     F = Variant
     G = Variants
     H = Sequence
     I = Symbol
     J = Sequence'
+    X = Axiom
 
      */
 
@@ -55,10 +55,9 @@ public class GrammarConverter {
                 .replace("Sequence'", "J")
                 .replace("Sequence", "H")
                 .replace("Symbol", "I")
-                .replace("Nonterminal", "N")
                 .replace("nonterminal", "n")
                 .replace("terminal", "t")
-                .replace("start", "s");
+                .replace("Axiom", "X");
         return result;
     }
 
@@ -76,16 +75,17 @@ public class GrammarConverter {
                 .replace("Sequence'", "J")
                 .replace("Sequence", "H")
                 .replace("Symbol", "I")
-                .replace("Nonterminal", "N")
                 .replace(",", "','")
                 .replace(":", "':'")
                 .replace("@", "'@'")
                 .replace("eps", "")
+                .replace("{", "'{'")
+                .replace("}", "'}'")
                 .replace("[", "'['")
                 .replace("]", "']'")
                 .replace("nonterminal", "n")
                 .replace("terminal", "t")
-                .replace("start", "s");
+                .replace("Axiom", "X");
 
         result = result.replaceAll("(?m)$", ".");
 

@@ -6,7 +6,7 @@ class Scanner {
     private int pos;
 
     private static final Pattern PATTERN = Pattern.compile(
-            "(\"[^\"]*\")|([^\\s\\[\\]:,@\"{}]+)|(\\{[A-Z]+\\})|\\[|\\]|:|@|,|\\s+|."
+            "(\"[^\"]*\")|([^\\s\\[\\]:,@\"{}]+)|\\{|\\}|\\[|\\]|:|@|,|\\s+|."
     );
 
     public Scanner(String input) {
@@ -34,8 +34,10 @@ class Scanner {
             return new Token(token, DomainTag.TERMINAL, "terminal");
         } else if (token.matches("[^\\s\\[\\]:,@\"{}]+(?:[\\s,]|$)")) {
             return new Token(token, DomainTag.NONTERMINAL, "nonterminal");
-        } else if (token.matches("\\{[A-Z]+\\}")) {
-            return new Token(token, DomainTag.START_SYMBOL, "start");
+        } else if (token.equals("{")) {
+            return new Token(token, DomainTag.LEFT_CURLY_BRACE, "{");
+        } else if (token.equals("}")) {
+            return new Token(token, DomainTag.RIGHT_CURLY_BRACE, "}");
         } else if (token.equals("[")) {
             return new Token(token, DomainTag.LEFT_BRACKET, "[");
         } else if (token.equals("]")) {

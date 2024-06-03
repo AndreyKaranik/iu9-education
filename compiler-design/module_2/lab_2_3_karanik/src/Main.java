@@ -22,11 +22,12 @@ public class Main {
                 List<Symbol> symbols = new ArrayList<>();
                 for (String rt : right) {
                     switch (rt) {
+                        case "{" -> symbols.add(new Symbol(DomainTag.LEFT_CURLY_BRACE, rt, false));
+                        case "}" -> symbols.add(new Symbol(DomainTag.RIGHT_CURLY_BRACE, rt, false));
                         case "[" -> symbols.add(new Symbol(DomainTag.LEFT_BRACKET, rt, false));
                         case "]" -> symbols.add(new Symbol(DomainTag.RIGHT_BRACKET, rt, false));
                         case ":" -> symbols.add(new Symbol(DomainTag.COLON, rt, false));
                         case "@" -> symbols.add(new Symbol(DomainTag.EMPTY_STRING, rt, false));
-                        case "start" -> symbols.add(new Symbol(DomainTag.START_SYMBOL, rt, false));
                         case "terminal" -> symbols.add(new Symbol(DomainTag.TERMINAL, rt, false));
                         case "nonterminal" -> symbols.add(new Symbol(DomainTag.NONTERMINAL, rt, false));
                         case "," -> symbols.add(new Symbol(DomainTag.COMMA, rt, false));
@@ -42,17 +43,17 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         String grammar = "Grammar -> Definitions Rules\n" +
-                "Definitions -> start Definitions' | nonterminal , Definitions\n" +
+                "Definitions -> Axiom Definitions' | nonterminal , Definitions\n" +
                 "Definitions' -> , nonterminal Definitions' | eps\n" +
                 "Rules -> Rule Rules\n" +
-                "Rule -> [ Nonterminal Rule' ]\n" +
+                "Rule -> [ nonterminal Rule' ]\n" +
                 "Rule' -> Variant Variants\n" +
                 "Variants -> Variant Variants | eps\n" +
                 "Variant -> : Sequence\n" +
                 "Sequence -> Symbol Sequence'\n" +
                 "Sequence' -> Symbol Sequence' | eps\n" +
-                "Symbol -> terminal | Nonterminal | @\n" +
-                "Nonterminal -> nonterminal | start";
+                "Symbol -> terminal | nonterminal | @\n" +
+                "Axiom -> { nonterminal }";
 
         String grammar2 = GrammarConverter.convert(grammar);
 
@@ -71,34 +72,35 @@ public class Main {
         map.put("J", "Sequence'");
         map.put("H", "Sequence");
         map.put("I", "Symbol");
-        map.put("N", "Nonterminal");
+        map.put("X", "Axiom");
         map.put(",", ",");
         map.put(":", ":");
+        map.put("{", "{");
+        map.put("}", "}");
         map.put("[", "[");
         map.put("]", "]");
         map.put("@", "@");
         map.put("n", "nonterminal");
         map.put("t", "terminal");
-        map.put("s", "start");
         map.put("$", "$");
 
         Table<String, String, Rule> table = new Table<>();
         Table<String, String, Rule> table2 = new Table<>();
 
-        for (char row : "SACBDEGFHJIN".toCharArray()) {
+        for (char row : "SACBDEGFHJIX".toCharArray()) {
             table.addRow(map.get(String.valueOf(row)));
             table2.addRow(String.valueOf(row));
         }
 
-        for (char column : "sn,[]:t@$".toCharArray()) {
+        for (char column : "n,[]:t@{}$".toCharArray()) {
             table.addColumn(map.get(String.valueOf(column)));
             table2.addColumn(String.valueOf(column));
         }
 
-        table.setValue(map.get("S"), map.get("s"), rules.get(0));
         table.setValue(map.get("S"), map.get("n"), rules.get(0));
-        table.setValue(map.get("A"), map.get("s"), rules.get(1));
+        table.setValue(map.get("S"), map.get("{"), rules.get(0));
         table.setValue(map.get("A"), map.get("n"), rules.get(2));
+        table.setValue(map.get("A"), map.get("{"), rules.get(1));
         table.setValue(map.get("C"), map.get(","), rules.get(3));
         table.setValue(map.get("C"), map.get("["), rules.get(4));
         table.setValue(map.get("B"), map.get("["), rules.get(5));
@@ -107,27 +109,23 @@ public class Main {
         table.setValue(map.get("G"), map.get("]"), rules.get(9));
         table.setValue(map.get("G"), map.get(":"), rules.get(8));
         table.setValue(map.get("F"), map.get(":"), rules.get(10));
-        table.setValue(map.get("H"), map.get("s"), rules.get(11));
         table.setValue(map.get("H"), map.get("n"), rules.get(11));
         table.setValue(map.get("H"), map.get("t"), rules.get(11));
         table.setValue(map.get("H"), map.get("@"), rules.get(11));
-        table.setValue(map.get("J"), map.get("s"), rules.get(12));
         table.setValue(map.get("J"), map.get("n"), rules.get(12));
         table.setValue(map.get("J"), map.get("]"), rules.get(13));
         table.setValue(map.get("J"), map.get(":"), rules.get(13));
         table.setValue(map.get("J"), map.get("t"), rules.get(12));
         table.setValue(map.get("J"), map.get("@"), rules.get(12));
-        table.setValue(map.get("I"), map.get("s"), rules.get(15));
         table.setValue(map.get("I"), map.get("n"), rules.get(15));
         table.setValue(map.get("I"), map.get("t"), rules.get(14));
         table.setValue(map.get("I"), map.get("@"), rules.get(16));
-        table.setValue(map.get("N"), map.get("s"), rules.get(18));
-        table.setValue(map.get("N"), map.get("n"), rules.get(17));
+        table.setValue(map.get("X"), map.get("{"), rules.get(17));
 
-        table2.setValue("S", "s", rules2.get(0));
         table2.setValue("S", "n", rules2.get(0));
-        table2.setValue("A", "s", rules2.get(1));
+        table2.setValue("S", "{", rules2.get(0));
         table2.setValue("A", "n", rules2.get(2));
+        table2.setValue("A", "{", rules2.get(1));
         table2.setValue("C", ",", rules2.get(3));
         table2.setValue("C", "[", rules2.get(4));
         table2.setValue("B", "[", rules2.get(5));
@@ -136,22 +134,19 @@ public class Main {
         table2.setValue("G", "]", rules2.get(9));
         table2.setValue("G", ":", rules2.get(8));
         table2.setValue("F", ":", rules2.get(10));
-        table2.setValue("H", "s", rules2.get(11));
         table2.setValue("H", "n", rules2.get(11));
         table2.setValue("H", "t", rules2.get(11));
         table2.setValue("H", "@", rules2.get(11));
-        table2.setValue("J", "s", rules2.get(12));
         table2.setValue("J", "n", rules2.get(12));
         table2.setValue("J", "]", rules2.get(13));
         table2.setValue("J", ":", rules2.get(13));
         table2.setValue("J", "t", rules2.get(12));
         table2.setValue("J", "@", rules2.get(12));
-        table2.setValue("I", "s", rules2.get(15));
         table2.setValue("I", "n", rules2.get(15));
         table2.setValue("I", "t", rules2.get(14));
         table2.setValue("I", "@", rules2.get(16));
-        table2.setValue("N", "s", rules2.get(18));
-        table2.setValue("N", "n", rules2.get(17));
+        table2.setValue("X", "{", rules2.get(17));
+
 
         String input = new String(Files.readAllBytes(Paths.get("input.txt")));
         Scanner scanner = new Scanner(input);
