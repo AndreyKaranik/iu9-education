@@ -122,6 +122,8 @@ public class Main {
         table.setValue(map.get("I"), map.get("@"), rules.get(16));
         table.setValue(map.get("X"), map.get("{"), rules.get(17));
 
+        table.print();
+
         table2.setValue("S", "n", rules2.get(0));
         table2.setValue("S", "{", rules2.get(0));
         table2.setValue("A", "n", rules2.get(2));
