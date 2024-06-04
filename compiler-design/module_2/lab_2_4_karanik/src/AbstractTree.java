@@ -11,8 +11,18 @@ public class AbstractTree {
         String toString(int indent);
     }
 
-    public record Type(PrimType base, int arrayLevel) { }
-    public record FormalParameter(Type type, String name) { }
+    public record Type(PrimType base, int arrayLevel) implements PrettyPrintable {
+        @Override
+        public String toString(int indent) {
+            return toString();
+        }
+    }
+    public record FormalParameter(Type type, String name) implements PrettyPrintable {
+        @Override
+        public String toString(int indent) {
+            return toString();
+        }
+    }
     public record FunctionHeaderTypeAndName(Type type, String name) { }
 
     public record Program(List<FunctionDeclaration> functionDeclarations) implements PrettyPrintable {
@@ -29,18 +39,14 @@ public class AbstractTree {
             PrettyBuilder builder = new PrettyBuilder("FunctionDeclaration", indent);
             builder.append("header", header).append("body", body);
             return builder.toString();
-//            StringBuilder builder = new StringBuilder();
-//            builder.append("FunctionDeclaration(");
-//            int size = builder.length();
-//            builder.append("header=");
-//            builder.append(header).append(",\n").append(" ".repeat(Math.max(0, indent + size))).append("body=").append(body).append(")");
-//            return builder.toString();
         }
     }
     public record FunctionHeader(Type type, String name, List<FormalParameter> formalParameters) implements PrettyPrintable {
         @Override
         public String toString(int indent) {
-            return toString();
+            PrettyBuilder builder = new PrettyBuilder("FunctionHeader", indent);
+            builder.append("type", type).append("name", name).append("formalParameters", formalParameters);
+            return builder.toString();
         }
     }
 

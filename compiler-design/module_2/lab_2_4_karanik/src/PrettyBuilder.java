@@ -44,6 +44,18 @@ public class PrettyBuilder {
         return this;
     }
 
+    public PrettyBuilder append(String name, String value) {
+        StringBuilder builder = new StringBuilder();
+        if (count > 0) {
+            builder.append(",\n").append(" ".repeat(Math.max(0, indent)));
+        }
+        builder.append(name).append("=");
+        builder.append(value);
+        stringBuilder.append(builder);
+        count++;
+        return this;
+    }
+
     @Override
     public String toString() {
         return stringBuilder.toString() + ")";

@@ -10,7 +10,7 @@ public class Main {
         Scanner scanner = new Scanner(input);
 
         Parser parser = new Parser(scanner);
-
+        parser.printTree();
 //        Token a = scanner.nextToken();
 //        while (a.getTag() != DomainTag.END) {
 //            System.out.println(a.getValue() + " " + a.getTag());

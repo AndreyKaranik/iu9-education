@@ -6,11 +6,16 @@ public class Parser {
     private Token sym;
     private Map<String, HashSet<DomainTag>> first;
 
+    private AbstractTree tree;
+
     public Parser(Scanner scanner) {
         this.scanner = scanner;
         initializeMinFirstSet();
         sym = scanner.nextToken();
-        AbstractTree tree = new AbstractTree(NProgram());
+        tree = new AbstractTree(NProgram());
+    }
+
+    public void printTree() {
         tree.print();
     }
 
