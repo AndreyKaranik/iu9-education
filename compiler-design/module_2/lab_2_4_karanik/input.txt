@@ -1,6 +1,6 @@
 #comment#
 int {f} <- int {a} =
-return.
+return 2 + 2.
 
 int {Main} =
-return.
+return null.

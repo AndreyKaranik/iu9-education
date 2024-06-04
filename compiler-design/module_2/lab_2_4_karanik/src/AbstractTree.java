@@ -51,6 +51,16 @@ public class AbstractTree {
     }
 
     public interface Expr { }
+
+    public record VariableExpr(String name) implements Expr { }
+    public record ConstExpr(Type type, String value) implements Expr { }
+    public record StringConstExpr(Type type, List<String> value) implements Expr { }
+    public record FunctionInvocationExpr(String name, List<Expr> actualParameters) implements Expr { }
+    public record BinOpExpr(Expr left, String op, Expr right) implements Expr { }
+    public record AllocExpr(Type type, Expr right) implements Expr { }
+    public record UnOpExpr(String op, Expr right) implements Expr { }
+
+
     public interface Statement extends PrettyPrintable { }
 
     public record ReturnStatement(Expr expr) implements Statement {

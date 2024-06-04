@@ -43,6 +43,11 @@ public class Parser {
         set3.add(DomainTag.BOOLEAN_CONSTANT);
         set3.add(DomainTag.KW_NULL);
         first.put("NBottomExpr", set3);
+
+        HashSet<DomainTag> set4 = new HashSet<>();
+        set4.add(DomainTag.EQ_OP);
+        set4.add(DomainTag.ORD_OP);
+        first.put("NCmpOp", set4);
     }
 
     public void reportError() {
@@ -161,7 +166,8 @@ public class Parser {
         } else {
             reportError();
         }
-        return new AbstractTree.ReturnStatement(null);
+        AbstractTree.Expr expr = NExpr();
+        return new AbstractTree.ReturnStatement(expr);
     }
 
     // NType ::= (KW_INT | KW_CHAR | KW_BOOL) '[]'*
@@ -189,157 +195,259 @@ public class Parser {
     }
 
     // NExpr ::= NAndExpr ('|' NAndExpr | '@' NAndExpr)*
-    public void NExpr() {
-        NAndExpr();
+    public AbstractTree.Expr NExpr() {
+        AbstractTree.Expr expr = NAndExpr();
+        AbstractTree.BinOpExpr binOpExpr = null;
         while (sym.getTag().equals(DomainTag.OR_XOR_OP)) {
+            String op = sym.getValue();
             sym = scanner.nextToken();
-            NAndExpr();
+            AbstractTree.Expr expr2 = NAndExpr();
+            if (binOpExpr != null) {
+                binOpExpr = new AbstractTree.BinOpExpr(binOpExpr, op, expr2);
+            } else {
+                binOpExpr = new AbstractTree.BinOpExpr(expr, op, expr2);
+            }
         }
+        if (binOpExpr == null) {
+            return expr;
+        }
+        return binOpExpr;
     }
 
     // NAndExpr ::= NCmpExpr ('&' NCmpExpr)*
-    public void NAndExpr() {
-        NCmpExpr();
+    public AbstractTree.Expr NAndExpr() {
+        AbstractTree.Expr expr = NCmpExpr();
+        AbstractTree.BinOpExpr binOpExpr = null;
         while (sym.getTag().equals(DomainTag.AND_OP)) {
+            String op = sym.getValue();
             sym = scanner.nextToken();
-            NCmpExpr();
+            AbstractTree.Expr expr2 = NCmpExpr();
+            if (binOpExpr != null) {
+                binOpExpr = new AbstractTree.BinOpExpr(binOpExpr, op, expr2);
+            } else {
+                binOpExpr = new AbstractTree.BinOpExpr(expr, op, expr2);
+            }
         }
+        if (binOpExpr == null) {
+            return expr;
+        }
+        return binOpExpr;
     }
 
     // NCmpExpr ::= NFuncCallExpr (NCmpOp NFuncCallExpr)*
-    public void NCmpExpr() {
-        NFuncCallExpr();
+    public AbstractTree.Expr NCmpExpr() {
+        AbstractTree.Expr expr = NFuncCallExpr();
+        AbstractTree.BinOpExpr binOpExpr = null;
         while (first.get("NCmpOp").contains(sym.getTag())) {
-            NCmpOp();
-            NFuncCallExpr();
+            String op = NCmpOp();
+            AbstractTree.Expr expr2 = NFuncCallExpr();
+            if (binOpExpr != null) {
+                binOpExpr = new AbstractTree.BinOpExpr(binOpExpr, op, expr2);
+            } else {
+                binOpExpr = new AbstractTree.BinOpExpr(expr, op, expr2);
+            }
         }
+        if (binOpExpr == null) {
+            return expr;
+        }
+        return binOpExpr;
     }
 
     // NCmpOp ::= EQ_OP | ORD_OP
-    public void NCmpOp() {
+    public String NCmpOp() {
+        String op = "";
         if (sym.getTag().equals(DomainTag.EQ_OP)) {
+            op = sym.getValue();
             sym = scanner.nextToken();
         } else if (sym.getTag().equals(DomainTag.ORD_OP)) {
+            op = sym.getValue();
             sym = scanner.nextToken();
         } else {
             reportError();
         }
+        return op;
     }
 
     // NFuncCallExpr ::= NArithmExpr | (IDENTIFIER '<-' NArgs)
-    public void NFuncCallExpr() {
+    public AbstractTree.Expr NFuncCallExpr() {
+        AbstractTree.Expr expr = null;
         if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
+            String name = sym.getValue();
             sym = scanner.nextToken();
             if (sym.getTag().equals(DomainTag.LEFT_ARROW)) {
                 sym = scanner.nextToken();
-                NArgs();
+                List<AbstractTree.Expr> args = NArgs();
+                expr = new AbstractTree.FunctionInvocationExpr(name, args);
             } else {
                 reportError();
             }
         } else {
-            NArithmExpr();
+            expr = NArithmExpr();
         }
+        return expr;
     }
 
     // NArgs ::= NArithmExpr (',' NArithmExpr)*
-    public void NArgs() {
-        NArithmExpr();
+    public List<AbstractTree.Expr> NArgs() {
+        List<AbstractTree.Expr> args = new ArrayList<>();
+        args.add(NArithmExpr());
         while (sym.getTag().equals(DomainTag.COMMA)) {
             sym = scanner.nextToken();
-            NArithmExpr();
+            args.add(NArithmExpr());
         }
+        return args;
     }
 
     // NArithmExpr ::= NTerm (('+' | '-') NTerm)*
-    public void NArithmExpr() {
-        NTerm();
+    public AbstractTree.Expr NArithmExpr() {
+        AbstractTree.Expr expr = NTerm();
+        AbstractTree.BinOpExpr binOpExpr = null;
         while (sym.getTag().equals(DomainTag.PLUS_MINUS_OP)) {
+            String op = sym.getValue();
             sym = scanner.nextToken();
-            NTerm();
+            AbstractTree.Expr expr2 = NTerm();
+            if (binOpExpr != null) {
+                binOpExpr = new AbstractTree.BinOpExpr(binOpExpr, op, expr2);
+            } else {
+                binOpExpr = new AbstractTree.BinOpExpr(expr, op, expr2);
+            }
         }
+        if (binOpExpr == null) {
+            return expr;
+        }
+        return binOpExpr;
     }
 
     // NTerm ::= NFactor (('*' | '/' | '%') NFactor)*
-    public void NTerm() {
-        NFactor();
+    public AbstractTree.Expr NTerm() {
+        AbstractTree.Expr expr = NFactor();
+        AbstractTree.BinOpExpr binOpExpr = null;
         while (sym.getTag().equals(DomainTag.MUL_DIV_REM_OP)) {
+            String op = sym.getValue();
             sym = scanner.nextToken();
-            NFactor();
+            AbstractTree.Expr expr2 = NFactor();
+            if (binOpExpr != null) {
+                binOpExpr = new AbstractTree.BinOpExpr(binOpExpr, op, expr2);
+            } else {
+                binOpExpr = new AbstractTree.BinOpExpr(expr, op, expr2);
+            }
         }
+        if (binOpExpr == null) {
+            return expr;
+        }
+        return binOpExpr;
     }
 
     // NFactor ::= NPower ('^' NFactor)?
-    public void NFactor() {
-        NPower();
+    public AbstractTree.Expr NFactor() {
+        AbstractTree.Expr expr = NPower();
+        AbstractTree.BinOpExpr binOpExpr = null;
         if (sym.getTag().equals(DomainTag.POWER_OP)) {
+            String op = sym.getValue();
             sym = scanner.nextToken();
-            NFactor();
+            AbstractTree.Expr expr2 = NFactor();
+            binOpExpr = new AbstractTree.BinOpExpr(expr, op, expr2);
         }
+        if (binOpExpr == null) {
+            return expr;
+        }
+        return binOpExpr;
     }
 
     // NPower ::= NArrExpr | (('!' | '-') NPower) | (NType NBottomExpr)
-    public void NPower() {
+    public AbstractTree.Expr NPower() {
+        AbstractTree.Expr expr = null;
         if (sym.getTag().equals(DomainTag.NOT_MINUS_OP)) {
+            String op = sym.getValue();
             sym = scanner.nextToken();
+            expr = new AbstractTree.UnOpExpr(op, NPower());
         } else if (first.get("NType").contains(sym.getTag())) {
-            NType();
-            NBottomExpr();
+            AbstractTree.Type type = NType();
+            AbstractTree.Expr expr2 = NBottomExpr();
+            expr = new AbstractTree.AllocExpr(type, expr2);
         } else {
-            NArrExpr();
+            expr = NArrExpr();
         }
+
+        return expr;
     }
 
     // NArrExpr ::= NBottomExpr | (NArrExpr NBottomExpr) | NStringConstant
-    public void NArrExpr() {
+    public AbstractTree.Expr NArrExpr() {
+        AbstractTree.Expr expr = null;
         if (sym.getTag().equals(DomainTag.STRING_SECTION)) {
-            NStringConstant();
+            expr = NStringConstant();
         } else if (first.get("NBottomExpr").contains(sym.getTag())) {
-            NBottomExpr();
+            expr = NBottomExpr();
         } else {
-            NArrExpr();
-            NBottomExpr();
+            AbstractTree.Expr expr1 = NArrExpr();
+            AbstractTree.Expr expr2 = NBottomExpr();
+            expr = new AbstractTree.BinOpExpr(expr1, "at", expr2);
         }
+        return expr;
     }
 
     // NBottomExpr ::= IDENTIFIER | NConst | ('(' NExpr ')')
-    public void NBottomExpr() {
+    public AbstractTree.Expr NBottomExpr() {
+        AbstractTree.Expr expr = null;
         if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
+            String name = sym.getValue();
             sym = scanner.nextToken();
+            expr = new AbstractTree.VariableExpr(name);
         } else if (sym.getTag().equals(DomainTag.LEFT_PAR)) {
             sym = scanner.nextToken();
-            NExpr();
+            expr = NExpr();
             if (sym.getTag().equals(DomainTag.RIGHT_PAR)) {
                 sym = scanner.nextToken();
             } else {
                 reportError();
             }
         } else {
-            NConst();
+            expr = NConst();
         }
+        return expr;
     }
 
     // NStringConstant ::= STRING_SECTION STRING_SECTION*
-    public void NStringConstant() {
+    public AbstractTree.Expr NStringConstant() {
+        List<String> sections = new ArrayList<>();
         if (sym.getTag().equals(DomainTag.STRING_SECTION)) {
+            sections.add(sym.getValue());
             sym = scanner.nextToken();
         } else {
             reportError();
         }
         while (sym.getTag().equals(DomainTag.STRING_SECTION)) {
+            sections.add(sym.getValue());
             sym = scanner.nextToken();
         }
+        return new AbstractTree.StringConstExpr(new AbstractTree.Type(AbstractTree.PrimType.CHAR, 0), sections);
     }
 
     // NConst ::= DECIMAL_INTEGER_CONSTANT | NON_DECIMAL_INTEGER_CONSTANT | SYMBOLIC_CONSTANT | BOOLEAN_CONSTANT | KW_NULL
-    public void NConst() {
+    public AbstractTree.Expr NConst() {
+        AbstractTree.Expr expr = null;
         if (sym.getTag().equals(DomainTag.DECIMAL_INTEGER_CONSTANT)
-                | sym.getTag().equals(DomainTag.NON_DECIMAL_INTEGER_CONSTANT)
-                | sym.getTag().equals(DomainTag.SYMBOLIC_CONSTANT)
-                | sym.getTag().equals(DomainTag.BOOLEAN_CONSTANT)
-                | sym.getTag().equals(DomainTag.KW_NULL)) {
+                || sym.getTag().equals(DomainTag.NON_DECIMAL_INTEGER_CONSTANT)
+                || sym.getTag().equals(DomainTag.SYMBOLIC_CONSTANT)
+                || sym.getTag().equals(DomainTag.BOOLEAN_CONSTANT)
+                || sym.getTag().equals(DomainTag.KW_NULL)) {
+            String value = sym.getValue();
+            if (sym.getTag().equals(DomainTag.DECIMAL_INTEGER_CONSTANT) || sym.getTag().equals(DomainTag.NON_DECIMAL_INTEGER_CONSTANT)) {
+                expr = new AbstractTree.ConstExpr(new AbstractTree.Type(AbstractTree.PrimType.INT, 0), value);
+            } else if (sym.getTag().equals(DomainTag.SYMBOLIC_CONSTANT)) {
+                expr = new AbstractTree.ConstExpr(new AbstractTree.Type(AbstractTree.PrimType.CHAR, 0), value);
+            } else if (sym.getTag().equals(DomainTag.BOOLEAN_CONSTANT)) {
+                expr = new AbstractTree.ConstExpr(new AbstractTree.Type(AbstractTree.PrimType.BOOL, 0), value);
+            } else if (sym.getTag().equals(DomainTag.KW_NULL)) {
+                expr = new AbstractTree.ConstExpr(new AbstractTree.Type(null, 0), value);
+            }
+
+
             sym = scanner.nextToken();
         } else {
             reportError();
         }
+        return expr;
     }
 }
