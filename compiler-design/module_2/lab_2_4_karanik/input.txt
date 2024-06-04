@@ -1,3 +1,6 @@
 #comment#
 int {f} <- int {a} =
 return.
+
+int {Main} =
+return.

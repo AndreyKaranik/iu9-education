@@ -11,7 +11,7 @@ public class Parser {
         initializeMinFirstSet();
         sym = scanner.nextToken();
         AbstractTree tree = new AbstractTree(NProgram());
-        System.out.println(tree);
+        tree.print();
     }
 
     public void initializeMinFirstSet() {
@@ -150,7 +150,6 @@ public class Parser {
 
     // NType ::= (KW_INT | KW_CHAR | KW_BOOL) '[]'*
     public AbstractTree.Type NType() {
-        AbstractTree.Type type = null;
         AbstractTree.PrimType prim = null;
         if (sym.getTag().equals(DomainTag.KW_INT)) {
             prim = AbstractTree.PrimType.INT;
