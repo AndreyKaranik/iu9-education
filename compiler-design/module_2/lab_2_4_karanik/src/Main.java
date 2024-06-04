@@ -9,11 +9,12 @@ public class Main {
         String input = new String(Files.readAllBytes(Paths.get("input.txt")));
         Scanner scanner = new Scanner(input);
 
+        Parser parser = new Parser(scanner);
 
-        Token a = scanner.nextToken();
-        while (a.getTag() != DomainTag.END) {
-            System.out.println(a.getValue() + " " + a.getTag());
-            a = scanner.nextToken();
-        }
+//        Token a = scanner.nextToken();
+//        while (a.getTag() != DomainTag.END) {
+//            System.out.println(a.getValue() + " " + a.getTag());
+//            a = scanner.nextToken();
+//        }
     }
 }

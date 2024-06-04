@@ -1,17 +1,3 @@
 #comment#
 int {f} <- int {a} =
-int {b}, {c} := 10;
-{c} > 5 then
-    {c} := 0
-else
-    int {d} := 0;
-    {d} := 5.;
-
-int {i} := 0;
-1 ~ 10 loop {i}
-    {a} := 10.;
-
-return {param}.
-
-int {Main} <- char[][] {args} =
-return 2 + 2.
+return.
