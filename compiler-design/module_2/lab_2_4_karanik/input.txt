@@ -1,6 +1,16 @@
-#comment#
-int {f} <- int {a}, bool {b} =
-return ({f} <- {x}, {y}).
+int {f} <- int {a} =
+int {b}, {c} := 10;
+1 > 5 then
+    {c} := 0
+else
+    int {d} := 0;
+    {d} := 5.;
 
-int {Main} =
+int {i} := 0;
+1 ~ 10 loop {i}
+    {a} := 10.;
+
+return {param}.
+
+int {Main} <- char[][] {args} =
 return 2 + 2.

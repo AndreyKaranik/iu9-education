@@ -52,7 +52,7 @@ class Scanner {
 
 
     private static final Pattern PATTERN = Pattern.compile(
-            IDENTIFIER_REGEX + "|" + DECIMAL_INTEGER_CONSTANT_REGEX + "|" + NON_DECIMAL_INTEGER_CONSTANT_REGEX + "|" +
+              IDENTIFIER_REGEX + "|" + DECIMAL_INTEGER_CONSTANT_REGEX + "|" + NON_DECIMAL_INTEGER_CONSTANT_REGEX + "|" +
                     SYMBOLIC_CONSTANT_REGEX + "|" + STRING_SECTION_REGEX + "|" + BOOLEAN_CONSTANT_REGEX + "|" +
                     OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + LEFT_ARROW_REGEX + "|" + PLUS_OP_REGEX + "|" + MINUS_OP_REGEX + "|" +
                     MUL_DIV_REM_OP_REGEX + "|" + POWER_OP_REGEX + "|" + NOT_OP_REGEX + "|" + EQUAL_REGEX + "|" + ASSIGN_REGEX + "|" + DOT_REGEX + "|" +
@@ -162,6 +162,7 @@ class Scanner {
         } else if (token.matches(SPACES_REGEX)) {
             return nextToken();
         }
+        System.out.println(token);
         throw new RuntimeException("LEX_ERROR: " + fragmentPosition);
     }
 

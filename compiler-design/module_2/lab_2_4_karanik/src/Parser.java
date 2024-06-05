@@ -48,6 +48,22 @@ public class Parser {
         set4.add(DomainTag.EQ_OP);
         set4.add(DomainTag.ORD_OP);
         first.put("NCmpOp", set4);
+
+        HashSet<DomainTag> set5 = new HashSet<>();
+        set5.add(DomainTag.IDENTIFIER);
+        set5.add(DomainTag.LEFT_PAR);
+        set5.add(DomainTag.DECIMAL_INTEGER_CONSTANT);
+        set5.add(DomainTag.NON_DECIMAL_INTEGER_CONSTANT);
+        set5.add(DomainTag.SYMBOLIC_CONSTANT);
+        set5.add(DomainTag.BOOLEAN_CONSTANT);
+        set5.add(DomainTag.KW_NULL);
+        set5.add(DomainTag.STRING_SECTION);
+        set5.add(DomainTag.MINUS_OP);
+        set5.add(DomainTag.NOT_OP);
+        set5.add(DomainTag.KW_INT);
+        set5.add(DomainTag.KW_CHAR);
+        set5.add(DomainTag.KW_BOOL);
+        first.put("NExpr", set5);
     }
 
     public void reportError() {
@@ -387,19 +403,20 @@ public class Parser {
     // NFuncCallExpr ::= NArithmExpr | (IDENTIFIER '<-' NArgs)
     public AbstractTree.Expr NFuncCallExpr() {
         AbstractTree.Expr expr = null;
-        if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
-            String name = sym.getValue();
-            sym = scanner.nextToken();
-            if (sym.getTag().equals(DomainTag.LEFT_ARROW)) {
-                sym = scanner.nextToken();
-                List<AbstractTree.Expr> args = NArgs();
-                expr = new AbstractTree.FunctionInvocationExpr(name, args);
-            } else {
-                reportError();
-            }
-        } else {
-            expr = NArithmExpr();
-        }
+//        if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
+//            String name = sym.getValue();
+//            sym = scanner.nextToken();
+//            if (sym.getTag().equals(DomainTag.LEFT_ARROW)) {
+//                sym = scanner.nextToken();
+//                List<AbstractTree.Expr> args = NArgs();
+//                expr = new AbstractTree.FunctionInvocationExpr(name, args);
+//            } else {
+//                reportError();
+//            }
+//        } else {
+//            expr = NArithmExpr();
+//        }
+        expr = NArithmExpr();
         return expr;
     }
 
