@@ -18,7 +18,7 @@ public class PrettyBuilder {
             builder.append(",\n").append(" ".repeat(Math.max(0, indent)));
         }
         builder.append(name).append("=[");
-        int size = indent + builder.length();
+        int size = indent + name.length() + 2;
         if (!list.isEmpty()) {
             builder.append(list.get(0).toString(size));
             for (int i = 1; i < list.size(); i++) {
@@ -37,7 +37,7 @@ public class PrettyBuilder {
             builder.append(",\n").append(" ".repeat(Math.max(0, indent)));
         }
         builder.append(name).append("=");
-        int size = indent + builder.length();
+        int size = indent + name.length() + 1;
         builder.append(prettyPrintable.toString(size));
         stringBuilder.append(builder);
         count++;

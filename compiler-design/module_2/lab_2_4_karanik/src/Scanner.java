@@ -21,10 +21,12 @@ class Scanner {
     private final static String AND_OP_REGEX = "[&]";
     private final static String EQ_OP_REGEX = "([!=]=)";
     private final static String ORD_OP_REGEX = "([<>]=?)";
-    private final static String PLUS_MINUS_OP_REGEX = "[-+]";
+    private final static String PLUS_OP_REGEX = "[+]";
+    private final static String MINUS_OP_REGEX = "-";
+
     private final static String MUL_DIV_REM_OP_REGEX = "[*/%]";
     private final static String POWER_OP_REGEX = "\\^";
-    private final static String NOT_MINUS_OP_REGEX = "[-!]";
+    private final static String NOT_OP_REGEX = "!";
     private final static String EQUAL_REGEX = "[=]";
     private final static String ASSIGN_REGEX = "(:=)";
     private final static String DOT_REGEX = "[.]";
@@ -52,8 +54,8 @@ class Scanner {
     private static final Pattern PATTERN = Pattern.compile(
             IDENTIFIER_REGEX + "|" + DECIMAL_INTEGER_CONSTANT_REGEX + "|" + NON_DECIMAL_INTEGER_CONSTANT_REGEX + "|" +
                     SYMBOLIC_CONSTANT_REGEX + "|" + STRING_SECTION_REGEX + "|" + BOOLEAN_CONSTANT_REGEX + "|" +
-                    OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + LEFT_ARROW_REGEX + "|" + PLUS_MINUS_OP_REGEX + "|" +
-                    MUL_DIV_REM_OP_REGEX + "|" + POWER_OP_REGEX + "|" + NOT_MINUS_OP_REGEX + "|" + EQUAL_REGEX + "|" + ASSIGN_REGEX + "|" + DOT_REGEX + "|" +
+                    OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + LEFT_ARROW_REGEX + "|" + PLUS_OP_REGEX + "|" + MINUS_OP_REGEX + "|" +
+                    MUL_DIV_REM_OP_REGEX + "|" + POWER_OP_REGEX + "|" + NOT_OP_REGEX + "|" + EQUAL_REGEX + "|" + ASSIGN_REGEX + "|" + DOT_REGEX + "|" +
                     ORD_OP_REGEX + "|" + COMMA_REGEX + "|" + TILDE_REGEX + "|" + BRACKETS_REGEX + "|" + LEFT_PAR_REGEX + "|" + RIGHT_PAR_REGEX + "|" + SEMICOLON_REGEX + "|" +
                     KW_INT_REGEX + "|" + KW_BOOL_REGEX + "|" + KW_RETURN_REGEX + "|" +
                     KW_VOID_REGEX + "|" + KW_CHAR_REGEX + "|" + KW_LOOP_REGEX + "|" +
@@ -105,14 +107,16 @@ class Scanner {
             return new Token(token, DomainTag.EQ_OP, fragmentPosition);
         } else if (token.matches(ORD_OP_REGEX)) {
             return new Token(token, DomainTag.ORD_OP, fragmentPosition);
-        } else if (token.matches(PLUS_MINUS_OP_REGEX)) {
-            return new Token(token, DomainTag.PLUS_MINUS_OP, fragmentPosition);
+        } else if (token.matches(PLUS_OP_REGEX)) {
+            return new Token(token, DomainTag.PLUS_OP, fragmentPosition);
+        } else if (token.matches(MINUS_OP_REGEX)) {
+            return new Token(token, DomainTag.MINUS_OP, fragmentPosition);
         } else if (token.matches(MUL_DIV_REM_OP_REGEX)) {
             return new Token(token, DomainTag.MUL_DIV_REM_OP, fragmentPosition);
         } else if (token.matches(POWER_OP_REGEX)) {
             return new Token(token, DomainTag.POWER_OP, fragmentPosition);
-        } else if (token.matches(NOT_MINUS_OP_REGEX)) {
-            return new Token(token, DomainTag.NOT_MINUS_OP, fragmentPosition);
+        } else if (token.matches(NOT_OP_REGEX)) {
+            return new Token(token, DomainTag.NOT_OP, fragmentPosition);
         } else if (token.matches(EQUAL_REGEX)) {
             return new Token(token, DomainTag.EQUAL, fragmentPosition);
         } else if (token.matches(ASSIGN_REGEX)) {

@@ -160,14 +160,130 @@ public class Parser {
         return new AbstractTree.FormalParameter(type, name);
     }
 
+    // NStatement ::= NType NDeclarationAssignments
+    //             | NExpr
+    //               (
+    //                 ':=' NExpr
+    //               | KW_THEN NStatements (KW_ELSE NStatements)? '.'
+    //               | KW_LOOP NStatements '.'
+    //               | '~' NExpr KW_LOOP IDENTIFIER NStatements '.'
+    //               )?
+    //             | KW_LOOP NStatements KW_WHILE NExpr '.'
+    //             | KW_RETURN (NExpr)?
     public AbstractTree.Statement NStatement() {
-        if (sym.getTag().equals(DomainTag.KW_RETURN)) {
+
+        AbstractTree.Statement statement = null;
+
+        if (first.get("NType").contains(sym.getTag())) {
+            AbstractTree.Type type = NType();
+            List<AbstractTree.DeclarationAssignment> declarationAssignments = NDeclarationAssignments();
+            statement = new AbstractTree.DeclarationStatement(type, declarationAssignments);
+        } else if (sym.getTag().equals(DomainTag.KW_LOOP)) {
+            sym = scanner.nextToken();
+            List<AbstractTree.Statement> body = NStatements();
+            if (sym.getTag().equals(DomainTag.DOT)) {
+                sym = scanner.nextToken();
+            } else {
+                reportError();
+            }
+            AbstractTree.Expr condition = NExpr();
+            if (sym.getTag().equals(DomainTag.DOT)) {
+                sym = scanner.nextToken();
+            } else {
+                reportError();
+            }
+            statement = new AbstractTree.PostWhileStatement(condition, body);
+        } else if (sym.getTag().equals(DomainTag.KW_RETURN)) {
+            sym = scanner.nextToken();
+            AbstractTree.Expr expr = null;
+            if (first.get("NExpr").contains(sym.getTag())) {
+                expr = NExpr();
+            }
+            statement = new AbstractTree.ReturnStatement(expr);
+        } else {
+            AbstractTree.Expr expr = NExpr();
+            if (sym.getTag().equals(DomainTag.ASSIGN)) {
+                sym = scanner.nextToken();
+                AbstractTree.Expr expr2 = NExpr();
+                statement = new AbstractTree.AssignmentStatement(expr, expr2);
+            } else if (sym.getTag().equals(DomainTag.KW_THEN)) {
+                sym = scanner.nextToken();
+                List<AbstractTree.Statement> thenBranch = NStatements();
+                List<AbstractTree.Statement> elseBranch = new ArrayList<>();
+                if (sym.getTag().equals(DomainTag.KW_ELSE)) {
+                    sym = scanner.nextToken();
+                    elseBranch = NStatements();
+                }
+                if (sym.getTag().equals(DomainTag.DOT)) {
+                    sym = scanner.nextToken();
+                } else {
+                    reportError();
+                }
+                statement = new AbstractTree.IfStatement(expr, thenBranch, elseBranch);
+            } else if (sym.getTag().equals(DomainTag.KW_LOOP)) {
+                sym = scanner.nextToken();
+                List<AbstractTree.Statement> body = NStatements();
+                if (sym.getTag().equals(DomainTag.DOT)) {
+                    sym = scanner.nextToken();
+                } else {
+                    reportError();
+                }
+                statement = new AbstractTree.PreWhileStatement(expr, body);
+            } else if (sym.getTag().equals(DomainTag.TILDE)) {
+                sym = scanner.nextToken();
+                AbstractTree.Expr expr2 = NExpr();
+                if (sym.getTag().equals(DomainTag.KW_LOOP)) {
+                    sym = scanner.nextToken();
+                } else {
+                    reportError();
+                }
+                String variable = null;
+                if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
+                    variable = sym.getValue();
+                    sym = scanner.nextToken();
+                } else {
+                    reportError();
+                }
+                List<AbstractTree.Statement> body = NStatements();
+                if (sym.getTag().equals(DomainTag.DOT)) {
+                    sym = scanner.nextToken();
+                } else {
+                    reportError();
+                }
+                statement = new AbstractTree.ForStatement(expr, expr2, variable, body);
+            }
+        }
+        return statement;
+    }
+
+    // NDeclarationAssignments ::= NDeclarationAssignment (',' NDeclarationAssignment)*
+    public List<AbstractTree.DeclarationAssignment> NDeclarationAssignments() {
+        List<AbstractTree.DeclarationAssignment> declarationAssignments = new ArrayList<>();
+        declarationAssignments.add(NDeclarationAssignment());
+        while (sym.getTag().equals(DomainTag.COMMA)) {
+            sym = scanner.nextToken();
+            declarationAssignments.add(NDeclarationAssignment());
+        }
+        return declarationAssignments;
+    }
+
+    // NDeclarationAssignment ::= IDENTIFIER (':=' NArithmExpr)?
+    public AbstractTree.DeclarationAssignment NDeclarationAssignment() {
+        String name = null;
+        AbstractTree.Expr expr = null;
+        if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
+            name = sym.getValue();
             sym = scanner.nextToken();
         } else {
             reportError();
         }
-        AbstractTree.Expr expr = NExpr();
-        return new AbstractTree.ReturnStatement(expr);
+
+        if (sym.getTag().equals(DomainTag.ASSIGN)) {
+            sym = scanner.nextToken();
+            expr = NArithmExpr();
+        }
+
+        return new AbstractTree.DeclarationAssignment(name, expr);
     }
 
     // NType ::= (KW_INT | KW_CHAR | KW_BOOL) '[]'*
@@ -302,7 +418,7 @@ public class Parser {
     public AbstractTree.Expr NArithmExpr() {
         AbstractTree.Expr expr = NTerm();
         AbstractTree.BinOpExpr binOpExpr = null;
-        while (sym.getTag().equals(DomainTag.PLUS_MINUS_OP)) {
+        while (sym.getTag().equals(DomainTag.PLUS_OP) || sym.getTag().equals(DomainTag.MINUS_OP)) {
             String op = sym.getValue();
             sym = scanner.nextToken();
             AbstractTree.Expr expr2 = NTerm();
@@ -357,7 +473,7 @@ public class Parser {
     // NPower ::= NArrExpr | (('!' | '-') NPower) | (NType NBottomExpr)
     public AbstractTree.Expr NPower() {
         AbstractTree.Expr expr = null;
-        if (sym.getTag().equals(DomainTag.NOT_MINUS_OP)) {
+        if (sym.getTag().equals(DomainTag.NOT_OP) || sym.getTag().equals(DomainTag.MINUS_OP)) {
             String op = sym.getValue();
             sym = scanner.nextToken();
             expr = new AbstractTree.UnOpExpr(op, NPower());
@@ -421,7 +537,7 @@ public class Parser {
             sections.add(sym.getValue());
             sym = scanner.nextToken();
         }
-        return new AbstractTree.StringConstExpr(new AbstractTree.Type(AbstractTree.PrimType.CHAR, 0), sections);
+        return new AbstractTree.StringConstExpr(new AbstractTree.Type(AbstractTree.PrimType.CHAR, 1), sections);
     }
 
     // NConst ::= DECIMAL_INTEGER_CONSTANT | NON_DECIMAL_INTEGER_CONSTANT | SYMBOLIC_CONSTANT | BOOLEAN_CONSTANT | KW_NULL
@@ -442,8 +558,6 @@ public class Parser {
             } else if (sym.getTag().equals(DomainTag.KW_NULL)) {
                 expr = new AbstractTree.ConstExpr(new AbstractTree.Type(null, 0), value);
             }
-
-
             sym = scanner.nextToken();
         } else {
             reportError();

@@ -1,6 +1,6 @@
 #comment#
-int {f} <- int {a} =
-return 2 + 2.
+int {f} <- int {a}, bool {b} =
+return ({f} <- {x}, {y}).
 
 int {Main} =
-return null.
+return 2 + 2.
