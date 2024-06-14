@@ -618,7 +618,6 @@ NBrackets |= '[]', lambda: 1
 
 # Парсер
 parser = pe.Parser(NProgram)
-# parser.print_table()
 assert parser.is_lalr_one()
 
 parser.add_skipped_domain('\\s')
