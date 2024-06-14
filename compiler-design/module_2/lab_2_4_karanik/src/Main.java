@@ -11,10 +11,5 @@ public class Main {
 
         Parser parser = new Parser(scanner);
         parser.printTree();
-//        Token a = scanner.nextToken();
-//        while (a.getTag() != DomainTag.END) {
-//            System.out.println(a.getValue() + " " + a.getTag());
-//            a = scanner.nextToken();
-//        }
     }
 }
