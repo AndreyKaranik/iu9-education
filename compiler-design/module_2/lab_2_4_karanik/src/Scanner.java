@@ -56,7 +56,7 @@ class Scanner {
                     SYMBOLIC_CONSTANT_REGEX + "|" + STRING_SECTION_REGEX + "|" + BOOLEAN_CONSTANT_REGEX + "|" +
                     OR_XOR_OP_REGEX + "|" + AND_OP_REGEX + "|" + EQ_OP_REGEX + "|" + LEFT_ARROW_REGEX + "|" + PLUS_OP_REGEX + "|" + MINUS_OP_REGEX + "|" +
                     MUL_DIV_REM_OP_REGEX + "|" + POWER_OP_REGEX + "|" + NOT_OP_REGEX + "|" + EQUAL_REGEX + "|" + ASSIGN_REGEX + "|" + DOT_REGEX + "|" +
-                    ORD_OP_REGEX + "|" + COMMA_REGEX + "|" + TILDE_REGEX + "|" + BRACKETS_REGEX + "|" + LEFT_PAR_REGEX + "|" + RIGHT_PAR_REGEX + "|" + SEMICOLON_REGEX + "|" +
+                    ORD_OP_REGEX + "|" + COMMA_REGEX + "|" + TILDE_REGEX + "|" + BRACKETS_REGEX + "|" + LEFT_PAR_REGEX + "|" + RIGHT_PAR_REGEX + "|" +SEMICOLON_REGEX + "|" +
                     KW_INT_REGEX + "|" + KW_BOOL_REGEX + "|" + KW_RETURN_REGEX + "|" +
                     KW_VOID_REGEX + "|" + KW_CHAR_REGEX + "|" + KW_LOOP_REGEX + "|" +
                     KW_THEN_REGEX + "|" + KW_ELSE_REGEX + "|" + KW_NULL_REGEX + "|" + KW_WHILE_REGEX + "|" +
