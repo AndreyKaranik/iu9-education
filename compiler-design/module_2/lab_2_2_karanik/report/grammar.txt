@@ -1,0 +1,89 @@
+NProgram → NFunctionDeclarations
+NFunctionDeclarations → NFunctionDeclaration
+NFunctionDeclarations → NFunctionDeclarations NFunctionDeclaration
+NFunctionDeclaration → NFunctionHeader '=' NStatements '.'
+NFunctionHeader → NFunctionHeaderTypeName
+NFunctionHeader → NFunctionHeaderTypeName '<-' NFormalParameters
+NFunctionHeaderTypeName → NType IDENTIFIER
+NFunctionHeaderTypeName → KW_VOID IDENTIFIER
+NFormalParameters → NFormalParameters ',' NFormalParameter
+NFormalParameters → NFormalParameter
+NFormalParameter → NType IDENTIFIER
+
+NExpr → NAndExpr
+NExpr → NExpr '|' NAndExpr
+NExpr → NExpr '@' NAndExpr
+NAndExpr → NCmpExpr
+NAndExpr → NAndExpr '&' NCmpExpr
+NCmpExpr → NFuncCallExpr
+NCmpExpr → NCmpExpr NCmpOp NFuncCallExpr
+NFuncCallExpr → NArithmExpr
+NFuncCallExpr → IDENTIFIER '<-' NArgs
+NArgs → NArithmExpr
+NArgs → NArgs ',' NArithmExpr
+
+NArithmExpr → NTerm
+NArithmExpr → NArithmExpr NAddOp NTerm
+NAddOp → '+'
+NAddOp → '-'
+NTerm → NFactor
+NTerm → NTerm NMulOp NFactor
+NMulOp → '*'
+NMulOp → '/'
+NMulOp → '%'
+NFactor → NPower
+NFactor → NPower '^' NFactor
+NPower → NArrExpr
+NPower → '!' NPower
+NPower → '-' NPower
+NArrExpr → NBottomExpr
+NArrExpr → NArrExpr NBottomExpr
+NArrExpr → NStringConstant
+NPower → NType NBottomExpr
+NBottomExpr → IDENTIFIER VariableExpr
+NBottomExpr → NConst
+NBottomExpr → '(' NExpr ')'
+
+NStringConstant → NStringConstant STRING_SECTION
+NStringConstant → STRING_SECTION
+
+NConst → DECIMAL_INTEGER_CONSTANT
+NConst → NON_DECIMAL_INTEGER_CONSTANT
+NConst → SYMBOLIC_CONSTANT
+NConst → BOOLEAN_CONSTANT
+NConst → KW_NULL
+
+NStatements → NStatements ';' NStatement
+NStatements → NStatement
+
+NStatement → NType NDeclarationAssignments
+NDeclarationAssignments → NDeclarationAssignment
+NDeclarationAssignments → NDeclarationAssignments ',' NDeclarationAssignment
+NDeclarationAssignment → IDENTIFIER
+NDeclarationAssignment → IDENTIFIER ':=' NArithmExpr
+
+NStatement → NArrExpr ':=' NExpr
+
+NStatement → IDENTIFIER '<-' NArgs
+
+NStatement → NExpr KW_THEN NStatements '.'
+NStatement → NExpr KW_THEN NStatements KW_ELSE NStatements '.'
+
+NStatement → NExpr KW_LOOP NStatements '.'
+NStatement → NExpr '~' NExpr KW_LOOP IDENTIFIER NStatements '.'
+
+NStatement → KW_LOOP NStatements KW_WHILE NExpr '.'
+
+NStatement → KW_RETURN NExpr
+NStatement → KW_RETURN
+
+NType → KW_INT
+NType → KW_CHAR
+NType → KW_BOOL
+NType → NArrayType
+
+NArrayType → KW_INT NBrackets
+NArrayType → KW_CHAR NBrackets
+NArrayType → KW_BOOL NBrackets
+NBrackets → NBrackets '[]'
+NBrackets → '[]'
