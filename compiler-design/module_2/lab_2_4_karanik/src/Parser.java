@@ -400,7 +400,7 @@ public class Parser {
         return op;
     }
 
-    // NFuncCallExpr ::= NArithmExpr | (IDENTIFIER '<-' NArgs)
+    // NFuncCallExpr ::= NArithmExpr ('<-' NArgs)? # | (IDENTIFIER '<-' NArgs)
     public AbstractTree.Expr NFuncCallExpr() {
         AbstractTree.Expr expr = null;
 //        if (sym.getTag().equals(DomainTag.IDENTIFIER)) {
@@ -417,7 +417,15 @@ public class Parser {
 //            expr = NArithmExpr();
 //        }
         expr = NArithmExpr();
-        return expr;
+        List<AbstractTree.Expr> args = new ArrayList<>();
+        if (sym.getTag().equals(DomainTag.LEFT_ARROW)) {
+            sym = scanner.nextToken();
+            args = NArgs();
+        }
+        if (args.isEmpty()) {
+            return expr;
+        }
+        return new AbstractTree.FunctionInvocationExpr(expr, args);
     }
 
     // NArgs ::= NArithmExpr (',' NArithmExpr)*

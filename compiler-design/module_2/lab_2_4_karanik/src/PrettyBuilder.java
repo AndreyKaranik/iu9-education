@@ -22,7 +22,11 @@ public class PrettyBuilder {
         if (!list.isEmpty()) {
             builder.append(list.get(0).toString(size));
             for (int i = 1; i < list.size(); i++) {
-                builder.append(",\n").append(" ".repeat(Math.max(0, size))).append(list.get(i).toString(size));
+                if (list.get(i) != null) {
+                    builder.append(",\n").append(" ".repeat(Math.max(0, size))).append(list.get(i).toString(size));
+                } else {
+                    builder.append(",\n").append(" ".repeat(Math.max(0, size))).append("null");
+                }
             }
         }
         builder.append("]");

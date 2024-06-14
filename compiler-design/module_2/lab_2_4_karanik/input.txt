@@ -1,9 +1,10 @@
+#comment#
 int {f} <- int {a} =
 int {b}, {c} := 10;
-1 > 5 then
+{c} > 5 then
     {c} := 0
 else
-    int {d} := 0;
+    int {d} := ({Main} <- {a});
     {d} := 5.;
 
 int {i} := 0;

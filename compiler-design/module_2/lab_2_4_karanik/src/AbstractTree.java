@@ -76,11 +76,11 @@ public class AbstractTree {
             return builder.toString();
         }
     }
-    public record FunctionInvocationExpr(String name, List<Expr> actualParameters) implements Expr {
+    public record FunctionInvocationExpr(Expr expr, List<Expr> actualParameters) implements Expr {
         @Override
         public String toString(int indent) {
             PrettyBuilder builder = new PrettyBuilder("FunctionInvocationExpr", indent);
-            builder.append("name", name).append("actualParameters", actualParameters);
+            builder.append("Expr", expr).append("actualParameters", actualParameters);
             return builder.toString();
         }
     }
