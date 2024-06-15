@@ -504,7 +504,8 @@ def make_keyword(image):
 (NProgram, NFunctionDeclarations, NFunctionDeclaration, NFunctionHeader, NFunctionHeaderTypeName,
  NFormalParameters, NFormalParameter, NStatements, NStatement) = \
     map(pe.NonTerminal, 'Program FunctionDeclarations FunctionDeclaration FunctionHeader'
-                        ' FunctionHeaderTypeName FormalParameters FormalParameter Statements Statement'.split())
+                        ' FunctionHeaderTypeName FormalParameters'
+                        ' FormalParameter Statements Statement'.split())
 
 (NType, NArrayType, NBrackets, NDeclarationAssignments, NDeclarationAssignment, NActualParameters,
  NActualParameter) = \
