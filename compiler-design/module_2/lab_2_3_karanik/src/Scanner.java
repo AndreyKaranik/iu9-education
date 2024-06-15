@@ -30,14 +30,12 @@ class Scanner {
         }
 
         throw new RuntimeException("LEX_ERROR: " + new FragmentPosition(findPosition(input, pos), findPosition(input, pos)));
-//        return new Token("", DomainTag.NONE, "",
-//                new FragmentPosition(findPosition(input, pos), findPosition(input, pos)));
     }
 
     private Token determineToken(String token, FragmentPosition fragmentPosition) {
         if (token.matches("\"[^\"]*\"")) {
             return new Token(token, DomainTag.TERMINAL, "terminal", fragmentPosition);
-        } else if (token.matches("[^\\s\\[\\]:,@\"{}]+(?:[\\s,]|$)")) {
+        } else if (token.matches("[^\\s\\[\\]:,@\"{}\\-]+(?:[\\s,]|$)")) {
             return new Token(token, DomainTag.NONTERMINAL, "nonterminal", fragmentPosition);
         } else if (token.equals("{")) {
             return new Token(token, DomainTag.LEFT_CURLY_BRACE, "{", fragmentPosition);
