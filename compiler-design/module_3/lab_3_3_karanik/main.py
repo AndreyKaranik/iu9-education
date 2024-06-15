@@ -161,7 +161,8 @@ class AssignmentStatement(Statement):
     def check(self, vars):
         self.leftExpr.check(vars)
         self.rightExpr.check(vars)
-        if self.leftExpr.type == Type(PrimType.Int, 0) and self.rightExpr.type in (Type(PrimType.Int, 0), Type(PrimType.Char, 0)):
+        if (self.leftExpr.type == Type(PrimType.Int, 0) and self.rightExpr.type in
+                (Type(PrimType.Int, 0), Type(PrimType.Char, 0))):
             return
         elif self.leftExpr.type != self.rightExpr.type:
             raise BinBadType(self.var_coord, self.leftExpr.type, ':=', self.rightExpr.type)
@@ -319,10 +320,14 @@ class BinOpExpr(Expr):
         self.type = None
         if self.op in ('<', '>', '<=', '>='):
             if self.left.type.array_level == 0 and self.right.type.array_level == 0:
-                if self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Int, 0) or \
-                        self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Char, 0) or \
-                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Int, 0) or \
-                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Char, 0):
+                if (self.left.type == Type(PrimType.Int, 0)
+                        and self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Int, 0)
+                        and self.right.type == Type(PrimType.Char, 0) or \
+                        self.left.type == Type(PrimType.Char, 0)
+                        and self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Char, 0)
+                        and self.right.type == Type(PrimType.Char, 0)):
                     self.type = Type(PrimType.Bool, 0)
                 else:
                     raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
@@ -330,11 +335,16 @@ class BinOpExpr(Expr):
                 raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
         elif self.op in ('==', '!='):
             if self.left.type.array_level == 0 and self.right.type.array_level == 0:
-                if self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Int, 0) or \
-                        self.left.type == Type(PrimType.Int, 0) == self.right.type == Type(PrimType.Char, 0) or \
-                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Int, 0) or \
-                        self.left.type == Type(PrimType.Char, 0) == self.right.type == Type(PrimType.Char, 0) or \
-                        self.left.type == Type(PrimType.Bool, 0) == self.right.type == Type(PrimType.Bool, 0):
+                if (self.left.type == Type(PrimType.Int, 0)
+                        and self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Int, 0)
+                        and self.right.type == Type(PrimType.Char, 0) or \
+                        self.left.type == Type(PrimType.Char, 0)
+                        and self.right.type == Type(PrimType.Int, 0) or \
+                        self.left.type == Type(PrimType.Char, 0)
+                        and self.right.type == Type(PrimType.Char, 0) or \
+                        self.left.type == Type(PrimType.Bool, 0)
+                        and self.right.type == Type(PrimType.Bool, 0)):
                     self.type = Type(PrimType.Bool, 0)
                 else:
                     raise BinBadType(self.op_coord, self.left.type, self.op, self.right.type)
@@ -456,7 +466,8 @@ class Program:
                 raise MainFunctionIncorrect(mainFunction.header.type_coord)
             else:
                 if len(mainFunction.header.formalParameters) == 1:
-                    if mainFunction.header.formalParameters[0][0].base != PrimType.Char or mainFunction.header.formalParameters[0][0].array_level != 2:
+                    if (mainFunction.header.formalParameters[0][0].base != PrimType.Char
+                            or mainFunction.header.formalParameters[0][0].array_level != 2):
                         raise MainFunctionIncorrect(mainFunction.header.type_coord)
                 else:
                     raise MainFunctionIncorrect(mainFunction.header.type_coord)
@@ -490,14 +501,20 @@ REFERENCE_NULL_CONSTANT = pe.Terminal('REFERENCE_NULL_CONSTANT', 'null', str)
 def make_keyword(image):
     return pe.Terminal(image, image, lambda name: None)
 
-NProgram, NFunctionDeclarations, NFunctionDeclaration, NFunctionHeader, NFunctionHeaderTypeName, NFormalParameters, NFormalParameter, NStatements, NStatement = \
-    map(pe.NonTerminal, 'Program FunctionDeclarations FunctionDeclaration FunctionHeader FunctionHeaderTypeName FormalParameters FormalParameter Statements Statement'.split())
+(NProgram, NFunctionDeclarations, NFunctionDeclaration, NFunctionHeader, NFunctionHeaderTypeName,
+ NFormalParameters, NFormalParameter, NStatements, NStatement) = \
+    map(pe.NonTerminal, 'Program FunctionDeclarations FunctionDeclaration FunctionHeader'
+                        ' FunctionHeaderTypeName FormalParameters FormalParameter Statements Statement'.split())
 
-NType, NArrayType, NBrackets, NDeclarationAssignments, NDeclarationAssignment, NActualParameters, NActualParameter = \
-    map(pe.NonTerminal, 'Type ArrayType Brackets DeclarationAssignments DeclarationAssignment ActualParameters ActualParameter'.split())
+(NType, NArrayType, NBrackets, NDeclarationAssignments, NDeclarationAssignment, NActualParameters,
+ NActualParameter) = \
+    map(pe.NonTerminal, 'Type ArrayType Brackets DeclarationAssignments DeclarationAssignment '
+                        'ActualParameters ActualParameter'.split())
 
-NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp, NFactor, NPower, NArrExpr, NBottomExpr, NFuncCallExpr, NArgs = \
-    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp AddOp Factor Power ArrExpr BottomExpr FuncCallExpr Args'.split())
+(NExpr, NAndExpr, NCmpExpr, NStringConstant, NConst, NArithmExpr, NCmpOp, NTerm, NMulOp, NAddOp,
+ NFactor, NPower, NArrExpr, NBottomExpr, NFuncCallExpr, NArgs) = \
+    map(pe.NonTerminal, 'Expr AndExpr CmpExpr StringConstant Const ArithmExpr CmpOp Term MulOp'
+                        ' AddOp Factor Power ArrExpr BottomExpr FuncCallExpr Args'.split())
 
 KW_BOOL, KW_INT, KW_RETURN, KW_VOID, KW_CHAR, KW_LOOP, KW_THEN, KW_ELSE, KW_NULL, KW_WHILE = \
     map(make_keyword, 'bool int return void char loop then else null while'.split())
@@ -575,8 +592,10 @@ NStatements |= NStatement, lambda st: [st]
 NStatement |= NType, NDeclarationAssignments, DeclarationStatement
 NDeclarationAssignments |= NDeclarationAssignment, lambda vr: [vr]
 NDeclarationAssignments |= NDeclarationAssignments, ',', NDeclarationAssignment, lambda vrs, vr: vrs + [vr]
-NDeclarationAssignment |= IDENTIFIER, pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], None))
-NDeclarationAssignment |= IDENTIFIER, ':=', NArithmExpr, pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], attrs[1]))
+NDeclarationAssignment |= (IDENTIFIER,
+pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], None)))
+NDeclarationAssignment |= (IDENTIFIER, ':=', NArithmExpr,
+pe.ExAction(lambda attrs, coords, res_coord: (attrs[0], coords[0], attrs[1])))
 
 # int {a} := ({f} <- {x}, {y})
 
