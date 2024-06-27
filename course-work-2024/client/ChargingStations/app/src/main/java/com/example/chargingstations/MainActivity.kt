@@ -1,10 +1,11 @@
 package com.example.chargingstations
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
@@ -30,30 +31,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -80,12 +77,13 @@ import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 
 class MainActivity : ComponentActivity() {
@@ -99,8 +97,11 @@ class MainActivity : ComponentActivity() {
     private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
 
-
     private val TAG: String = "MainActivity"
+    private val placemarkMapObjectList = mutableListOf<PlacemarkMapObject>()
+
+    private val tapListeners = mutableListOf<MapObjectTapListener>()
+
 
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
@@ -111,8 +112,8 @@ class MainActivity : ComponentActivity() {
         mapView = MapView(this)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
         list = addMarkers()
-        cameraListener = MyCameraListener(this, list, mapView.mapWindow.map.cameraPosition.zoom)
-        mapView.mapWindow.map.addCameraListener(cameraListener)
+        cameraListener = MyCameraListener(this, list, mapView.map.cameraPosition.zoom)
+        mapView.map.addCameraListener(cameraListener)
 
         locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -143,7 +144,7 @@ class MainActivity : ComponentActivity() {
             // Handle camera move finished ...
         }
 
-        mapView.mapWindow.map.move(
+        mapView.map.move(
             CameraPosition(Point(55.751244, 37.618423), 11.0f, 0.0f, 0.0f),
             Animation(Animation.Type.SMOOTH, 1f),
             cameraCallback
@@ -198,6 +199,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun move() {
+        if (mainActivityViewModel.gpsProgressIndicatorIsShown.value) {
+            mainActivityViewModel.hideGPSProgressIndicator()
+        }
         if (ActivityCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -207,16 +211,29 @@ class MainActivity : ComponentActivity() {
             Log.w(TAG, "You don't have the permissions to get last known location.")
             return
         }
+
+        val manager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.w(TAG, "GPS is disabled.")
+            return
+        }
+
         mainActivityViewModel.showGPSProgressIndicator()
+
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
-                mapView.mapWindow.map.move(
+                mapView.map.move(
                     CameraPosition(Point(location.latitude, location.longitude), 15.0f, 0.0f, 0.0f),
                     Animation(Animation.Type.SMOOTH, 1f),
                     cameraCallback
                 )
+                mainActivityViewModel.hideGPSProgressIndicator()
+            } else {
+               lifecycleScope.launch {
+                   delay(1000)
+                   move()
+               }
             }
-            mainActivityViewModel.hideGPSProgressIndicator()
         }
     }
 
@@ -252,7 +269,7 @@ class MainActivity : ComponentActivity() {
             }) {
                 Text("No")
             }
-        })
+        }, modifier = Modifier.padding(32.dp))
     }
 
     @Composable
@@ -272,21 +289,22 @@ class MainActivity : ComponentActivity() {
         val marker = createBitmapFromVector(this, R.drawable.baseline_circle_24)
         val imageProvider = ImageProvider.fromBitmap(marker)
 
-        val list = mutableListOf<PlacemarkMapObject>()
-
         points.forEach { (point, title) ->
             val placemarkMapObject = mapView.map.mapObjects.addPlacemark().apply {
                 geometry = point
                 setIcon(imageProvider)
                 userData = title
-                addTapListener { _, _ ->
+            }
+            val listener = MapObjectTapListener { _,_ ->
+                Log.e(TAG, title)
                     showStationInfo(title)
                     true
-                }
             }
-            list.add(placemarkMapObject)
+            placemarkMapObject.addTapListener(listener)
+            tapListeners.add(listener)
+            placemarkMapObjectList.add(placemarkMapObject)
         }
-        return list
+        return placemarkMapObjectList
     }
 
     private fun showStationInfo(title: String) {
