@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.ApiService
 import com.example.chargingstations.model.ChargingStation
+import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,9 @@ class MainActivityViewModel : ViewModel() {
     private val _searchQuery = MutableStateFlow(" ")
     val searchQuery: StateFlow<String> = _searchQuery
 
+    private val _moveEvent = MutableStateFlow(null)
+    val moveEvent: StateFlow<Point?> = _moveEvent
+
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://89.111.172.144:8000/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -33,9 +37,13 @@ class MainActivityViewModel : ViewModel() {
 
     private val apiService = retrofit.create(ApiService::class.java)
 
+    fun moveTo() {
+
+    }
+
     init {
-        _loading.value = true
-        fetchChargingStations()
+//        _loading.value = true
+//        fetchChargingStations()
     }
 
     private fun fetchChargingStations() {

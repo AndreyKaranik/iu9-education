@@ -39,6 +39,14 @@ sudo mv /root/init.sql /var/lib/postgresql/
 
 sudo chmod 644 /var/lib/postgresql/init.sql
 
+
+
+
+
+
+
+
+
 curl -X GET "89.111.172.144:8000/charging-stations" -v
 
 ssh root@89.111.172.144
