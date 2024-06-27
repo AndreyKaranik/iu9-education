@@ -177,13 +177,14 @@ class MainActivity : ComponentActivity() {
                             },
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .padding(16.dp)
-                                .size(64.dp)
+                                .padding(16.dp, 32.dp)
+                                .size(56.dp)
                         ) {
                             if (gpsProgressIndicatorIsShown) {
                                 CircularProgressIndicator(
                                     color = MaterialTheme.colorScheme.secondary,
                                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    modifier = Modifier.size(32.dp)
                                 )
                             } else {
                                 Icon(
@@ -223,7 +224,7 @@ class MainActivity : ComponentActivity() {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 mapView.map.move(
-                    CameraPosition(Point(location.latitude, location.longitude), 15.0f, 0.0f, 0.0f),
+                    CameraPosition(Point(location.latitude, location.longitude), 15.0f, mapView.map.cameraPosition.azimuth, mapView.map.cameraPosition.tilt),
                     Animation(Animation.Type.SMOOTH, 1f),
                     cameraCallback
                 )
@@ -296,9 +297,8 @@ class MainActivity : ComponentActivity() {
                 userData = title
             }
             val listener = MapObjectTapListener { _,_ ->
-                Log.e(TAG, title)
-                    showStationInfo(title)
-                    true
+                showStationInfo(title)
+                true
             }
             placemarkMapObject.addTapListener(listener)
             tapListeners.add(listener)
