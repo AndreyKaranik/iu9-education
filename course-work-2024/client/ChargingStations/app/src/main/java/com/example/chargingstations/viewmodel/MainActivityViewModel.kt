@@ -27,8 +27,11 @@ class MainActivityViewModel : ViewModel() {
     private val _searchQuery = MutableStateFlow(" ")
     val searchQuery: StateFlow<String> = _searchQuery
 
-    private val _moveEvent = MutableStateFlow(null)
-    val moveEvent: StateFlow<Point?> = _moveEvent
+    private val _gpsProgressIndicatorIsShown = MutableStateFlow(false)
+    val gpsProgressIndicatorIsShown: StateFlow<Boolean> = _gpsProgressIndicatorIsShown
+
+    private val _gpsDialogIsShown = MutableStateFlow<Boolean>(false)
+    val gpsDialogIsShown: StateFlow<Boolean> = _gpsDialogIsShown
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://89.111.172.144:8000/")
@@ -37,8 +40,20 @@ class MainActivityViewModel : ViewModel() {
 
     private val apiService = retrofit.create(ApiService::class.java)
 
-    fun moveTo() {
+    fun showGPSDialog() {
+        _gpsDialogIsShown.value = true
+    }
 
+    fun hideGPSDialog() {
+        _gpsDialogIsShown.value = false
+    }
+
+    fun showGPSProgressIndicator() {
+        _gpsProgressIndicatorIsShown.value = true
+    }
+
+    fun hideGPSProgressIndicator() {
+        _gpsProgressIndicatorIsShown.value = false
     }
 
     init {

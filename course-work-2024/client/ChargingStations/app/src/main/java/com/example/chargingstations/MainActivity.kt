@@ -1,6 +1,7 @@
 package com.example.chargingstations
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -28,9 +30,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,13 +42,18 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -73,6 +83,9 @@ import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
@@ -84,8 +97,12 @@ class MainActivity : ComponentActivity() {
     private lateinit var cameraCallback: Map.CameraCallback
 
     private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
+    private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+
 
     private val TAG: String = "MainActivity"
+
+    private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,6 +114,31 @@ class MainActivity : ComponentActivity() {
         cameraListener = MyCameraListener(this, list, mapView.mapWindow.map.cameraPosition.zoom)
         mapView.mapWindow.map.addCameraListener(cameraListener)
 
+        locationPermissionRequest = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            Log.d(TAG, "locationPermissionRequest")
+            if (permissions.getOrDefault(
+                    Manifest.permission.ACCESS_FINE_LOCATION, false
+                ) && permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false)
+            ) {
+                val manager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                    mainActivityViewModel.showGPSDialog()
+                } else {
+                    move()
+                }
+            } else {
+                Log.w(TAG, "permission problem")
+            }
+        }
+
+        activityResultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            move()
+        }
+
         cameraCallback = Map.CameraCallback {
             // Handle camera move finished ...
         }
@@ -106,26 +148,26 @@ class MainActivity : ComponentActivity() {
             Animation(Animation.Type.SMOOTH, 1f),
             cameraCallback
         )
-        locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            Log.d(TAG, "locationPermissionRequest")
-            if (permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)
-                && permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false)
-            ) {
-                Log.i(TAG, "move")
-                move()
-            } else {
-                Log.w(TAG, "permission problem")
-            }
-        }
 
         setContent {
             ChargingStationsTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
+                    val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsStateWithLifecycle()
+                    val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsStateWithLifecycle()
+
+                    when {
+                        gpsDialogIsShown -> {
+                            GPSDialog(onDismissRequest = {
+                                mainActivityViewModel.hideGPSDialog()
+                            }, onConfirmation = {
+                                mainActivityViewModel.hideGPSDialog()
+                                activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            })
+                        }
+                    }
+
                     Box(modifier = Modifier.fillMaxSize()) {
                         ChargingStationsMap()
                         FilledIconButton(
@@ -137,125 +179,81 @@ class MainActivity : ComponentActivity() {
                                 .padding(16.dp)
                                 .size(64.dp)
                         ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.baseline_my_location_24),
-                                contentDescription = "description"
-                            )
+                            if (gpsProgressIndicatorIsShown) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.secondary,
+                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_my_location_24),
+                                    contentDescription = "description"
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-
-
-//        setContent {
-//            ChargingStationsTheme {
-//                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-//                    ChargingStationsMap()
-//                }
-//            }
-//        }
-//        setContent {
-//            MyApp()
-//        }
     }
 
-    fun move() {
+    private fun move() {
         if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             Log.w(TAG, "You don't have the permissions to get last known location.")
             return
         }
+        mainActivityViewModel.showGPSProgressIndicator()
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 mapView.mapWindow.map.move(
-                    CameraPosition(Point(location.latitude, location.longitude), 18.0f, 0.0f, 0.0f),
+                    CameraPosition(Point(location.latitude, location.longitude), 15.0f, 0.0f, 0.0f),
                     Animation(Animation.Type.SMOOTH, 1f),
                     cameraCallback
                 )
             }
+            mainActivityViewModel.hideGPSProgressIndicator()
         }
     }
 
-    fun requestPermissions() {
-//        statusCheck()
+    private fun requestPermissions() {
         locationPermissionRequest.launch(
             arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun AlertDialogExample(
-        onDismissRequest: () -> Unit,
-        onConfirmation: () -> Unit,
-        dialogTitle: String,
-        dialogText: String,
-        icon: ImageVector,
+    fun GPSDialog(
+        onDismissRequest: () -> Unit, onConfirmation: () -> Unit
     ) {
-        AlertDialog(
-            icon = {
-                Icon(icon, contentDescription = "Example Icon")
-            },
-            title = {
-                Text(text = dialogTitle)
-            },
-            text = {
-                Text(text = dialogText)
-            },
-            onDismissRequest = {
-                onDismissRequest()
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onConfirmation()
-                    }
-                ) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        onDismissRequest()
-                    }
-                ) {
-                    Text("Dismiss")
-                }
+        AlertDialog(icon = {
+            Icon(Icons.Default.Info, contentDescription = "Icon")
+        }, title = {
+            Text(text = "GPS Dialog")
+        }, text = {
+            Text(text = "Your GPS seems to be disabled, do you want to enable it?")
+        }, onDismissRequest = {
+            onDismissRequest()
+        }, confirmButton = {
+            TextButton(onClick = {
+                onConfirmation()
+            }) {
+                Text("Yes")
             }
-        )
+        }, dismissButton = {
+            TextButton(onClick = {
+                onDismissRequest()
+            }) {
+                Text("No")
+            }
+        })
     }
-
-//    fun statusCheck() {
-//        val manager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-//        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            buildAlertMessageNoGps()
-//        }
-//    }
-//
-//    private fun buildAlertMessageNoGps() {
-//        val builder = AlertDialog.Builder(this)
-//        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-//            .setCancelable(false)
-//            .setPositiveButton(
-//                "Yes"
-//            ) { dialog, id -> startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) }
-//            .setNegativeButton(
-//                "No"
-//            ) { dialog, id -> dialog.cancel() }
-//        val alert = builder.create()
-//        alert.show()
-//    }
 
     @Composable
     fun ChargingStationsMap() {
@@ -292,11 +290,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun showStationInfo(title: String) {
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setMessage("Описание для $title")
-            .setPositiveButton("OK", null)
-            .show()
+        AlertDialog.Builder(this).setTitle(title).setMessage("Описание для $title")
+            .setPositiveButton("OK", null).show()
     }
 
     override fun onStart() {
@@ -320,24 +315,16 @@ fun MyApp() {
     val mainActivityViewModel: MainActivityViewModel = viewModel()
 
     AnimatedNavHost(navController, startDestination = "chargingStationList") {
-        composable(
-            "chargingStationList",
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
-            },
-            exitTransition = {
-                slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
-            }
-        ) { ChargingStationListScreen(navController, mainActivityViewModel) }
-        composable(
-            "chargingStationDetail/{id}",
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
-            },
-            exitTransition = {
-                slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
-            }
-        ) { backStackEntry ->
+        composable("chargingStationList", enterTransition = {
+            slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+        }, exitTransition = {
+            slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
+        }) { ChargingStationListScreen(navController, mainActivityViewModel) }
+        composable("chargingStationDetail/{id}", enterTransition = {
+            slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
+        }, exitTransition = {
+            slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
+        }) { backStackEntry ->
             val chargingStationId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
             ChargingStationDetailScreen(chargingStationId, mainActivityViewModel)
         }
@@ -346,8 +333,7 @@ fun MyApp() {
 
 @Composable
 fun ChargingStationDetailScreen(
-    chargingStationId: Int?,
-    mainActivityViewModel: MainActivityViewModel
+    chargingStationId: Int?, mainActivityViewModel: MainActivityViewModel
 ) {
     val chargingStation = chargingStationId?.let { mainActivityViewModel.getChargingStation(it) }
     if (chargingStation != null) {
@@ -361,9 +347,7 @@ fun ChargingStationDetailScreen(
             Text(text = chargingStation.address, fontSize = 20.sp, color = Color.Gray)
             Text(text = (chargingStation.opening_hours), fontSize = 20.sp, color = Color.Blue)
             Text(
-                text = (chargingStation.description ?: "null"),
-                fontSize = 20.sp,
-                color = Color.Blue
+                text = (chargingStation.description ?: "null"), fontSize = 20.sp, color = Color.Blue
             )
         }
     } else {
@@ -373,8 +357,7 @@ fun ChargingStationDetailScreen(
 
 @Composable
 fun ChargingStationListScreen(
-    navController: NavHostController,
-    mainActivityViewModel: MainActivityViewModel
+    navController: NavHostController, mainActivityViewModel: MainActivityViewModel
 ) {
     val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
     val chargingStations by mainActivityViewModel.chargingStations.collectAsState()
@@ -387,10 +370,8 @@ fun ChargingStationListScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        SearchBar(
-            searchQuery = searchQuery,
-            onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) }
-        )
+        SearchBar(searchQuery = searchQuery,
+            onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
         Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -411,18 +392,14 @@ fun ChargingStationListScreen(
                             .fillMaxWidth()
                             .fillMaxHeight()//.height(300.dp)
                     ) {
-                        items(
-                            count = filteredChargingStations.size,
-                            key = {
-                                filteredChargingStations[it].id
-                            },
-                            itemContent = { index ->
-                                ChargingStationItem(filteredChargingStations[index]) {
-                                    navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
-                                }
-                                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                        items(count = filteredChargingStations.size, key = {
+                            filteredChargingStations[it].id
+                        }, itemContent = { index ->
+                            ChargingStationItem(filteredChargingStations[index]) {
+                                navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
                             }
-                        )
+                            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                        })
                     }
                 }
             }
@@ -439,18 +416,16 @@ fun SearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
         placeholder = { Text("Search") },
         label = { Text("Search") },
         leadingIcon = {
-            IconButton(
-                onClick = {
-                    //
-                }) {
+            IconButton(onClick = {
+                //
+            }) {
                 Icon(imageVector = Icons.Filled.Search, contentDescription = "description")
             }
         },
         trailingIcon = {
-            IconButton(
-                onClick = {
-                    onSearchQueryChanged("")
-                }) {
+            IconButton(onClick = {
+                onSearchQueryChanged("")
+            }) {
                 Icon(imageVector = Icons.Filled.Clear, contentDescription = "description")
             }
         },
@@ -474,13 +449,9 @@ fun ChargingStationItem(chargingStation: ChargingStation, onClick: () -> Unit) {
 
 @Composable
 fun AnimatedNavHost(
-    navController: NavHostController,
-    startDestination: String,
-    builder: NavGraphBuilder.() -> Unit
+    navController: NavHostController, startDestination: String, builder: NavGraphBuilder.() -> Unit
 ) {
     NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        builder = builder
+        navController = navController, startDestination = startDestination, builder = builder
     )
 }
