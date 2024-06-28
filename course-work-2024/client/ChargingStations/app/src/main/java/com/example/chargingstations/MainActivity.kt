@@ -183,43 +183,9 @@ class MainActivity : ComponentActivity() {
                                 onClick = { /*TODO*/ },
                                 imageVector = Icons.Default.Settings
                             )
-//                            FilledIconButton(
-//                                onClick = {
-//                                },
-//                                modifier = Modifier
-//                                    .size(48.dp)
-//                                    .align(Alignment.TopStart)
-//                            ) {
-//                                Icon(
-//                                    imageVector = Icons.Default.Settings,
-//                                    contentDescription = "description"
-//                                )
-//                            }
                             Spacer(modifier = Modifier.size(8.dp))
-
-//                            Column {
-//                                SearchBar(searchQuery = searchQuery,
-//                                    onSearchQueryChanged = {
-//                                        mainActivityViewModel.updateSearchQuery(
-//                                            it
-//                                        )
-//                                    })
-//                                LazyColumn(
-//                                    Modifier.background(Color.White).height(120.dp),
-//                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-//                                ) {
-//                                    items(count = filteredChargingStations.size, key = {
-//                                        filteredChargingStations[it].id
-//                                    }, itemContent = { index ->
-//                                        ChargingStationItem(filteredChargingStations[index]) {
-//                                            //navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
-//                                        }
-//                                        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-//                                    })
-//                                }
-//                            }
                             Column(modifier = Modifier.align(Alignment.CenterEnd)) {
-                                FilledIconButton(
+                                BasicIconButton(
                                     onClick = {
                                         mapView.map.apply {
                                             move(
@@ -234,15 +200,10 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     },
-                                    modifier = Modifier.size(48.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24),
-                                        contentDescription = "description"
-                                    )
-                                }
+                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24)
+                                )
                                 Spacer(modifier = Modifier.size(8.dp))
-                                FilledIconButton(
+                                BasicIconButton(
                                     onClick = {
                                         mapView.map.apply {
                                             move(
@@ -257,13 +218,8 @@ class MainActivity : ComponentActivity() {
                                             )
                                         }
                                     },
-                                    modifier = Modifier.size(48.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_remove_24),
-                                        contentDescription = "description"
-                                    )
-                                }
+                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_remove_24)
+                                )
                             }
 
                             Column(
@@ -271,50 +227,27 @@ class MainActivity : ComponentActivity() {
                                     .align(Alignment.BottomEnd)
                                     .padding(0.dp, 64.dp)
                             ) {
-                                FilledIconButton(
+                                BasicIconButton(
                                     onClick = {
-                                        //state = true
+                                        /*TODO*/
                                     },
-                                    modifier = Modifier.size(48.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "description"
-                                    )
-                                }
+                                    imageVector = Icons.Default.Search
+                                )
                                 Spacer(modifier = Modifier.size(8.dp))
-                                FilledIconButton(
+                                BasicIconButton(
                                     onClick = {
-                                        //state = true
+                                        /*TODO*/
                                     },
-                                    modifier = Modifier.size(48.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_qr_code_2_24),
-                                        contentDescription = "description"
-                                    )
-                                }
+                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_qr_code_2_24)
+                                )
                                 Spacer(modifier = Modifier.size(32.dp))
-                                FilledIconButton(
+                                BasicIconButtonWithProgress(
                                     onClick = {
                                         requestPermissions()
                                     },
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                ) {
-                                    if (gpsProgressIndicatorIsShown) {
-                                        CircularProgressIndicator(
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                                            modifier = Modifier.size(32.dp)
-                                        )
-                                    } else {
-                                        Icon(
-                                            imageVector = ImageVector.vectorResource(R.drawable.round_near_me_24),
-                                            contentDescription = "description"
-                                        )
-                                    }
-                                }
+                                    imageVector = ImageVector.vectorResource(R.drawable.round_near_me_24),
+                                    gpsProgressIndicatorIsShown
+                                )
                             }
                         }
                     }
@@ -327,6 +260,7 @@ class MainActivity : ComponentActivity() {
         if (mainActivityViewModel.gpsProgressIndicatorIsShown.value) {
             mainActivityViewModel.hideGPSProgressIndicator()
         }
+        
         if (ActivityCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
@@ -509,19 +443,47 @@ fun BasicIconButton(
     onClick: () -> Unit,
     imageVector: ImageVector
 ) {
-
-    Box (contentAlignment = Alignment.Center){
+    Box(contentAlignment = Alignment.Center) {
         Button(
             onClick = onClick,
+            elevation = ButtonDefaults.buttonElevation(3.dp),
             modifier = Modifier
                 .size(48.dp)
-                .shadow(12.dp, shape = CircleShape)
         ) {}
         Icon(
             imageVector = imageVector,
             contentDescription = "description",
             tint = Color.White
         )
+    }
+}
+
+@Composable
+fun BasicIconButtonWithProgress(
+    onClick: () -> Unit,
+    imageVector: ImageVector,
+    progressIsShown: Boolean
+) {
+    Box(contentAlignment = Alignment.Center) {
+        Button(
+            onClick = onClick,
+            elevation = ButtonDefaults.buttonElevation(3.dp),
+            modifier = Modifier
+                .size(48.dp)
+        ) {}
+        if (progressIsShown) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.secondary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.size(32.dp)
+            )
+        } else {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = "description",
+                tint = Color.White
+            )
+        }
     }
 }
 
