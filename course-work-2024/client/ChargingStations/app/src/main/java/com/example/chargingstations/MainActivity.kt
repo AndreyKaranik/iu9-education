@@ -4,8 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
@@ -15,11 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,26 +26,31 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -61,15 +60,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import com.example.chargingstations.model.ChargingStation
 import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import com.example.chargingstations.viewmodel.MainActivityViewModel
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.Animation
@@ -83,7 +79,6 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 
 
 class MainActivity : ComponentActivity() {
@@ -158,6 +153,11 @@ class MainActivity : ComponentActivity() {
                     val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsStateWithLifecycle()
                     val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsStateWithLifecycle()
 
+//                    val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
+//                    val chargingStations by mainActivityViewModel.chargingStations.collectAsState()
+//                    val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
+//                    val loading by mainActivityViewModel.loading.collectAsState()
+
                     when {
                         gpsDialogIsShown -> {
                             GPSDialog(onDismissRequest = {
@@ -169,28 +169,152 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    Box(modifier = Modifier.fillMaxSize()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
                         ChargingStationsMap()
-                        FilledIconButton(
-                            onClick = {
-                                requestPermissions()
-                            },
+                        Box(
                             modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(16.dp, 32.dp)
-                                .size(56.dp)
+                                .fillMaxSize()
+                                .padding(16.dp)
                         ) {
-                            if (gpsProgressIndicatorIsShown) {
-                                CircularProgressIndicator(
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_my_location_24),
-                                    contentDescription = "description"
-                                )
+                            BasicIconButton(
+                                onClick = { /*TODO*/ },
+                                imageVector = Icons.Default.Settings
+                            )
+//                            FilledIconButton(
+//                                onClick = {
+//                                },
+//                                modifier = Modifier
+//                                    .size(48.dp)
+//                                    .align(Alignment.TopStart)
+//                            ) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Settings,
+//                                    contentDescription = "description"
+//                                )
+//                            }
+                            Spacer(modifier = Modifier.size(8.dp))
+
+//                            Column {
+//                                SearchBar(searchQuery = searchQuery,
+//                                    onSearchQueryChanged = {
+//                                        mainActivityViewModel.updateSearchQuery(
+//                                            it
+//                                        )
+//                                    })
+//                                LazyColumn(
+//                                    Modifier.background(Color.White).height(120.dp),
+//                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+//                                ) {
+//                                    items(count = filteredChargingStations.size, key = {
+//                                        filteredChargingStations[it].id
+//                                    }, itemContent = { index ->
+//                                        ChargingStationItem(filteredChargingStations[index]) {
+//                                            //navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
+//                                        }
+//                                        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+//                                    })
+//                                }
+//                            }
+                            Column(modifier = Modifier.align(Alignment.CenterEnd)) {
+                                FilledIconButton(
+                                    onClick = {
+                                        mapView.map.apply {
+                                            move(
+                                                CameraPosition(
+                                                    cameraPosition.target,
+                                                    cameraPosition.zoom + 1,
+                                                    cameraPosition.azimuth,
+                                                    cameraPosition.tilt
+                                                ),
+                                                Animation(Animation.Type.SMOOTH, 0.25f),
+                                                cameraCallback
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier.size(48.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24),
+                                        contentDescription = "description"
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(8.dp))
+                                FilledIconButton(
+                                    onClick = {
+                                        mapView.map.apply {
+                                            move(
+                                                CameraPosition(
+                                                    cameraPosition.target,
+                                                    cameraPosition.zoom - 1,
+                                                    cameraPosition.azimuth,
+                                                    cameraPosition.tilt
+                                                ),
+                                                Animation(Animation.Type.SMOOTH, 0.25f),
+                                                cameraCallback
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier.size(48.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_remove_24),
+                                        contentDescription = "description"
+                                    )
+                                }
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(0.dp, 64.dp)
+                            ) {
+                                FilledIconButton(
+                                    onClick = {
+                                        //state = true
+                                    },
+                                    modifier = Modifier.size(48.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Search,
+                                        contentDescription = "description"
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(8.dp))
+                                FilledIconButton(
+                                    onClick = {
+                                        //state = true
+                                    },
+                                    modifier = Modifier.size(48.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_qr_code_2_24),
+                                        contentDescription = "description"
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(32.dp))
+                                FilledIconButton(
+                                    onClick = {
+                                        requestPermissions()
+                                    },
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                ) {
+                                    if (gpsProgressIndicatorIsShown) {
+                                        CircularProgressIndicator(
+                                            color = MaterialTheme.colorScheme.secondary,
+                                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = ImageVector.vectorResource(R.drawable.round_near_me_24),
+                                            contentDescription = "description"
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -224,16 +348,21 @@ class MainActivity : ComponentActivity() {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
                 mapView.map.move(
-                    CameraPosition(Point(location.latitude, location.longitude), 15.0f, mapView.map.cameraPosition.azimuth, mapView.map.cameraPosition.tilt),
+                    CameraPosition(
+                        Point(location.latitude, location.longitude),
+                        15.0f,
+                        mapView.map.cameraPosition.azimuth,
+                        mapView.map.cameraPosition.tilt
+                    ),
                     Animation(Animation.Type.SMOOTH, 1f),
                     cameraCallback
                 )
                 mainActivityViewModel.hideGPSProgressIndicator()
             } else {
-               lifecycleScope.launch {
-                   delay(1000)
-                   move()
-               }
+                lifecycleScope.launch {
+                    delay(1000)
+                    move()
+                }
             }
         }
     }
@@ -296,7 +425,7 @@ class MainActivity : ComponentActivity() {
                 setIcon(imageProvider)
                 userData = title
             }
-            val listener = MapObjectTapListener { _,_ ->
+            val listener = MapObjectTapListener { _, _ ->
                 showStationInfo(title)
                 true
             }
@@ -324,30 +453,100 @@ class MainActivity : ComponentActivity() {
         super.onStop()
     }
 
-}
+    @Composable
+    fun ChargingStationListScreen() {
+        val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
+        val chargingStations by mainActivityViewModel.chargingStations.collectAsState()
+        val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
+        val loading by mainActivityViewModel.loading.collectAsState()
 
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-fun MyApp() {
-    val navController = rememberAnimatedNavController()
-    val mainActivityViewModel: MainActivityViewModel = viewModel()
-
-    AnimatedNavHost(navController, startDestination = "chargingStationList") {
-        composable("chargingStationList", enterTransition = {
-            slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
-        }, exitTransition = {
-            slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
-        }) { ChargingStationListScreen(navController, mainActivityViewModel) }
-        composable("chargingStationDetail/{id}", enterTransition = {
-            slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
-        }, exitTransition = {
-            slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
-        }) { backStackEntry ->
-            val chargingStationId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-            ChargingStationDetailScreen(chargingStationId, mainActivityViewModel)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            SearchBar(searchQuery = searchQuery,
+                onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
+            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (loading) {
+                    CircularProgressIndicator()
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()//.height(300.dp)
+                        ) {
+                            items(count = filteredChargingStations.size, key = {
+                                filteredChargingStations[it].id
+                            }, itemContent = { index ->
+                                ChargingStationItem(filteredChargingStations[index]) {
+                                    //navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
+                                }
+                                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                            })
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
+
+@Composable
+fun BasicIconButton(
+    onClick: () -> Unit,
+    imageVector: ImageVector
+) {
+
+    Box (contentAlignment = Alignment.Center){
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .size(48.dp)
+                .shadow(12.dp, shape = CircleShape)
+        ) {}
+        Icon(
+            imageVector = imageVector,
+            contentDescription = "description",
+            tint = Color.White
+        )
+    }
+}
+
+//@OptIn(ExperimentalAnimationApi::class)
+//@Composable
+//fun MyApp() {
+//    val navController = rememberAnimatedNavController()
+//    val mainActivityViewModel: MainActivityViewModel = viewModel()
+//
+//    AnimatedNavHost(navController, startDestination = "chargingStationList") {
+//        composable("chargingStationList", enterTransition = {
+//            slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+//        }, exitTransition = {
+//            slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
+//        }) { ChargingStationListScreen(navController, mainActivityViewModel) }
+//        composable("chargingStationDetail/{id}", enterTransition = {
+//            slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
+//        }, exitTransition = {
+//            slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
+//        }) { backStackEntry ->
+//            val chargingStationId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+//            ChargingStationDetailScreen(chargingStationId, mainActivityViewModel)
+//        }
+//    }
+//}
 
 @Composable
 fun ChargingStationDetailScreen(
@@ -374,64 +573,12 @@ fun ChargingStationDetailScreen(
 }
 
 @Composable
-fun ChargingStationListScreen(
-    navController: NavHostController, mainActivityViewModel: MainActivityViewModel
-) {
-    val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
-    val chargingStations by mainActivityViewModel.chargingStations.collectAsState()
-    val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
-
-    val loading by mainActivityViewModel.loading.collectAsState()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        SearchBar(searchQuery = searchQuery,
-            onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
-        Spacer(modifier = Modifier.height(16.dp))
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (loading) {
-                CircularProgressIndicator()
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()//.height(300.dp)
-                    ) {
-                        items(count = filteredChargingStations.size, key = {
-                            filteredChargingStations[it].id
-                        }, itemContent = { index ->
-                            ChargingStationItem(filteredChargingStations[index]) {
-                                navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
-                            }
-                            HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-                        })
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun SearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
-    OutlinedTextField(
+    TextField(
         value = searchQuery,
         singleLine = true,
         onValueChange = onSearchQueryChanged,
-        placeholder = { Text("Search") },
+        placeholder = { Text("Address") },
         label = { Text("Search") },
         leadingIcon = {
             IconButton(onClick = {

@@ -57,8 +57,8 @@ class MainActivityViewModel : ViewModel() {
     }
 
     init {
-//        _loading.value = true
-//        fetchChargingStations()
+        _loading.value = true
+        fetchChargingStations()
     }
 
     private fun fetchChargingStations() {
