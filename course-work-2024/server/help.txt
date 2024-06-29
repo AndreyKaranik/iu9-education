@@ -24,23 +24,23 @@ Response-Body:
 
 
 
+\i 'C:/Users/Golum/Desktop/iu9-education/course-work-2024/server/init.sql'
+java -jar ChargingStationsServer-1.0.jar
+
 
 windows:
 psql -U postgres
 
 linux:
 sudo -i -u postgres
-
-\i 'C:/Users/Golum/Desktop/iu9-education/course-work-2024/server/init.sql'
-
-java -jar ChargingStationsServer-1.0.jar
+psql
+\i '/var/lib/postgresql/init.sql'
 
 sudo mv /root/init.sql /var/lib/postgresql/
-
 sudo chmod 644 /var/lib/postgresql/init.sql
 
 
-
+sudo systemctl restart csserver.service
 
 
 
@@ -52,6 +52,7 @@ curl -X GET "89.111.172.144:8000/charging-stations" -v
 ssh root@89.111.172.144
 
 pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" root@89.111.172.144:/root
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
 
 
 

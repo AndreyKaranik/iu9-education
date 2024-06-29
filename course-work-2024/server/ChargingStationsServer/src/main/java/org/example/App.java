@@ -88,13 +88,17 @@ public class App {
                             int id = rs.getInt("id");
                             String name = rs.getString("name");
                             String address = rs.getString("address");
-                            int companyId = rs.getInt("id");
+                            double latitude = rs.getDouble("latitude");
+                            double longitude = rs.getDouble("longitude");
+                            int companyId = rs.getInt("company_id");
                             String hours = rs.getString("opening_hours");
                             String description = rs.getString("description");
                             JSONObject object = new JSONObject();
                             object.put("id", id);
                             object.put("name", name);
                             object.put("address", address);
+                            object.put("latitude", latitude);
+                            object.put("longitude", longitude);
                             object.put("company_id", companyId);
                             object.put("opening_hours", hours);
                             object.put("description", description);

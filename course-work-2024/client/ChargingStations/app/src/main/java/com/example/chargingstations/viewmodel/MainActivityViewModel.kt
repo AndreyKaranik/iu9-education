@@ -23,8 +23,14 @@ class MainActivityViewModel : ViewModel() {
     private val _chargingStations = MutableStateFlow<List<ChargingStation>>(emptyList())
     val chargingStations: StateFlow<List<ChargingStation>> = _chargingStations
 
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
+    private val _chargingStationsFetching = MutableStateFlow(false)
+    val chargingStationsFetching: StateFlow<Boolean> = _chargingStationsFetching
+
+    private val _chargingStationsFetched = MutableStateFlow(false)
+    val chargingStationsFetched: StateFlow<Boolean> = _chargingStationsFetched
+
+    private val _internetConnectionDialogIsShown = MutableStateFlow(false)
+    val internetConnectionDialogIsShown: StateFlow<Boolean> = _internetConnectionDialogIsShown
 
     private val _searchQuery = MutableStateFlow(" ")
     val searchQuery: StateFlow<String> = _searchQuery
@@ -32,7 +38,7 @@ class MainActivityViewModel : ViewModel() {
     private val _gpsProgressIndicatorIsShown = MutableStateFlow(false)
     val gpsProgressIndicatorIsShown: StateFlow<Boolean> = _gpsProgressIndicatorIsShown
 
-    private val _gpsDialogIsShown = MutableStateFlow<Boolean>(false)
+    private val _gpsDialogIsShown = MutableStateFlow(false)
     val gpsDialogIsShown: StateFlow<Boolean> = _gpsDialogIsShown
 
     private val retrofit = Retrofit.Builder()
@@ -50,6 +56,14 @@ class MainActivityViewModel : ViewModel() {
         _gpsDialogIsShown.value = false
     }
 
+    fun showInternetConnectionDialog() {
+        _internetConnectionDialogIsShown.value = true
+    }
+
+    fun hideInternetConnectionDialog() {
+        _internetConnectionDialogIsShown.value = false
+    }
+
     fun showGPSProgressIndicator() {
         _gpsProgressIndicatorIsShown.value = true
     }
@@ -59,17 +73,18 @@ class MainActivityViewModel : ViewModel() {
     }
 
     init {
-        _loading.value = true
         fetchChargingStations()
     }
 
-    private fun fetchChargingStations() {
+    fun fetchChargingStations() {
+        _chargingStationsFetching.value = true
         viewModelScope.launch {
             try {
                 val response = apiService.getChargingStations().awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _chargingStations.value = it
+                        _chargingStationsFetched.value = true
                         updateSearchQuery("")
                     }
                 } else {
@@ -78,8 +93,9 @@ class MainActivityViewModel : ViewModel() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.e("E", "exception")
+            } finally {
+                _chargingStationsFetching.value = false
             }
-            _loading.value = false
         }
     }
 

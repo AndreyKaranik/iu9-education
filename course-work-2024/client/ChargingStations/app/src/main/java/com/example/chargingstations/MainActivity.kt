@@ -4,9 +4,15 @@ import android.Manifest
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -40,18 +46,25 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -61,14 +74,8 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityCompat
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import com.example.chargingstations.model.ChargingStation
 import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import com.example.chargingstations.viewmodel.MainActivityViewModel
@@ -89,7 +96,6 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private lateinit var mapView: MapView
     private lateinit var cameraListener: MyCameraListener
-    private lateinit var list: List<PlacemarkMapObject>
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     private lateinit var cameraCallback: Map.CameraCallback
@@ -101,7 +107,6 @@ class MainActivity : ComponentActivity() {
 
     private val TAG: String = "MainActivity"
     private val placemarkMapObjectList = mutableListOf<PlacemarkMapObject>()
-
     private val tapListeners = mutableListOf<MapObjectTapListener>()
 
 
@@ -114,9 +119,28 @@ class MainActivity : ComponentActivity() {
         MapKitFactory.initialize(this)
         mapView = MapView(this)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        list = addMarkers()
-        cameraListener = MyCameraListener(this, list, mapView.map.cameraPosition.zoom)
+        cameraListener =
+            MyCameraListener(this, placemarkMapObjectList, mapView.map.cameraPosition.zoom)
         mapView.map.addCameraListener(cameraListener)
+
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network : Network) {
+                if (!mainActivityViewModel.chargingStationsFetched.value) {
+                    mainActivityViewModel.fetchChargingStations()
+                }
+            }
+
+            override fun onLost(network : Network) {
+            }
+
+            override fun onCapabilitiesChanged(network : Network, networkCapabilities : NetworkCapabilities) {
+            }
+
+            override fun onLinkPropertiesChanged(network : Network, linkProperties : LinkProperties) {
+            }
+        })
 
         locationPermissionRequest = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -169,13 +193,16 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsStateWithLifecycle()
-                    val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsStateWithLifecycle()
+                    val chargingStationsFetched by mainActivityViewModel.chargingStationsFetched.collectAsState()
+                    val chargingStationsFetching by mainActivityViewModel.chargingStationsFetching.collectAsState()
+                    val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsState()
+                    val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsState()
+                    val internetConnectionDialogIsShown by mainActivityViewModel.internetConnectionDialogIsShown.collectAsState()
+                    var searchSheetIsShown by remember { mutableStateOf(false) }
 
-//                    val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
-//                    val chargingStations by mainActivityViewModel.chargingStations.collectAsState()
-//                    val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
-//                    val loading by mainActivityViewModel.loading.collectAsState()
+                    if (chargingStationsFetched && placemarkMapObjectList.isEmpty()) {
+                        addMarkers()
+                    }
 
                     when {
                         gpsDialogIsShown -> {
@@ -189,89 +216,126 @@ class MainActivity : ComponentActivity() {
                     }
 
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        ChargingStationsMap()
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
-                        ) {
-                            BasicIconButton(
-                                onClick = { /*TODO*/ },
-                                imageVector = Icons.Default.Settings
-                            )
-                            Spacer(modifier = Modifier.size(8.dp))
-                            Column(modifier = Modifier.align(Alignment.CenterEnd)) {
-                                BasicIconButton(
-                                    onClick = {
-                                        mapView.map.apply {
-                                            move(
-                                                CameraPosition(
-                                                    cameraPosition.target,
-                                                    cameraPosition.zoom + 1,
-                                                    cameraPosition.azimuth,
-                                                    cameraPosition.tilt
-                                                ),
-                                                Animation(Animation.Type.SMOOTH, 0.25f),
-                                                cameraCallback
-                                            )
-                                        }
-                                    },
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24)
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                                BasicIconButton(
-                                    onClick = {
-                                        mapView.map.apply {
-                                            move(
-                                                CameraPosition(
-                                                    cameraPosition.target,
-                                                    cameraPosition.zoom - 1,
-                                                    cameraPosition.azimuth,
-                                                    cameraPosition.tilt
-                                                ),
-                                                Animation(Animation.Type.SMOOTH, 0.25f),
-                                                cameraCallback
-                                            )
-                                        }
-                                    },
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_remove_24)
-                                )
+                        if (!chargingStationsFetched) {
+                            if (!chargingStationsFetching) {
+                                mainActivityViewModel.showInternetConnectionDialog()
                             }
-
-                            Column(
+                            if (!internetConnectionDialogIsShown) {
+                                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                            } else {
+                                if (!isNetworkAvailable(this@MainActivity)) {
+                                    InternetConnectionDialog()
+                                } else {
+                                    //InternetConnectionDialog()
+                                }
+                            }
+                        } else {
+                            ChargingStationsMap()
+                            Box(
                                 modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(0.dp, 64.dp)
+                                    .fillMaxSize()
+                                    .padding(16.dp)
                             ) {
                                 BasicIconButton(
-                                    onClick = {
-                                        /*TODO*/
-                                    },
-                                    imageVector = Icons.Default.Search
+                                    onClick = { /*TODO*/ }, imageVector = Icons.Default.Settings
                                 )
                                 Spacer(modifier = Modifier.size(8.dp))
-                                BasicIconButton(
-                                    onClick = {
-                                        qrScannerActivityResultLauncher.launch(Intent(this@MainActivity, QRScannerActivity::class.java))
-                                    },
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_qr_code_2_24)
-                                )
-                                Spacer(modifier = Modifier.size(32.dp))
-                                BasicIconButtonWithProgress(
-                                    onClick = {
-                                        requestPermissions()
-                                    },
-                                    imageVector = ImageVector.vectorResource(R.drawable.round_near_me_24),
-                                    gpsProgressIndicatorIsShown
-                                )
+                                Column(modifier = Modifier.align(Alignment.CenterEnd)) {
+                                    BasicIconButton(
+                                        onClick = {
+                                            mapView.map.apply {
+                                                move(
+                                                    CameraPosition(
+                                                        cameraPosition.target,
+                                                        cameraPosition.zoom + 1,
+                                                        cameraPosition.azimuth,
+                                                        cameraPosition.tilt
+                                                    ),
+                                                    Animation(Animation.Type.SMOOTH, 0.25f),
+                                                    cameraCallback
+                                                )
+                                            }
+                                        },
+                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_add_24)
+                                    )
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    BasicIconButton(
+                                        onClick = {
+                                            mapView.map.apply {
+                                                move(
+                                                    CameraPosition(
+                                                        cameraPosition.target,
+                                                        cameraPosition.zoom - 1,
+                                                        cameraPosition.azimuth,
+                                                        cameraPosition.tilt
+                                                    ),
+                                                    Animation(Animation.Type.SMOOTH, 0.25f),
+                                                    cameraCallback
+                                                )
+                                            }
+                                        },
+                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_remove_24)
+                                    )
+                                }
+
+                                Column(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(0.dp, 64.dp)
+                                ) {
+                                    BasicIconButton(
+                                        onClick = {
+                                            searchSheetIsShown = true
+                                        }, imageVector = Icons.Default.Search
+                                    )
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    BasicIconButton(
+                                        onClick = {
+                                            qrScannerActivityResultLauncher.launch(
+                                                Intent(
+                                                    this@MainActivity, QRScannerActivity::class.java
+                                                )
+                                            )
+                                        },
+                                        imageVector = ImageVector.vectorResource(R.drawable.baseline_qr_code_2_24)
+                                    )
+                                    Spacer(modifier = Modifier.size(32.dp))
+                                    BasicIconButtonWithProgress(
+                                        onClick = {
+                                            requestPermissions()
+                                        },
+                                        imageVector = ImageVector.vectorResource(R.drawable.round_near_me_24),
+                                        gpsProgressIndicatorIsShown
+                                    )
+                                }
+                            }
+                            if (searchSheetIsShown) {
+                                SearchSheet(onDismissRequest = {
+                                    searchSheetIsShown = false
+                                })
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun SearchSheet(onDismissRequest: () -> Unit) {
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+        )
+
+        ModalBottomSheet(modifier = Modifier
+            .fillMaxHeight()
+            .padding(0.dp, 32.dp, 0.dp, 0.dp),
+            sheetState = sheetState,
+            onDismissRequest = { onDismissRequest() }) {
+            ChargingStationList()
         }
     }
 
@@ -306,9 +370,7 @@ class MainActivity : ComponentActivity() {
                         15.0f,
                         mapView.map.cameraPosition.azimuth,
                         mapView.map.cameraPosition.tilt
-                    ),
-                    Animation(Animation.Type.SMOOTH, 1f),
-                    cameraCallback
+                    ), Animation(Animation.Type.SMOOTH, 1f), cameraCallback
                 )
                 mainActivityViewModel.hideGPSProgressIndicator()
             } else {
@@ -356,37 +418,46 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
+    fun InternetConnectionDialog() {
+        AlertDialog(icon = {
+            Icon(Icons.Default.Info, contentDescription = "Icon")
+        }, title = {
+            Text(text = "Internet Connection Dialog")
+        }, text = {
+            Text(text = "Your internet connection seems to be disabled. You need to enable it.")
+        }, onDismissRequest = {}, confirmButton = {}, modifier = Modifier.padding(32.dp))
+    }
+
+    @Composable
     fun ChargingStationsMap() {
         AndroidView(factory = {
             mapView
         })
     }
 
-    private fun addMarkers(): List<PlacemarkMapObject> {
-        val points = listOf(
-            Point(55.751244, 37.618423) to "Station 1",
-            Point(55.761244, 37.628423) to "Station 2",
-            Point(55.771244, 37.638423) to "Station 3"
-        )
-
+    private fun addMarkers() {
         val marker = createBitmapFromVector(this, R.drawable.baseline_circle_24)
         val imageProvider = ImageProvider.fromBitmap(marker)
 
-        points.forEach { (point, title) ->
+        val points = mutableListOf<Point>()
+        mainActivityViewModel.chargingStations.value.forEach {
+            points.add(Point(it.latitude, it.longitude))
+        }
+
+        points.forEach { point ->
             val placemarkMapObject = mapView.map.mapObjects.addPlacemark().apply {
                 geometry = point
                 setIcon(imageProvider)
                 userData = title
             }
             val listener = MapObjectTapListener { _, _ ->
-                showStationInfo(title)
+                showStationInfo("title")
                 true
             }
             placemarkMapObject.addTapListener(listener)
             tapListeners.add(listener)
             placemarkMapObjectList.add(placemarkMapObject)
         }
-        return placemarkMapObjectList
     }
 
     private fun showStationInfo(title: String) {
@@ -407,49 +478,33 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ChargingStationListScreen() {
+    fun ChargingStationList() {
         val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
-        val chargingStations by mainActivityViewModel.chargingStations.collectAsState()
         val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
-        val loading by mainActivityViewModel.loading.collectAsState()
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
             SearchBar(searchQuery = searchQuery,
                 onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
             Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier.fillMaxSize()
             ) {
-                if (loading) {
-                    CircularProgressIndicator()
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                    ) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()//.height(300.dp)
-                        ) {
-                            items(count = filteredChargingStations.size, key = {
-                                filteredChargingStations[it].id
-                            }, itemContent = { index ->
-                                ChargingStationItem(filteredChargingStations[index]) {
-                                    //navController.navigate("chargingStationDetail/${filteredChargingStations[index].id}")
-                                }
-                                HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-                            })
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()//.height(300.dp)
+                ) {
+                    items(count = filteredChargingStations.size, key = {
+                        filteredChargingStations[it].id
+                    }, itemContent = { index ->
+                        ChargingStationItem(filteredChargingStations[index]) {
+
                         }
-                    }
+                        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+                    })
                 }
             }
         }
@@ -459,36 +514,29 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BasicIconButton(
-    onClick: () -> Unit,
-    imageVector: ImageVector
+    onClick: () -> Unit, imageVector: ImageVector
 ) {
     Box(contentAlignment = Alignment.Center) {
         Button(
             onClick = onClick,
             elevation = ButtonDefaults.buttonElevation(3.dp),
-            modifier = Modifier
-                .size(48.dp)
+            modifier = Modifier.size(48.dp)
         ) {}
         Icon(
-            imageVector = imageVector,
-            contentDescription = "description",
-            tint = Color.White
+            imageVector = imageVector, contentDescription = "description", tint = Color.White
         )
     }
 }
 
 @Composable
 fun BasicIconButtonWithProgress(
-    onClick: () -> Unit,
-    imageVector: ImageVector,
-    progressIsShown: Boolean
+    onClick: () -> Unit, imageVector: ImageVector, progressIsShown: Boolean
 ) {
     Box(contentAlignment = Alignment.Center) {
         Button(
             onClick = onClick,
             elevation = ButtonDefaults.buttonElevation(3.dp),
-            modifier = Modifier
-                .size(48.dp)
+            modifier = Modifier.size(48.dp)
         ) {}
         if (progressIsShown) {
             CircularProgressIndicator(
@@ -498,36 +546,11 @@ fun BasicIconButtonWithProgress(
             )
         } else {
             Icon(
-                imageVector = imageVector,
-                contentDescription = "description",
-                tint = Color.White
+                imageVector = imageVector, contentDescription = "description", tint = Color.White
             )
         }
     }
 }
-
-//@OptIn(ExperimentalAnimationApi::class)
-//@Composable
-//fun MyApp() {
-//    val navController = rememberAnimatedNavController()
-//    val mainActivityViewModel: MainActivityViewModel = viewModel()
-//
-//    AnimatedNavHost(navController, startDestination = "chargingStationList") {
-//        composable("chargingStationList", enterTransition = {
-//            slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
-//        }, exitTransition = {
-//            slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
-//        }) { ChargingStationListScreen(navController, mainActivityViewModel) }
-//        composable("chargingStationDetail/{id}", enterTransition = {
-//            slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
-//        }, exitTransition = {
-//            slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
-//        }) { backStackEntry ->
-//            val chargingStationId = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-//            ChargingStationDetailScreen(chargingStationId, mainActivityViewModel)
-//        }
-//    }
-//}
 
 @Composable
 fun ChargingStationDetailScreen(
@@ -555,7 +578,7 @@ fun ChargingStationDetailScreen(
 
 @Composable
 fun SearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
-    TextField(
+    OutlinedTextField(
         value = searchQuery,
         singleLine = true,
         onValueChange = onSearchQueryChanged,
@@ -583,21 +606,12 @@ fun SearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
 fun ChargingStationItem(chargingStation: ChargingStation, onClick: () -> Unit) {
     Column(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            .background(Color.White)
     ) {
         Text(text = chargingStation.name, fontSize = 20.sp)
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = chargingStation.address, fontSize = 16.sp)
     }
-}
-
-@Composable
-fun AnimatedNavHost(
-    navController: NavHostController, startDestination: String, builder: NavGraphBuilder.() -> Unit
-) {
-    NavHost(
-        navController = navController, startDestination = startDestination, builder = builder
-    )
 }

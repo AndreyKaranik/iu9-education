@@ -3,6 +3,8 @@ package com.example.chargingstations
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.yandex.mapkit.map.CameraListener
@@ -11,6 +13,7 @@ import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.runtime.image.ImageProvider
+
 
 class MyCameraListener(
     private val context: Context,
@@ -71,4 +74,21 @@ fun createBitmapFromVector(context: Context, art: Int): Bitmap? {
     drawable.setBounds(0, 0, canvas.width, canvas.height)
     drawable.draw(canvas)
     return bitmap
+}
+
+fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val capabilities =
+        connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    if (capabilities != null) {
+        if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+            return true
+        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+            return true
+        } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+            return true
+        }
+    }
+    return false
 }
