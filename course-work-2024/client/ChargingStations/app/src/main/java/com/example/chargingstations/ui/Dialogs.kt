@@ -77,9 +77,9 @@ fun BadQRCodeDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
         text = {
             Text(text = "Your QR code is bad")
         },
-        onDismissRequest = {},
+        onDismissRequest = { onDismissRequest() },
         confirmButton = {
-            TextButton(onClick = {}) {
+            TextButton(onClick = { onConfirmation() }) {
                 Text("continue")
             }
         },
@@ -99,9 +99,9 @@ fun ChargingStationNotFoundDialog(onDismissRequest: () -> Unit, onConfirmation: 
         text = {
             Text(text = "Charging Station Not Found Dialog")
         },
-        onDismissRequest = {},
+        onDismissRequest = { onDismissRequest() },
         confirmButton = {
-            TextButton(onClick = {}) {
+            TextButton(onClick = { onConfirmation() }) {
                 Text("continue")
             }
         },
