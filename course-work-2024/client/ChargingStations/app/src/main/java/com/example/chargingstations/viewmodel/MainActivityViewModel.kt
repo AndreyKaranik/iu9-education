@@ -44,6 +44,12 @@ class MainActivityViewModel : ViewModel() {
     private val _gpsDialogIsShown = MutableStateFlow(false)
     val gpsDialogIsShown: StateFlow<Boolean> = _gpsDialogIsShown
 
+    private val _badQRCodeDialogIsShown = MutableStateFlow(false)
+    val badQRCodeDialogIsShown: StateFlow<Boolean> = _badQRCodeDialogIsShown
+
+    private val _chargingStationNotFoundDialogIsShown = MutableStateFlow(false)
+    val chargingStationNotFoundDialogIsShown: StateFlow<Boolean> = _chargingStationNotFoundDialogIsShown
+
     private val _selectedChargingStation = MutableStateFlow<ChargingStation?>(null)
     val selectedChargingStation: StateFlow<ChargingStation?> = _selectedChargingStation
 
@@ -73,6 +79,23 @@ class MainActivityViewModel : ViewModel() {
     fun hideInternetConnectionDialog() {
         _internetConnectionDialogIsShown.value = false
     }
+
+    fun showBadQRCodeDialogIsShown() {
+        _badQRCodeDialogIsShown.value = true
+    }
+
+    fun hideBadQRCodeDialogIsShown() {
+        _badQRCodeDialogIsShown.value = false
+    }
+
+    fun showChargingStationNotFoundDialogIsShown() {
+        _chargingStationNotFoundDialogIsShown.value = true
+    }
+
+    fun hideChargingStationNotFoundDialogIsShown() {
+        _chargingStationNotFoundDialogIsShown.value = false
+    }
+
 
     fun showGPSProgressIndicator() {
         _gpsProgressIndicatorIsShown.value = true

@@ -96,9 +96,11 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
 import com.example.chargingstations.ui.BasicIconButtonWithProgress
 import com.example.chargingstations.ui.ChargingStationItem
+import com.example.chargingstations.ui.ChargingStationNotFoundDialog
 import com.example.chargingstations.ui.ChargingStationSearchBar
 import com.example.chargingstations.ui.GPSDialog
 import com.example.chargingstations.ui.InternetConnectionDialog
@@ -140,6 +142,7 @@ class MainActivity : ComponentActivity() {
             override fun onAvailable(network: Network) {
                 if (!mainActivityViewModel.chargingStationsFetched.value) {
                     mainActivityViewModel.fetchChargingStations()
+                    mainActivityViewModel.hideInternetConnectionDialog()
                 }
             }
 
@@ -197,10 +200,10 @@ class MainActivity : ComponentActivity() {
                                 Point(chargingStation.latitude, chargingStation.longitude)
                             )
                         } else {
-                            Log.e(TAG, "Charging Station (id:${pair[1]}) not found!")
+                            mainActivityViewModel.showChargingStationNotFoundDialogIsShown()
                         }
                     } else {
-                        Log.e(TAG, "BAD QR!")
+                        mainActivityViewModel.showBadQRCodeDialogIsShown()
                     }
                 }
             }
@@ -226,6 +229,9 @@ class MainActivity : ComponentActivity() {
                     val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsState()
                     val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsState()
                     val internetConnectionDialogIsShown by mainActivityViewModel.internetConnectionDialogIsShown.collectAsState()
+                    val badQRCodeDialogIsShown by mainActivityViewModel.badQRCodeDialogIsShown.collectAsState()
+                    val chargingStationNotFoundDialogIsShown by mainActivityViewModel.chargingStationNotFoundDialogIsShown.collectAsState()
+
 
                     val chargingStationDetailsSheetIsShown by mainActivityViewModel.chargingStationDetailsSheetIsShown.collectAsState()
                     var searchSheetIsShown by remember { mutableStateOf(false) }
@@ -234,13 +240,35 @@ class MainActivity : ComponentActivity() {
                         addMarkers()
                     }
 
-                    if (gpsDialogIsShown) {
-                        GPSDialog(onDismissRequest = {
-                            mainActivityViewModel.hideGPSDialog()
-                        }, onConfirmation = {
-                            mainActivityViewModel.hideGPSDialog()
-                            activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                        })
+                    when {
+                        gpsDialogIsShown -> {
+                            GPSDialog(onDismissRequest = {
+                                mainActivityViewModel.hideGPSDialog()
+                            }, onConfirmation = {
+                                mainActivityViewModel.hideGPSDialog()
+                                activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                            })
+                        }
+
+                        badQRCodeDialogIsShown -> {
+                            BadQRCodeDialog(
+                                onDismissRequest = {
+                                    mainActivityViewModel.hideBadQRCodeDialogIsShown()
+                                }, onConfirmation = {
+                                    mainActivityViewModel.hideBadQRCodeDialogIsShown()
+                                }
+                            )
+                        }
+
+                        chargingStationNotFoundDialogIsShown -> {
+                            ChargingStationNotFoundDialog(
+                                onDismissRequest = {
+                                    mainActivityViewModel.hideChargingStationNotFoundDialogIsShown()
+                                }, onConfirmation = {
+                                    mainActivityViewModel.hideChargingStationNotFoundDialogIsShown()
+                                }
+                            )
+                        }
                     }
 
                     Box(
