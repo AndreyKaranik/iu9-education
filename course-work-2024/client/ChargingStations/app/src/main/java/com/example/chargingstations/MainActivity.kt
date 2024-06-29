@@ -147,14 +147,17 @@ class MainActivity : ComponentActivity() {
             }
 
             override fun onLost(network: Network) {
+
             }
 
             override fun onCapabilitiesChanged(
                 network: Network, networkCapabilities: NetworkCapabilities
             ) {
+
             }
 
             override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
+
             }
         })
 

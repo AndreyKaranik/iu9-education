@@ -10,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.chargingstations.R
 
 @Composable
 fun GPSDialog(
@@ -72,11 +74,9 @@ fun BadQRCodeDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
             Icon(Icons.Default.Warning, contentDescription = "Icon")
         },
         title = {
-            Text(text = "Bad QRCode Dialog")
+            Text(text = stringResource(R.string.bad_qrcode_dialog_title))
         },
-        text = {
-            Text(text = "Your QR code is bad")
-        },
+        text = {},
         onDismissRequest = { onDismissRequest() },
         confirmButton = {
             TextButton(onClick = { onConfirmation() }) {
@@ -94,11 +94,9 @@ fun ChargingStationNotFoundDialog(onDismissRequest: () -> Unit, onConfirmation: 
             Icon(Icons.Default.Warning, contentDescription = "Icon")
         },
         title = {
-            Text(text = "Charging Station Not Found Dialog")
+            Text(text = stringResource(R.string.charging_station_not_found_dialog_title))
         },
-        text = {
-            Text(text = "Charging Station Not Found Dialog")
-        },
+        text = {},
         onDismissRequest = { onDismissRequest() },
         confirmButton = {
             TextButton(onClick = { onConfirmation() }) {
