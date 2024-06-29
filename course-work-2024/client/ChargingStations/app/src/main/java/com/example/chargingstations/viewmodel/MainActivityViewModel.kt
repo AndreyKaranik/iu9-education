@@ -32,6 +32,9 @@ class MainActivityViewModel : ViewModel() {
     private val _internetConnectionDialogIsShown = MutableStateFlow(false)
     val internetConnectionDialogIsShown: StateFlow<Boolean> = _internetConnectionDialogIsShown
 
+    private val _chargingStationDetailsSheetIsShown = MutableStateFlow(false)
+    val chargingStationDetailsSheetIsShown: StateFlow<Boolean> = _chargingStationDetailsSheetIsShown
+
     private val _searchQuery = MutableStateFlow(" ")
     val searchQuery: StateFlow<String> = _searchQuery
 
@@ -70,6 +73,20 @@ class MainActivityViewModel : ViewModel() {
 
     fun hideGPSProgressIndicator() {
         _gpsProgressIndicatorIsShown.value = false
+    }
+
+    fun showChargingStationDetailsSheet(chargingStationId: Int) {
+        _chargingStationDetailsSheetIsShown.value = true
+    }
+
+    fun hideChargingStationDetailsSheet() {
+        _chargingStationDetailsSheetIsShown.value = false
+    }
+
+    fun getChargingStationById(chargingStationId: Int): ChargingStation? {
+        return chargingStations.value.find {
+            it.id == chargingStationId
+        }
     }
 
     init {

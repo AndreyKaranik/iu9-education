@@ -28,6 +28,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -92,6 +93,13 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.lazy.items
+import com.example.chargingstations.ui.BasicIconButton
+import com.example.chargingstations.ui.BasicIconButtonWithProgress
+import com.example.chargingstations.ui.ChargingStationItem
+import com.example.chargingstations.ui.GPSDialog
+import com.example.chargingstations.ui.InternetConnectionDialog
+import com.example.chargingstations.ui.SearchBar
 
 class MainActivity : ComponentActivity() {
     private lateinit var mapView: MapView
@@ -125,20 +133,24 @@ class MainActivity : ComponentActivity() {
 
         val connectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network : Network) {
+        connectivityManager.registerDefaultNetworkCallback(object :
+            ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
                 if (!mainActivityViewModel.chargingStationsFetched.value) {
                     mainActivityViewModel.fetchChargingStations()
                 }
             }
 
-            override fun onLost(network : Network) {
+            override fun onLost(network: Network) {
             }
 
-            override fun onCapabilitiesChanged(network : Network, networkCapabilities : NetworkCapabilities) {
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities
+            ) {
             }
 
-            override fun onLinkPropertiesChanged(network : Network, linkProperties : LinkProperties) {
+            override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
             }
         })
 
@@ -173,7 +185,22 @@ class MainActivity : ComponentActivity() {
             if (it.resultCode == RESULT_OK) {
                 val code = it.data?.getStringExtra("code")
                 if (code != null) {
-                    Log.e(TAG, code)
+                    val regex = "ChargingStationId=([0-9])+".toRegex()
+                    if (regex.containsMatchIn(code)) {
+                        val pair = code.split('=')
+                        val chargingStation =
+                            mainActivityViewModel.getChargingStationById(pair[1].toInt())
+                        if (chargingStation != null) {
+                            moveTo(
+                                chargingStation.id,
+                                Point(chargingStation.latitude, chargingStation.longitude)
+                            )
+                        } else {
+                            Log.e(TAG, "Charging Station (id:${pair[1]}) not found!")
+                        }
+                    } else {
+                        Log.e(TAG, "BAD QR!")
+                    }
                 }
             }
         }
@@ -198,6 +225,8 @@ class MainActivity : ComponentActivity() {
                     val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsState()
                     val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsState()
                     val internetConnectionDialogIsShown by mainActivityViewModel.internetConnectionDialogIsShown.collectAsState()
+
+                    val chargingStationDetailsSheetIsShown by mainActivityViewModel.chargingStationDetailsSheetIsShown.collectAsState()
                     var searchSheetIsShown by remember { mutableStateOf(false) }
 
                     if (chargingStationsFetched && placemarkMapObjectList.isEmpty()) {
@@ -311,6 +340,12 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
+                            if (chargingStationDetailsSheetIsShown) {
+                                searchSheetIsShown = false
+                                ChargingStationDetailsSheet(onDismissRequest = {
+                                    mainActivityViewModel.hideChargingStationDetailsSheet()
+                                })
+                            }
                             if (searchSheetIsShown) {
                                 SearchSheet(onDismissRequest = {
                                     searchSheetIsShown = false
@@ -336,6 +371,22 @@ class MainActivity : ComponentActivity() {
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
             ChargingStationList()
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun ChargingStationDetailsSheet(onDismissRequest: () -> Unit) {
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = false,
+        )
+
+        ModalBottomSheet(modifier = Modifier
+            .fillMaxHeight()
+            .padding(0.dp, 32.dp, 0.dp, 0.dp),
+            sheetState = sheetState,
+            onDismissRequest = { onDismissRequest() }) {
+            ChargingStationDetails(1)
         }
     }
 
@@ -391,44 +442,6 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun GPSDialog(
-        onDismissRequest: () -> Unit, onConfirmation: () -> Unit
-    ) {
-        AlertDialog(icon = {
-            Icon(Icons.Default.Info, contentDescription = "Icon")
-        }, title = {
-            Text(text = "GPS Dialog")
-        }, text = {
-            Text(text = "Your GPS seems to be disabled, do you want to enable it?")
-        }, onDismissRequest = {
-            onDismissRequest()
-        }, confirmButton = {
-            TextButton(onClick = {
-                onConfirmation()
-            }) {
-                Text("Yes")
-            }
-        }, dismissButton = {
-            TextButton(onClick = {
-                onDismissRequest()
-            }) {
-                Text("No")
-            }
-        }, modifier = Modifier.padding(32.dp))
-    }
-
-    @Composable
-    fun InternetConnectionDialog() {
-        AlertDialog(icon = {
-            Icon(Icons.Default.Info, contentDescription = "Icon")
-        }, title = {
-            Text(text = "Internet Connection Dialog")
-        }, text = {
-            Text(text = "Your internet connection seems to be disabled. You need to enable it.")
-        }, onDismissRequest = {}, confirmButton = {}, modifier = Modifier.padding(32.dp))
-    }
-
-    @Composable
     fun ChargingStationsMap() {
         AndroidView(factory = {
             mapView
@@ -439,19 +452,19 @@ class MainActivity : ComponentActivity() {
         val marker = createBitmapFromVector(this, R.drawable.baseline_circle_24)
         val imageProvider = ImageProvider.fromBitmap(marker)
 
-        val points = mutableListOf<Point>()
+        val points = mutableListOf<Pair<Int, Point>>()
         mainActivityViewModel.chargingStations.value.forEach {
-            points.add(Point(it.latitude, it.longitude))
+            points.add(it.id to Point(it.latitude, it.longitude))
         }
 
-        points.forEach { point ->
+        points.forEach { pair ->
             val placemarkMapObject = mapView.map.mapObjects.addPlacemark().apply {
-                geometry = point
+                geometry = pair.second
                 setIcon(imageProvider)
                 userData = title
             }
             val listener = MapObjectTapListener { _, _ ->
-                showStationInfo("title")
+                moveTo(pair.first, pair.second)
                 true
             }
             placemarkMapObject.addTapListener(listener)
@@ -460,9 +473,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun showStationInfo(title: String) {
-        AlertDialog.Builder(this).setTitle(title).setMessage("Описание для $title")
-            .setPositiveButton("OK", null).show()
+    private fun moveTo(chargingStationId: Int, point: Point) {
+        mainActivityViewModel.showChargingStationDetailsSheet(chargingStationId)
+        mapView.map.move(
+            CameraPosition(
+                Point(point.latitude, point.longitude),
+                20.0f,
+                mapView.map.cameraPosition.azimuth,
+                mapView.map.cameraPosition.tilt
+            ), Animation(Animation.Type.SMOOTH, 1f), cameraCallback
+        )
     }
 
     override fun onStart() {
@@ -483,7 +503,9 @@ class MainActivity : ComponentActivity() {
         val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp, 0.dp)
         ) {
             SearchBar(searchQuery = searchQuery,
                 onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
@@ -493,125 +515,47 @@ class MainActivity : ComponentActivity() {
             ) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 64.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight()//.height(300.dp)
-                ) {
-                    items(count = filteredChargingStations.size, key = {
-                        filteredChargingStations[it].id
-                    }, itemContent = { index ->
-                        ChargingStationItem(filteredChargingStations[index]) {
+                        .fillMaxHeight()
 
+                ) {
+                    items(filteredChargingStations, key = { it.id }) { station ->
+                        ChargingStationItem(station) {
+                            moveTo(station.id, Point(station.latitude, station.longitude))
                         }
                         HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-                    })
+                    }
                 }
             }
         }
     }
-}
 
-
-@Composable
-fun BasicIconButton(
-    onClick: () -> Unit, imageVector: ImageVector
-) {
-    Box(contentAlignment = Alignment.Center) {
-        Button(
-            onClick = onClick,
-            elevation = ButtonDefaults.buttonElevation(3.dp),
-            modifier = Modifier.size(48.dp)
-        ) {}
-        Icon(
-            imageVector = imageVector, contentDescription = "description", tint = Color.White
-        )
-    }
-}
-
-@Composable
-fun BasicIconButtonWithProgress(
-    onClick: () -> Unit, imageVector: ImageVector, progressIsShown: Boolean
-) {
-    Box(contentAlignment = Alignment.Center) {
-        Button(
-            onClick = onClick,
-            elevation = ButtonDefaults.buttonElevation(3.dp),
-            modifier = Modifier.size(48.dp)
-        ) {}
-        if (progressIsShown) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.secondary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                modifier = Modifier.size(32.dp)
-            )
-        } else {
-            Icon(
-                imageVector = imageVector, contentDescription = "description", tint = Color.White
-            )
-        }
-    }
-}
-
-@Composable
-fun ChargingStationDetailScreen(
-    chargingStationId: Int?, mainActivityViewModel: MainActivityViewModel
-) {
-    val chargingStation = chargingStationId?.let { mainActivityViewModel.getChargingStation(it) }
-    if (chargingStation != null) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(text = chargingStation.name, fontSize = 30.sp, color = Color.Black)
-            Text(text = chargingStation.address, fontSize = 20.sp, color = Color.Gray)
-            Text(text = (chargingStation.opening_hours), fontSize = 20.sp, color = Color.Blue)
-            Text(
-                text = (chargingStation.description ?: "null"), fontSize = 20.sp, color = Color.Blue
-            )
-        }
-    } else {
-        Text("not found", modifier = Modifier.padding(16.dp))
-    }
-}
-
-@Composable
-fun SearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
-    OutlinedTextField(
-        value = searchQuery,
-        singleLine = true,
-        onValueChange = onSearchQueryChanged,
-        placeholder = { Text("Address") },
-        label = { Text("Search") },
-        leadingIcon = {
-            IconButton(onClick = {
-                //
-            }) {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "description")
-            }
-        },
-        trailingIcon = {
-            IconButton(onClick = {
-                onSearchQueryChanged("")
-            }) {
-                Icon(imageVector = Icons.Filled.Clear, contentDescription = "description")
-            }
-        },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun ChargingStationItem(chargingStation: ChargingStation, onClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .background(Color.White)
+    @Composable
+    fun ChargingStationDetails(
+        chargingStationId: Int?
     ) {
-        Text(text = chargingStation.name, fontSize = 20.sp)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(text = chargingStation.address, fontSize = 16.sp)
+        val chargingStation =
+            chargingStationId?.let { mainActivityViewModel.getChargingStation(it) }
+        if (chargingStation != null) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Text(text = chargingStation.name, fontSize = 30.sp, color = Color.Black)
+                Text(text = chargingStation.address, fontSize = 20.sp, color = Color.Gray)
+                Text(text = (chargingStation.opening_hours), fontSize = 20.sp, color = Color.Blue)
+                Text(
+                    text = (chargingStation.description ?: "null"),
+                    fontSize = 20.sp,
+                    color = Color.Blue
+                )
+            }
+        } else {
+            Text("not found", modifier = Modifier.padding(16.dp))
+        }
     }
 }
