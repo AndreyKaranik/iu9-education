@@ -35,7 +35,7 @@ class MainActivityViewModel : ViewModel() {
     private val _chargingStationDetailsSheetIsShown = MutableStateFlow(false)
     val chargingStationDetailsSheetIsShown: StateFlow<Boolean> = _chargingStationDetailsSheetIsShown
 
-    private val _searchQuery = MutableStateFlow(" ")
+    private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
     private val _gpsProgressIndicatorIsShown = MutableStateFlow(false)
@@ -44,12 +44,19 @@ class MainActivityViewModel : ViewModel() {
     private val _gpsDialogIsShown = MutableStateFlow(false)
     val gpsDialogIsShown: StateFlow<Boolean> = _gpsDialogIsShown
 
+    private val _selectedChargingStation = MutableStateFlow<ChargingStation?>(null)
+    val selectedChargingStation: StateFlow<ChargingStation?> = _selectedChargingStation
+
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://89.111.172.144:8000/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
     private val apiService = retrofit.create(ApiService::class.java)
+
+    init {
+        fetchChargingStations()
+    }
 
     fun showGPSDialog() {
         _gpsDialogIsShown.value = true
@@ -77,20 +84,25 @@ class MainActivityViewModel : ViewModel() {
 
     fun showChargingStationDetailsSheet(chargingStationId: Int) {
         _chargingStationDetailsSheetIsShown.value = true
+        fetchChargingStation(chargingStationId)
+    }
+
+    fun fetchChargingStation(chargingStationId: Int) {
+        viewModelScope.launch {
+            delay(3000)
+            _selectedChargingStation.value = getChargingStationById(chargingStationId)
+        }
     }
 
     fun hideChargingStationDetailsSheet() {
         _chargingStationDetailsSheetIsShown.value = false
+        _selectedChargingStation.value = null
     }
 
     fun getChargingStationById(chargingStationId: Int): ChargingStation? {
         return chargingStations.value.find {
             it.id == chargingStationId
         }
-    }
-
-    init {
-        fetchChargingStations()
     }
 
     fun fetchChargingStations() {
@@ -102,7 +114,6 @@ class MainActivityViewModel : ViewModel() {
                     response.body()?.let {
                         _chargingStations.value = it
                         _chargingStationsFetched.value = true
-                        updateSearchQuery("")
                     }
                 } else {
                     Log.e("E", "error")

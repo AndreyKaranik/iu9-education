@@ -94,12 +94,14 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import com.example.chargingstations.ui.BasicIconButton
 import com.example.chargingstations.ui.BasicIconButtonWithProgress
 import com.example.chargingstations.ui.ChargingStationItem
+import com.example.chargingstations.ui.ChargingStationSearchBar
 import com.example.chargingstations.ui.GPSDialog
 import com.example.chargingstations.ui.InternetConnectionDialog
-import com.example.chargingstations.ui.SearchBar
 
 class MainActivity : ComponentActivity() {
     private lateinit var mapView: MapView
@@ -145,8 +147,7 @@ class MainActivity : ComponentActivity() {
             }
 
             override fun onCapabilitiesChanged(
-                network: Network,
-                networkCapabilities: NetworkCapabilities
+                network: Network, networkCapabilities: NetworkCapabilities
             ) {
             }
 
@@ -233,15 +234,13 @@ class MainActivity : ComponentActivity() {
                         addMarkers()
                     }
 
-                    when {
-                        gpsDialogIsShown -> {
-                            GPSDialog(onDismissRequest = {
-                                mainActivityViewModel.hideGPSDialog()
-                            }, onConfirmation = {
-                                mainActivityViewModel.hideGPSDialog()
-                                activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                            })
-                        }
+                    if (gpsDialogIsShown) {
+                        GPSDialog(onDismissRequest = {
+                            mainActivityViewModel.hideGPSDialog()
+                        }, onConfirmation = {
+                            mainActivityViewModel.hideGPSDialog()
+                            activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                        })
                     }
 
                     Box(
@@ -386,7 +385,7 @@ class MainActivity : ComponentActivity() {
             .padding(0.dp, 32.dp, 0.dp, 0.dp),
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
-            ChargingStationDetails(1)
+            ChargingStationDetails()
         }
     }
 
@@ -497,6 +496,7 @@ class MainActivity : ComponentActivity() {
         super.onStop()
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ChargingStationList() {
         val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
@@ -507,7 +507,33 @@ class MainActivity : ComponentActivity() {
                 .fillMaxSize()
                 .padding(16.dp, 0.dp)
         ) {
-            SearchBar(searchQuery = searchQuery,
+//            var active by remember { mutableStateOf(false) }
+//            SearchBar(
+//                query = searchQuery,
+//                onQueryChange = { mainActivityViewModel.updateSearchQuery(it) },
+//                onSearch = {active = false},
+//                active = active,
+//                onActiveChange = {active = it},
+//                placeholder = { Text("Name/Address...")},
+//                leadingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "description")},
+//            ) {
+//                LazyColumn(
+//                    verticalArrangement = Arrangement.spacedBy(8.dp),
+//                    contentPadding = PaddingValues(bottom = 64.dp),
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .fillMaxHeight()
+//
+//                ) {
+//                    items(filteredChargingStations, key = { it.id }) { station ->
+//                        ChargingStationItem(station) {
+//                            moveTo(station.id, Point(station.latitude, station.longitude))
+//                        }
+//                        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+//                    }
+//                }
+//            }
+            ChargingStationSearchBar(searchQuery = searchQuery,
                 onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
             Spacer(modifier = Modifier.height(16.dp))
             Box(
@@ -533,29 +559,35 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ChargingStationDetails(
-        chargingStationId: Int?
-    ) {
-        val chargingStation =
-            chargingStationId?.let { mainActivityViewModel.getChargingStation(it) }
-        if (chargingStation != null) {
+    fun ChargingStationDetails() {
+        val selectedChargingStation by mainActivityViewModel.selectedChargingStation.collectAsState()
+        if (selectedChargingStation != null) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(text = chargingStation.name, fontSize = 30.sp, color = Color.Black)
-                Text(text = chargingStation.address, fontSize = 20.sp, color = Color.Gray)
-                Text(text = (chargingStation.opening_hours), fontSize = 20.sp, color = Color.Blue)
+                Text(text = selectedChargingStation!!.name, fontSize = 30.sp, color = Color.Black)
+                Text(text = selectedChargingStation!!.address, fontSize = 20.sp, color = Color.Gray)
                 Text(
-                    text = (chargingStation.description ?: "null"),
+                    text = (selectedChargingStation!!.opening_hours),
+                    fontSize = 20.sp,
+                    color = Color.Blue
+                )
+                Text(
+                    text = (selectedChargingStation!!.description ?: "null"),
                     fontSize = 20.sp,
                     color = Color.Blue
                 )
             }
         } else {
-            Text("not found", modifier = Modifier.padding(16.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }

@@ -73,7 +73,7 @@ fun BasicIconButtonWithProgress(
 }
 
 @Composable
-fun SearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
+fun ChargingStationSearchBar(searchQuery: String, onSearchQueryChanged: (String) -> Unit) {
     OutlinedTextField(
         value = searchQuery,
         singleLine = true,
