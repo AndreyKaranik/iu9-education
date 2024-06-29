@@ -60,7 +60,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    //implementation("androidx.compose.material3:material3-android:1.2.1")
     implementation("androidx.compose.material3:material3-android:1.3.0-beta01")
     implementation("com.google.accompanist:accompanist-navigation-animation:0.31.3-beta")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -68,6 +67,16 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.yandex.android:maps.mobile:4.6.1-lite")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.4.0-beta02")
+    implementation("com.google.zxing:core:3.5.3")
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
 
     testImplementation("junit:junit:4.13.2")
@@ -75,6 +84,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

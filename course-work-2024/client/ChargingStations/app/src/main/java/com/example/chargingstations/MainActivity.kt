@@ -1,6 +1,8 @@
 package com.example.chargingstations
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -8,6 +10,8 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.view.View
+import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -57,7 +61,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.animation.doOnEnd
 import androidx.core.app.ActivityCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavGraphBuilder
@@ -80,7 +86,6 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 class MainActivity : ComponentActivity() {
     private lateinit var mapView: MapView
     private lateinit var cameraListener: MyCameraListener
@@ -91,6 +96,8 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
     private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var qrScannerActivityResultLauncher: ActivityResultLauncher<Intent>
+
 
     private val TAG: String = "MainActivity"
     private val placemarkMapObjectList = mutableListOf<PlacemarkMapObject>()
@@ -102,6 +109,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         MapKitFactory.setApiKey("83258943-5e6f-4d87-b448-45553225d7e4")
         MapKitFactory.initialize(this)
         mapView = MapView(this)
@@ -133,6 +141,17 @@ class MainActivity : ComponentActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) {
             move()
+        }
+
+        qrScannerActivityResultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) {
+            if (it.resultCode == RESULT_OK) {
+                val code = it.data?.getStringExtra("code")
+                if (code != null) {
+                    Log.e(TAG, code)
+                }
+            }
         }
 
         cameraCallback = Map.CameraCallback {
@@ -236,7 +255,7 @@ class MainActivity : ComponentActivity() {
                                 Spacer(modifier = Modifier.size(8.dp))
                                 BasicIconButton(
                                     onClick = {
-                                        /*TODO*/
+                                        qrScannerActivityResultLauncher.launch(Intent(this@MainActivity, QRScannerActivity::class.java))
                                     },
                                     imageVector = ImageVector.vectorResource(R.drawable.baseline_qr_code_2_24)
                                 )
@@ -260,7 +279,7 @@ class MainActivity : ComponentActivity() {
         if (mainActivityViewModel.gpsProgressIndicatorIsShown.value) {
             mainActivityViewModel.hideGPSProgressIndicator()
         }
-        
+
         if (ActivityCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
