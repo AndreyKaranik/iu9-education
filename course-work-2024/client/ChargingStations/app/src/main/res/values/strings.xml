@@ -3,4 +3,5 @@
     <string name="title_activity_qrscanner">QRScannerActivity</string>
     <string name="bad_qrcode_dialog_title">Bad QR Code</string>
     <string name="charging_station_not_found_dialog_title">Charging Station Not Found</string>
+    <string name="connection_problem_dialog_title">Connection Problem</string>
 </resources>

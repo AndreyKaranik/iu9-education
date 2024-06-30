@@ -102,6 +102,7 @@ import com.example.chargingstations.ui.BasicIconButtonWithProgress
 import com.example.chargingstations.ui.ChargingStationItem
 import com.example.chargingstations.ui.ChargingStationNotFoundDialog
 import com.example.chargingstations.ui.ChargingStationSearchBar
+import com.example.chargingstations.ui.ConnectionProblemDialog
 import com.example.chargingstations.ui.GPSDialog
 import com.example.chargingstations.ui.InternetConnectionDialog
 
@@ -234,6 +235,7 @@ class MainActivity : ComponentActivity() {
                     val internetConnectionDialogIsShown by mainActivityViewModel.internetConnectionDialogIsShown.collectAsState()
                     val badQRCodeDialogIsShown by mainActivityViewModel.badQRCodeDialogIsShown.collectAsState()
                     val chargingStationNotFoundDialogIsShown by mainActivityViewModel.chargingStationNotFoundDialogIsShown.collectAsState()
+                    val connectionProblemDialogIsShown by mainActivityViewModel.connectionProblemDialogIsShown.collectAsState()
 
 
                     val chargingStationDetailsSheetIsShown by mainActivityViewModel.chargingStationDetailsSheetIsShown.collectAsState()
@@ -263,6 +265,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        internetConnectionDialogIsShown -> {
+                            InternetConnectionDialog()
+                        }
+
                         chargingStationNotFoundDialogIsShown -> {
                             ChargingStationNotFoundDialog(
                                 onDismissRequest = {
@@ -272,22 +278,30 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+                        connectionProblemDialogIsShown -> {
+                            ConnectionProblemDialog(
+                                onDismissRequest = {},
+                                onConfirmation = {
+                                    mainActivityViewModel.hideConnectionProblemDialog()
+                                    mainActivityViewModel.fetchChargingStations()
+                                }
+                            )
+                        }
                     }
 
                     Box(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         if (!chargingStationsFetched) {
-                            if (!chargingStationsFetching) {
-                                mainActivityViewModel.showInternetConnectionDialog()
-                            }
-                            if (!internetConnectionDialogIsShown) {
+                            if (!internetConnectionDialogIsShown && !connectionProblemDialogIsShown) {
                                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                            } else {
+                            }
+                            if (!chargingStationsFetching) {
                                 if (!isNetworkAvailable(this@MainActivity)) {
-                                    InternetConnectionDialog()
+                                    mainActivityViewModel.showInternetConnectionDialog()
                                 } else {
-                                    //InternetConnectionDialog()
+                                    mainActivityViewModel.showConnectionProblemDialog()
                                 }
                             }
                         } else {

@@ -50,6 +50,9 @@ class MainActivityViewModel : ViewModel() {
     private val _chargingStationNotFoundDialogIsShown = MutableStateFlow(false)
     val chargingStationNotFoundDialogIsShown: StateFlow<Boolean> = _chargingStationNotFoundDialogIsShown
 
+    private val _connectionProblemDialogIsShown = MutableStateFlow(false)
+    val connectionProblemDialogIsShown: StateFlow<Boolean> = _connectionProblemDialogIsShown
+
     private val _selectedChargingStation = MutableStateFlow<ChargingStation?>(null)
     val selectedChargingStation: StateFlow<ChargingStation?> = _selectedChargingStation
 
@@ -95,6 +98,15 @@ class MainActivityViewModel : ViewModel() {
     fun hideChargingStationNotFoundDialogIsShown() {
         _chargingStationNotFoundDialogIsShown.value = false
     }
+
+    fun showConnectionProblemDialog() {
+        _connectionProblemDialogIsShown.value = true
+    }
+
+    fun hideConnectionProblemDialog() {
+        _connectionProblemDialogIsShown.value = false
+    }
+
 
 
     fun showGPSProgressIndicator() {

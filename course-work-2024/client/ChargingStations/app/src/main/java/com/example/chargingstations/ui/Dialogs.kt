@@ -106,3 +106,23 @@ fun ChargingStationNotFoundDialog(onDismissRequest: () -> Unit, onConfirmation: 
         modifier = Modifier.padding(32.dp)
     )
 }
+
+@Composable
+fun ConnectionProblemDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
+    AlertDialog(
+        icon = {
+            Icon(Icons.Default.Warning, contentDescription = "Icon")
+        },
+        title = {
+            Text(text = stringResource(R.string.connection_problem_dialog_title))
+        },
+        text = {},
+        onDismissRequest = { onDismissRequest() },
+        confirmButton = {
+            TextButton(onClick = { onConfirmation() }) {
+                Text("Try it again")
+            }
+        },
+        modifier = Modifier.padding(32.dp)
+    )
+}
