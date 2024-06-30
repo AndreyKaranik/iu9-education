@@ -33,6 +33,22 @@ CREATE TABLE charging_stations (
     description VARCHAR(512)
 );
 
+CREATE TABLE charging_types (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(32) NOT NULL,
+    current_type VARCHAR(32) NOT NULL
+);
+
+CREATE TABLE connectors (
+    id SERIAL PRIMARY KEY,
+    charging_station_id INT NOT NULL,
+    status INT NOT NULL,
+    charging_type_id INT NOT NULL,
+    rate REAL NOT NULL,
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id),
+    FOREIGN KEY (charging_type_id) REFERENCES charging_types (id)
+);
+
 
 INSERT INTO companies (name, address)
 VALUES ('Завод-X', 'Moscow city'),
@@ -73,3 +89,15 @@ VALUES
     ('Станция 30', 'ул. Никольская, 29, Москва', 55.754, 37.619, 2, '10-21', 'Описание для Станции 30'),
     ('Станция 31', 'ул. Большая Лубянка, 14, Москва', 55.759, 37.626, 1, '10-21', 'Описание для Станции 31'),
     ('Станция 32', 'ул. Пречистенка, 24, Москва', 55.744, 37.593, 2, '10-21', 'Описание для Станции 32');
+
+INSERT INTO charging_types (name, current_type)
+VALUES ('TYPE 2', 'AC'),
+        ('GB/T', 'DC');
+
+INSERT INTO connectors (charging_station_id, status, charging_type_id, rate)
+VALUES (1, 0, 1, 22),
+        (1, 1, 1, 15),
+        (2, 1, 1, 22),
+        (2, 1, 2, 30);
+
+SELECT * FROM connectors;

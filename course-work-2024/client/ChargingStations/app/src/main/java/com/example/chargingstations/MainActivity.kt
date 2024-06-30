@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -94,8 +95,11 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
 import com.example.chargingstations.ui.BasicIconButtonWithProgress
@@ -613,17 +617,44 @@ class MainActivity : ComponentActivity() {
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                Text(text = selectedChargingStation!!.name, fontSize = 30.sp, color = Color.Black)
+                Text(text = selectedChargingStation!!.name, fontSize = 24.sp, color = Color.Black)
                 Text(text = selectedChargingStation!!.address, fontSize = 20.sp, color = Color.Gray)
+                Text(text = "Connectors", fontSize = 24.sp, color = Color.Black)
                 Text(
-                    text = (selectedChargingStation!!.opening_hours),
-                    fontSize = 20.sp,
-                    color = Color.Blue
+                    text = "Opening hours",
+                    fontSize = 24.sp
                 )
+                Box(
+                    modifier = Modifier
+                        .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                        .padding(4.dp)
+                ) {
+                    Text(
+                        text = selectedChargingStation!!.opening_hours,
+                        fontSize = 20.sp,
+                        color = Color.White
+                    )
+                }
                 Text(
-                    text = (selectedChargingStation!!.description ?: "null"),
-                    fontSize = 20.sp,
-                    color = Color.Blue
+                    text = "Description",
+                    fontSize = 24.sp
+                )
+                Box(
+                    modifier = Modifier
+                        .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                        .defaultMinSize(minHeight = 64.dp)
+                ) {
+                    Text(
+                        text = selectedChargingStation!!.description ?: "No description",
+                        fontSize = 16.sp,
+                        color = Color.LightGray,
+                        modifier = Modifier.padding(4.dp)
+                    )
+                }
+                Text(
+                    text = "Marks",
+                    fontSize = 24.sp
                 )
             }
         } else {
@@ -636,3 +667,59 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+//@Preview
+//@Composable
+//fun ChargingStationDetailsPreview() {
+//    Surface(
+//        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+//    ) {
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(6.dp),
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp)
+//        ) {
+//            Text(text = "Name", fontSize = 24.sp, color = Color.Black)
+//            Text(text = "улица иванова", fontSize = 20.sp, color = Color.Gray)
+//            Text(text = "Connectors", fontSize = 24.sp, color = Color.Black)
+//            Text(
+//                text = "Opening hours",
+//                fontSize = 24.sp
+//            )
+//            Box(
+//                modifier = Modifier
+//                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+//                    .padding(4.dp)
+//            ) {
+//                Text(
+//                    text = "8-22",
+//                    fontSize = 20.sp,
+//                    color = Color.White
+//                )
+//            }
+//            Text(
+//                text = "Description",
+//                fontSize = 24.sp
+//            )
+//            Box(
+//                modifier = Modifier
+//                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+//                    .fillMaxWidth()
+//                    .defaultMinSize(minHeight = 64.dp)
+//            ) {
+//                Text(
+//                    text = "Super station",
+//                    fontSize = 16.sp,
+//                    color = Color.LightGray,
+//                    modifier = Modifier.padding(4.dp)
+//                )
+//            }
+//            Text(
+//                text = "Marks",
+//                fontSize = 24.sp
+//            )
+//        }
+//    }
+//}
