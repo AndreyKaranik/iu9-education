@@ -148,8 +148,8 @@ class MainActivity : ComponentActivity() {
             ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 if (!mainActivityViewModel.chargingStationsFetched.value) {
-                    mainActivityViewModel.fetchChargingStations()
                     mainActivityViewModel.hideInternetConnectionDialog()
+                    mainActivityViewModel.fetchChargingStations()
                 }
             }
 
@@ -293,6 +293,10 @@ class MainActivity : ComponentActivity() {
                                     mainActivityViewModel.fetchChargingStations()
                                 }
                             )
+                        }
+
+                        else -> {
+
                         }
                     }
 
