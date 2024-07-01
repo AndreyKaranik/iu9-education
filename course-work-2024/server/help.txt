@@ -21,6 +21,8 @@ Response-Body:
 5. curl -X POST 127.0.0.1:8000/charge
 6. curl -X GET "127.0.0.1:8000/orders/{id}/charging-information"
 
+curl -X GET "89.111.172.144:8000/charging-stations" -v
+
 
 
 \i 'C:/Users/Golum/Desktop/iu9-education/course-work-2024/server/init.sql'
@@ -35,23 +37,16 @@ sudo -i -u postgres
 psql
 \i '/var/lib/postgresql/init.sql'
 
-sudo mv /root/init.sql /var/lib/postgresql/
-sudo chmod 644 /var/lib/postgresql/init.sql
-
-
-sudo systemctl restart csserver.service
-
-
-
-
-
-
-curl -X GET "89.111.172.144:8000/charging-stations" -v
-
-ssh root@89.111.172.144
 
 pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" root@89.111.172.144:/root
 pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
+ssh root@89.111.172.144
+sudo mv /root/init.sql /var/lib/postgresql/
+sudo chmod 644 /var/lib/postgresql/init.sql
+sudo -i -u postgres
+psql
+\i '/var/lib/postgresql/init.sql'
+sudo systemctl restart csserver.service
 
 
 

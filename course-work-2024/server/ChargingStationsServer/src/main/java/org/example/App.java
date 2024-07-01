@@ -77,88 +77,14 @@ public class App {
                 Matcher m = r.matcher(httpExchange.getRequestURI().toString());
 
                 if (m.find()) {
-                    String stationId = m.group(1);
+                    String chargingStationId = m.group(1);
 
-                    Connection conn = null;
-                    Statement stmt1 = null;
-                    Statement stmt2 = null;
-                    ResultSet rs1 = null;
-                    ResultSet rs2 = null;
+                    Connection connection = null;
 
                     try {
-                        conn = DriverManager.getConnection(URL, USER, PASSWORD);
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
-                        stmt1 = conn.createStatement();
-                        stmt2 = conn.createStatement();
-
-                        String sql1 = "SELECT * FROM charging_stations WHERE id = " + stationId;
-                        String sql2 = "SELECT * FROM connectors WHERE charging_station_id = " + stationId;
-
-                        rs1 = stmt1.executeQuery(sql1);
-                        rs2 = stmt2.executeQuery(sql2);
-
-                        rs1.next();
-                        int id = rs1.getInt("id");
-                        String name = rs1.getString("name");
-                        String address = rs1.getString("address");
-                        double latitude = rs1.getDouble("latitude");
-                        double longitude = rs1.getDouble("longitude");
-                        int companyId = rs1.getInt("company_id");
-                        String hours = rs1.getString("opening_hours");
-                        String description = rs1.getString("description");
-                        JSONObject object = new JSONObject();
-                        object.put("id", id);
-                        object.put("name", name);
-                        object.put("address", address);
-                        object.put("latitude", latitude);
-                        object.put("longitude", longitude);
-                        object.put("company_id", companyId);
-                        object.put("opening_hours", hours);
-                        object.put("description", description);
-
-                        JSONArray array = new JSONArray();
-                        while (rs2.next()) {
-                            int connectorId = rs2.getInt("id");
-                            int chargingStationId = rs2.getInt("charging_station_id");
-                            int status = rs2.getInt("status");
-                            int chargingTypeId = rs2.getInt("charging_type_id");
-                            double rate = rs2.getDouble("rate");
-                            JSONObject o = new JSONObject();
-                            o.put("id", connectorId);
-                            o.put("charging_station_id", chargingStationId);
-                            o.put("status", status);
-                            o.put("rate", rate);
-
-                            String sql3 = "SELECT * FROM charging_types WHERE id = " + chargingTypeId;
-
-                            Statement stmt3 = null;
-                            ResultSet rs3 = null;
-
-                            try {
-                                stmt3 = conn.createStatement();
-                                rs3 = stmt3.executeQuery(sql3);
-                                rs3.next();
-                                int charging_type_id = rs3.getInt("id");
-                                String charging_type_name = rs3.getString("name");
-                                String currentType = rs3.getString("current_type");
-                                JSONObject object2 = new JSONObject();
-                                object2.put("id", charging_type_id);
-                                object2.put("name", charging_type_name);
-                                object2.put("current_type", currentType);
-                                o.put("charging_type", object2);
-                            } catch (SQLException e) {
-                                httpExchange.sendResponseHeaders(500, 0);
-                                OutputStream os = httpExchange.getResponseBody();
-                                os.flush();
-                                os.close();
-                                e.printStackTrace();
-                            }
-
-                            array.put(o);
-                        }
-
-                        object.put("connectors", array);
-                        object.put("charging_marks", Utils.getChargingMarksByChargingStationId(conn, id, httpExchange));
+                        JSONObject object = Utils.getChargingStationDetailsByChargingStationId(connection, Integer.parseInt(chargingStationId), httpExchange);
 
                         String response = object.toString();
                         ArrayList<String> list = new ArrayList<>();
@@ -178,11 +104,7 @@ public class App {
                         e.printStackTrace();
                     } finally {
                         try {
-                            if (rs1 != null) rs1.close();
-                            if (rs2 != null) rs2.close();
-                            if (stmt1 != null) stmt1.close();
-                            if (stmt2 != null) stmt2.close();
-                            if (conn != null) conn.close();
+                            if (connection != null) connection.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
