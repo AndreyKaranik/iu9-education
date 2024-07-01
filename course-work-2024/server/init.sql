@@ -49,12 +49,20 @@ CREATE TABLE connectors (
     FOREIGN KEY (charging_type_id) REFERENCES charging_types (id)
 );
 
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(32) NOT NULL,
+    email VARCHAR(320) NOT NULL,
+    password VARCHAR(32) NOT NULL
+);
+
 CREATE TABLE charging_marks (
     id SERIAL PRIMARY KEY,
     charging_station_id INT NOT NULL,
     status INT NOT NULL,
     user_id INT NULL,
-    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id)
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 
@@ -107,6 +115,10 @@ VALUES (1, 0, 1, 22),
         (1, 1, 1, 15),
         (2, 1, 1, 22),
         (2, 1, 2, 30);
+
+INSERT INTO users (name, email, password)
+VALUES ('John', 'john@gmail.com', 'john123'),
+        ('Andrey', 'andrey@yandex.ru', 'andrey2003');
 
 INSERT INTO charging_marks (charging_station_id, status, user_id)
 VALUES (1, 1, 1),

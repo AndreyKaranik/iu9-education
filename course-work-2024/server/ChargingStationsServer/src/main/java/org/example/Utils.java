@@ -13,7 +13,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Utils {
-    public static JSONArray getChargingMarksByChargingStationId(Connection connection, int chargingStationId, HttpExchange httpExchange) throws IOException {
+    public static JSONArray getChargingMarksWithUserNameByChargingStationId(Connection connection, int chargingStationId, HttpExchange httpExchange) throws IOException {
         String sql = "SELECT * FROM charging_marks WHERE charging_station_id = " + chargingStationId;
         Statement stmt = null;
         ResultSet rs = null;
@@ -31,7 +31,10 @@ public class Utils {
                 object.put("id", id);
                 object.put("charging_station_id", markChargingStationId);
                 object.put("status", status);
-                object.put("user_id", userId);
+                if (userId != 0) {
+                    object.put("user_id", userId);
+                    object.put("user_name", Utils.getUserNameByUserId(connection, userId, httpExchange));
+                }
                 array.put(object);
             }
         } catch (SQLException e) {
@@ -154,7 +157,7 @@ public class Utils {
             object.put("opening_hours", hours);
             object.put("description", description);
             object.put("connectors", Utils.getConnectorsByChargingStationId(connection, id, httpExchange));
-            object.put("charging_marks", Utils.getChargingMarksByChargingStationId(connection, id, httpExchange));
+            object.put("charging_marks", Utils.getChargingMarksWithUserNameByChargingStationId(connection, id, httpExchange));
         } catch (SQLException e) {
             httpExchange.sendResponseHeaders(500, 0);
             OutputStream os = httpExchange.getResponseBody();
@@ -170,5 +173,33 @@ public class Utils {
             }
         }
         return object;
+    }
+
+    public static String getUserNameByUserId(Connection connection, int userId, HttpExchange httpExchange) throws IOException {
+        String sql = "SELECT * FROM users WHERE id = " + userId;
+        Statement stmt = null;
+        ResultSet rs = null;
+        String name = null;
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+
+            rs.next();
+            name = rs.getString("name");
+        } catch (SQLException e) {
+            httpExchange.sendResponseHeaders(500, 0);
+            OutputStream os = httpExchange.getResponseBody();
+            os.flush();
+            os.close();
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return name;
     }
 }

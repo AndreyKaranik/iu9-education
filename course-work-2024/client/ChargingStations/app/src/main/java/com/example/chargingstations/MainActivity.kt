@@ -1,9 +1,6 @@
 package com.example.chargingstations
 
 import android.Manifest
-import android.animation.ObjectAnimator
-import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,19 +9,15 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.View
-import android.view.animation.OvershootInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,28 +31,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -69,7 +50,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -78,7 +58,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.chargingstations.model.ChargingStation
 import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import com.example.chargingstations.viewmodel.MainActivityViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -96,14 +75,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.chargingstations.model.ChargingMark
+import com.example.chargingstations.model.ChargingMarkWithUserName
 import com.example.chargingstations.model.ChargingStationDetails
 import com.example.chargingstations.model.ChargingType
-import com.example.chargingstations.model.Connector
+import com.example.chargingstations.model.ConnectorDetails
 import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
 import com.example.chargingstations.ui.BasicIconButtonWithProgress
@@ -721,10 +697,10 @@ class MainActivity : ComponentActivity() {
                 Text(
                     text = "Marks", fontSize = 24.sp
                 )
-                if (chargingStationDetails!!.chargingMarks.isEmpty()) {
+                if (chargingStationDetails!!.chargingMarksWithUserName.isEmpty()) {
                     Text(text = "No marks", fontSize = 20.sp, color = Color.Gray)
                 } else {
-                    chargingStationDetails!!.chargingMarks.forEach {
+                    chargingStationDetails!!.chargingMarksWithUserName.forEach {
                         Box(
                             modifier = Modifier
                                 .background(Color.Gray, shape = RoundedCornerShape(8.dp))
@@ -733,7 +709,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Column {
                                 if (it.userId != null) {
-                                    Text(text = it.userId.toString(), fontSize = 20.sp, color = Color.White)
+                                    Text(text = it.userName!!, fontSize = 20.sp, color = Color.White)
                                 } else {
                                     Text(text = "Anonymous", fontSize = 20.sp, color = Color.White)
                                 }
@@ -779,178 +755,178 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Preview
-@Composable
-fun ChargingStationDetailsPreview() {
-    Surface(
-        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
-    ) {
-        val connectors = listOf<Connector>(
-            Connector(0, 1, 0, ChargingType(0, "TYPE 2", "AC"), 22.0),
-            Connector(1, 1, 1, ChargingType(0, "GB/T", "DC"), 65.0)
-        )
-        val marks = listOf<ChargingMark>(
-            ChargingMark(0, 1, 0, 1),
-            ChargingMark(1, 1, 1, null)
-        )
-        val chargingStationDetails = ChargingStationDetails(
-            0,
-            "SuperCharger",
-            "ул. Иванова, Москва",
-            0.0,
-            0.0,
-            0,
-            "8-22",
-            "Отличная зарядная станция в Москва не улице Иванова.",
-            connectors,
-            marks
-        )
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(text = "Name", fontSize = 24.sp, color = Color.Black)
-            Text(text = "улица иванова", fontSize = 20.sp, color = Color.Gray)
-            Text(text = "Connectors", fontSize = 24.sp, color = Color.Black)
-            if (chargingStationDetails.connectors.isEmpty()) {
-                Text(text = "No connectors", fontSize = 20.sp, color = Color.Gray)
-            } else {
-                chargingStationDetails.connectors.forEach {
-                    Box(
-                        modifier = Modifier
-                            .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                            .fillMaxWidth()
-                            .padding(4.dp)
-                    ) {
-                        Column {
-                            Text(text = it.chargingType.name, fontSize = 20.sp, color = Color.White)
-                            Text(
-                                text = it.chargingType.currentType,
-                                fontSize = 16.sp,
-                                color = Color.LightGray
-                            )
-                            Text(
-                                text = it.rate.toInt().toString() + " kW/h",
-                                fontSize = 14.sp,
-                                color = Color.LightGray
-                            )
-                            if (it.status == 1) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            Color.Green, shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(4.dp)
-                                ) {
-                                    Text(
-                                        text = "active", fontSize = 12.sp, color = Color.White
-                                    )
-                                }
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            Color.Red, shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(4.dp)
-                                ) {
-                                    Text(
-                                        text = "inactive", fontSize = 12.sp, color = Color.White
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Text(
-                text = "Opening hours", fontSize = 24.sp
-            )
-            Box(
-                modifier = Modifier
-                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .padding(4.dp)
-            ) {
-                Text(
-                    text = chargingStationDetails.openingHours,
-                    fontSize = 20.sp,
-                    color = Color.White
-                )
-            }
-            Text(
-                text = "Description", fontSize = 24.sp
-            )
-            Box(
-                modifier = Modifier
-                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                    .fillMaxWidth()
-                    .defaultMinSize(minHeight = 64.dp)
-                    .padding(4.dp)
-            ) {
-                if (chargingStationDetails.description != null) {
-                    Text(
-                        text = chargingStationDetails.description,
-                        fontSize = 16.sp,
-                        color = Color.LightGray,
-                    )
-                } else {
-                    Text(
-                        text = "No description",
-                        fontSize = 16.sp,
-                        color = Color.LightGray,
-                    )
-                }
-            }
-            Text(
-                text = "Marks", fontSize = 24.sp
-            )
-            if (chargingStationDetails.chargingMarks.isEmpty()) {
-                Text(text = "No marks", fontSize = 20.sp, color = Color.Gray)
-            } else {
-                chargingStationDetails.chargingMarks.forEach {
-                    Box(
-                        modifier = Modifier
-                            .background(Color.Gray, shape = RoundedCornerShape(8.dp))
-                            .fillMaxWidth()
-                            .padding(4.dp)
-                    ) {
-                        Column {
-                            if (it.userId != null) {
-                                Text(text = it.userId.toString(), fontSize = 20.sp, color = Color.White)
-                            } else {
-                                Text(text = "Anonymous", fontSize = 20.sp, color = Color.White)
-                            }
-                            if (it.status == 1) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            Color.Green, shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(4.dp)
-                                ) {
-                                    Text(
-                                        text = "Success", fontSize = 12.sp, color = Color.White
-                                    )
-                                }
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            Color.Red, shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(4.dp)
-                                ) {
-                                    Text(
-                                        text = "Failed", fontSize = 12.sp, color = Color.White
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun ChargingStationDetailsPreview() {
+//    Surface(
+//        modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+//    ) {
+//        val connectors = listOf<ConnectorDetails>(
+//            ConnectorDetails(0, 1, 0, ChargingType(0, "TYPE 2", "AC"), 22.0),
+//            ConnectorDetails(1, 1, 1, ChargingType(0, "GB/T", "DC"), 65.0)
+//        )
+//        val marks = listOf<ChargingMarkWithUserName>(
+//            ChargingMarkWithUserName(0, 1, 0, 1, "John"),
+//            ChargingMarkWithUserName(1, 1, 1, null, null)
+//        )
+//        val chargingStationDetails = ChargingStationDetails(
+//            0,
+//            "SuperCharger",
+//            "ул. Иванова, Москва",
+//            0.0,
+//            0.0,
+//            0,
+//            "8-22",
+//            "Отличная зарядная станция в Москва не улице Иванова.",
+//            connectors,
+//            marks
+//        )
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(6.dp),
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp)
+//        ) {
+//            Text(text = "Name", fontSize = 24.sp, color = Color.Black)
+//            Text(text = "улица иванова", fontSize = 20.sp, color = Color.Gray)
+//            Text(text = "Connectors", fontSize = 24.sp, color = Color.Black)
+//            if (chargingStationDetails.connectors.isEmpty()) {
+//                Text(text = "No connectors", fontSize = 20.sp, color = Color.Gray)
+//            } else {
+//                chargingStationDetails.connectors.forEach {
+//                    Box(
+//                        modifier = Modifier
+//                            .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+//                            .fillMaxWidth()
+//                            .padding(4.dp)
+//                    ) {
+//                        Column {
+//                            Text(text = it.chargingType.name, fontSize = 20.sp, color = Color.White)
+//                            Text(
+//                                text = it.chargingType.currentType,
+//                                fontSize = 16.sp,
+//                                color = Color.LightGray
+//                            )
+//                            Text(
+//                                text = it.rate.toInt().toString() + " kW/h",
+//                                fontSize = 14.sp,
+//                                color = Color.LightGray
+//                            )
+//                            if (it.status == 1) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .background(
+//                                            Color.Green, shape = RoundedCornerShape(8.dp)
+//                                        )
+//                                        .padding(4.dp)
+//                                ) {
+//                                    Text(
+//                                        text = "active", fontSize = 12.sp, color = Color.White
+//                                    )
+//                                }
+//                            } else {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .background(
+//                                            Color.Red, shape = RoundedCornerShape(8.dp)
+//                                        )
+//                                        .padding(4.dp)
+//                                ) {
+//                                    Text(
+//                                        text = "inactive", fontSize = 12.sp, color = Color.White
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            Text(
+//                text = "Opening hours", fontSize = 24.sp
+//            )
+//            Box(
+//                modifier = Modifier
+//                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+//                    .padding(4.dp)
+//            ) {
+//                Text(
+//                    text = chargingStationDetails.openingHours,
+//                    fontSize = 20.sp,
+//                    color = Color.White
+//                )
+//            }
+//            Text(
+//                text = "Description", fontSize = 24.sp
+//            )
+//            Box(
+//                modifier = Modifier
+//                    .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+//                    .fillMaxWidth()
+//                    .defaultMinSize(minHeight = 64.dp)
+//                    .padding(4.dp)
+//            ) {
+//                if (chargingStationDetails.description != null) {
+//                    Text(
+//                        text = chargingStationDetails.description,
+//                        fontSize = 16.sp,
+//                        color = Color.LightGray,
+//                    )
+//                } else {
+//                    Text(
+//                        text = "No description",
+//                        fontSize = 16.sp,
+//                        color = Color.LightGray,
+//                    )
+//                }
+//            }
+//            Text(
+//                text = "Marks", fontSize = 24.sp
+//            )
+//            if (chargingStationDetails.chargingMarksWithUserName.isEmpty()) {
+//                Text(text = "No marks", fontSize = 20.sp, color = Color.Gray)
+//            } else {
+//                chargingStationDetails.chargingMarksWithUserName.forEach {
+//                    Box(
+//                        modifier = Modifier
+//                            .background(Color.Gray, shape = RoundedCornerShape(8.dp))
+//                            .fillMaxWidth()
+//                            .padding(4.dp)
+//                    ) {
+//                        Column {
+//                            if (it.userId != null) {
+//                                Text(text = it.userName, fontSize = 20.sp, color = Color.White)
+//                            } else {
+//                                Text(text = "Anonymous", fontSize = 20.sp, color = Color.White)
+//                            }
+//                            if (it.status == 1) {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .background(
+//                                            Color.Green, shape = RoundedCornerShape(8.dp)
+//                                        )
+//                                        .padding(4.dp)
+//                                ) {
+//                                    Text(
+//                                        text = "Success", fontSize = 12.sp, color = Color.White
+//                                    )
+//                                }
+//                            } else {
+//                                Box(
+//                                    modifier = Modifier
+//                                        .background(
+//                                            Color.Red, shape = RoundedCornerShape(8.dp)
+//                                        )
+//                                        .padding(4.dp)
+//                                ) {
+//                                    Text(
+//                                        text = "Failed", fontSize = 12.sp, color = Color.White
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}

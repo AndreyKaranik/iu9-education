@@ -13,7 +13,7 @@ data class ChargingStationDetails (
     @SerializedName("opening_hours")
     val openingHours: String,
     val description: String?,
-    val connectors: List<Connector>,
+    val connectors: List<ConnectorDetails>,
     @SerializedName("charging_marks")
-    val chargingMarks: List<ChargingMark>
+    val chargingMarksWithUserName: List<ChargingMarkWithUserName>
 )

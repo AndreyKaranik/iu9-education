@@ -2,7 +2,7 @@ package com.example.chargingstations.model
 
 import com.google.gson.annotations.SerializedName
 
-data class Connector (
+data class ConnectorDetails (
     val id: Int,
     @SerializedName("charging_station_id")
     val chargingStationId: Int,
