@@ -2,7 +2,7 @@ package com.example.chargingstations.model
 
 import com.google.gson.annotations.SerializedName
 
-data class ChargingStation (
+data class ChargingStationDetails (
     val id: Int,
     val name: String,
     val address: String,
@@ -12,5 +12,6 @@ data class ChargingStation (
     val companyId: Int,
     @SerializedName("opening_hours")
     val openingHours: String,
-    val description: String?
+    val description: String?,
+    val connectors: List<Connector>
 )

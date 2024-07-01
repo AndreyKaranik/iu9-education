@@ -127,7 +127,6 @@ public class App {
                             o.put("id", connectorId);
                             o.put("charging_station_id", chargingStationId);
                             o.put("status", status);
-                            o.put("charging_type_id", chargingTypeId);
                             o.put("rate", rate);
 
                             String sql3 = "SELECT * FROM charging_types WHERE id = " + chargingTypeId;

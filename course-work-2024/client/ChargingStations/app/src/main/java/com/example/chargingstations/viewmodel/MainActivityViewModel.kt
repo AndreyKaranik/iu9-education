@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.ApiService
 import com.example.chargingstations.model.ChargingStation
+import com.example.chargingstations.model.ChargingStationDetails
 import com.yandex.mapkit.geometry.Point
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.awaitResponse
 import retrofit2.converter.gson.GsonConverterFactory
@@ -53,12 +56,22 @@ class MainActivityViewModel : ViewModel() {
     private val _connectionProblemDialogIsShown = MutableStateFlow(false)
     val connectionProblemDialogIsShown: StateFlow<Boolean> = _connectionProblemDialogIsShown
 
-    private val _selectedChargingStation = MutableStateFlow<ChargingStation?>(null)
-    val selectedChargingStation: StateFlow<ChargingStation?> = _selectedChargingStation
+    private val _chargingStationDetails = MutableStateFlow<ChargingStationDetails?>(null)
+    val chargingStationDetails: StateFlow<ChargingStationDetails?> = _chargingStationDetails
+
+
+    val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    val httpClient = OkHttpClient.Builder().apply {
+        addInterceptor(logging)
+    }.build()
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://89.111.172.144:8000/")
         .addConverterFactory(GsonConverterFactory.create())
+        .client(httpClient)
         .build()
 
     private val apiService = retrofit.create(ApiService::class.java)
@@ -119,19 +132,30 @@ class MainActivityViewModel : ViewModel() {
 
     fun showChargingStationDetailsSheet(chargingStationId: Int) {
         _chargingStationDetailsSheetIsShown.value = true
-        fetchChargingStation(chargingStationId)
+        fetchChargingStationDetails(chargingStationId)
     }
 
-    fun fetchChargingStation(chargingStationId: Int) {
+    fun fetchChargingStationDetails(chargingStationId: Int) {
         viewModelScope.launch {
-            delay(3000)
-            _selectedChargingStation.value = getChargingStationById(chargingStationId)
+            try {
+                val response = apiService.getChargingStationDetails(chargingStationId).awaitResponse()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        _chargingStationDetails.value = it
+                    }
+                } else {
+                    Log.e("E", "error")
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("E", "exception")
+            }
         }
     }
 
     fun hideChargingStationDetailsSheet() {
         _chargingStationDetailsSheetIsShown.value = false
-        _selectedChargingStation.value = null
+        _chargingStationDetails.value = null
     }
 
     fun getChargingStationById(chargingStationId: Int): ChargingStation? {
@@ -176,9 +200,5 @@ class MainActivityViewModel : ViewModel() {
 
     fun updateSearchQuery(newQuery: String) {
         _searchQuery.value = newQuery
-    }
-
-    fun getChargingStation(chargingStationId: Int) : ChargingStation? {
-        return chargingStations.value.find { it.id == chargingStationId }
     }
 }
