@@ -26,7 +26,7 @@ public class App {
     private static final String PASSWORD = "postgres";
 
     public static void main(String[] args) throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0",8000), 0); // new InetSocketAddress("localhost",8080)
+        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8000), 0); // new InetSocketAddress("localhost",8080)
         server.createContext("/", new MyHandler());
         server.setExecutor(null);
         server.start();
@@ -134,7 +134,6 @@ public class App {
                             Statement stmt3 = null;
                             ResultSet rs3 = null;
 
-
                             try {
                                 stmt3 = conn.createStatement();
                                 rs3 = stmt3.executeQuery(sql3);
@@ -159,6 +158,7 @@ public class App {
                         }
 
                         object.put("connectors", array);
+                        object.put("charging_marks", Utils.getChargingMarksByChargingStationId(conn, id, httpExchange));
 
                         String response = object.toString();
                         ArrayList<String> list = new ArrayList<>();
