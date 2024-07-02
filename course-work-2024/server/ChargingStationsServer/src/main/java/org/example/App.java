@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
@@ -33,15 +35,16 @@ public class App {
         server.start();
         System.out.println("The server has started successfully.");
 
-        URI uri = new URI(
-                "http",
-                "example.com",
-                "/query",
-                "q=ул. Брусилова",
-                null);
 
-        String request = uri.toASCIIString();
-        System.out.println(request);
+//        URI uri = new URI(
+//                "http",
+//                "example.com",
+//                "/query",
+//                "q=ул. Брусилова",
+//                null);
+//
+//        String request = uri.toASCIIString();
+//        System.out.println(request);
     }
 
     private static Map<String, String> parseQueryParams(String query) {
@@ -70,20 +73,22 @@ public class App {
             System.out.println(new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
 
             if (httpExchange.getRequestMethod().equals("GET")) {
-//                Map<String, String> queryParams = parseQueryParams(httpExchange.getRequestURI().getQuery());
-//                System.out.println("Query Parameters:");
-//                for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-//                    System.out.println(entry.getKey() + " = " + entry.getValue());
-//                }
+                Map<String, String> queryParams = parseQueryParams(httpExchange.getRequestURI().getQuery());
+                System.out.println("Query Parameters:");
+                for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+                    System.out.println(entry.getKey() + " = " + entry.getValue());
+                }
+
 //                if (queryParams.containsKey("lang")) {
 //                    System.out.println("HERE: " + queryParams.get("lang"));
 //                }
+
+
                 // /charging-stations?lang=ru&simplify=true - example
                 // .getRequestURI().getPath() -> "/charging-stations"
                 // .getRequestURI().getQuery() -> "lang=ru&simplify=true"
 
-                String pattern = "/charging-stations/(\\d+)";
-
+                String pattern = "/charging-stations/(\\d+)$";
                 Pattern r = Pattern.compile(pattern);
                 Matcher m = r.matcher(httpExchange.getRequestURI().toString());
 
@@ -122,42 +127,22 @@ public class App {
                     }
                 }
 
-                if (httpExchange.getRequestURI().toString().equals("/charging-stations")) {
-                    Connection conn = null;
-                    Statement stmt = null;
-                    ResultSet rs = null;
+                pattern = "/charging-stations";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    Connection connection = null;
 
                     try {
-                        conn = DriverManager.getConnection(URL, USER, PASSWORD);
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
-                        stmt = conn.createStatement();
+                        JSONArray array = Utils.getChargingStations(
+                                connection,
+                                queryParams.get("level") == null ? null : URLDecoder.decode(queryParams.get("level"), StandardCharsets.UTF_8),
+                                queryParams.get("query") == null ? null : URLDecoder.decode(queryParams.get("query"), StandardCharsets.UTF_8)
+                        );
 
-                        String sql = "SELECT * FROM charging_stations";
-
-                        rs = stmt.executeQuery(sql);
-
-                        JSONArray array = new JSONArray();
-
-                        while (rs.next()) {
-                            int id = rs.getInt("id");
-                            String name = rs.getString("name");
-                            String address = rs.getString("address");
-                            double latitude = rs.getDouble("latitude");
-                            double longitude = rs.getDouble("longitude");
-                            int companyId = rs.getInt("company_id");
-                            String hours = rs.getString("opening_hours");
-                            String description = rs.getString("description");
-                            JSONObject object = new JSONObject();
-                            object.put("id", id);
-                            object.put("name", name);
-                            object.put("address", address);
-                            object.put("latitude", latitude);
-                            object.put("longitude", longitude);
-                            object.put("company_id", companyId);
-                            object.put("opening_hours", hours);
-                            object.put("description", description);
-                            array.put(object);
-                        }
                         String response = array.toString();
                         ArrayList<String> list = new ArrayList<>();
                         list.add("application/json");
@@ -176,9 +161,7 @@ public class App {
                         e.printStackTrace();
                     } finally {
                         try {
-                            if (rs != null) rs.close();
-                            if (stmt != null) stmt.close();
-                            if (conn != null) conn.close();
+                            if (connection != null) connection.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }

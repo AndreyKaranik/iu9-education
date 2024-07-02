@@ -1,15 +1,11 @@
 package com.example.chargingstations.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -32,8 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chargingstations.R
-import com.example.chargingstations.model.ChargingStation
-import com.example.chargingstations.viewmodel.MainActivityViewModel
+import com.example.chargingstations.model.ChargingStationMedium
 
 @Composable
 fun BasicIconButton(
@@ -110,7 +105,7 @@ fun ChargingStationSearchBar(searchQuery: String, onSearchQueryChanged: (String)
 }
 
 @Composable
-fun ChargingStationItem(chargingStation: ChargingStation, onClick: () -> Unit) {
+fun ChargingStationItem(chargingStation: ChargingStationMedium, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()

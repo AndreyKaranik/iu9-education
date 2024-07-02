@@ -6,10 +6,10 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class Utils {
@@ -79,7 +79,7 @@ public class Utils {
 
                 array.put(o);
             }
-        }  catch (SQLException e) {
+        } catch (SQLException e) {
             httpExchange.sendResponseHeaders(500, 0);
             OutputStream os = httpExchange.getResponseBody();
             os.flush();
@@ -201,5 +201,154 @@ public class Utils {
             }
         }
         return name;
+    }
+
+    public static JSONArray getChargingStations(Connection connection, String level, String query) throws IOException {
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        JSONArray array = new JSONArray();
+
+        if (level != null) {
+            if (level.equals("min")) {
+                try {
+                    String sql = "SELECT id, latitude, longitude FROM charging_stations;";
+                    stmt = connection.createStatement();
+                    rs = stmt.executeQuery(sql);
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        double latitude = rs.getDouble("latitude");
+                        double longitude = rs.getDouble("longitude");
+                        JSONObject object = new JSONObject();
+                        object.put("id", id);
+                        object.put("latitude", latitude);
+                        object.put("longitude", longitude);
+                        array.put(object);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs != null) rs.close();
+                        if (stmt != null) stmt.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (level.equals("medium")) {
+                try {
+                    String sql = "SELECT id, name, address, latitude, longitude FROM charging_stations";
+                    stmt = connection.createStatement();
+                    rs = stmt.executeQuery(sql);
+
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String name = rs.getString("name");
+                        String address = rs.getString("address");
+                        double latitude = rs.getDouble("latitude");
+                        double longitude = rs.getDouble("longitude");
+                        JSONObject object = new JSONObject();
+                        object.put("id", id);
+                        object.put("name", name);
+                        object.put("address", address);
+                        object.put("latitude", latitude);
+                        object.put("longitude", longitude);
+                        if (query != null) {
+                            if (name.toLowerCase().contains(query.toLowerCase()) ||
+                                    address.toLowerCase().contains(query.toLowerCase())) {
+                                array.put(object);
+                            }
+                        } else {
+                            array.put(object);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs != null) rs.close();
+                        if (stmt != null) stmt.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (level.equals("full")) {
+                try {
+                    String sql = "SELECT * FROM charging_stations";
+                    stmt = connection.createStatement();
+                    rs = stmt.executeQuery(sql);
+
+                    while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String name = rs.getString("name");
+                        String address = rs.getString("address");
+                        double latitude = rs.getDouble("latitude");
+                        double longitude = rs.getDouble("longitude");
+                        int companyId = rs.getInt("company_id");
+                        String hours = rs.getString("opening_hours");
+                        String description = rs.getString("description");
+                        JSONObject object = new JSONObject();
+                        object.put("id", id);
+                        object.put("name", name);
+                        object.put("address", address);
+                        object.put("latitude", latitude);
+                        object.put("longitude", longitude);
+                        object.put("company_id", companyId);
+                        object.put("opening_hours", hours);
+                        object.put("description", description);
+                        array.put(object);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs != null) rs.close();
+                        if (stmt != null) stmt.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            try {
+                String sql = "SELECT * FROM charging_stations";
+                stmt = connection.createStatement();
+                rs = stmt.executeQuery(sql);
+
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+                    String name = rs.getString("name");
+                    String address = rs.getString("address");
+                    double latitude = rs.getDouble("latitude");
+                    double longitude = rs.getDouble("longitude");
+                    int companyId = rs.getInt("company_id");
+                    String hours = rs.getString("opening_hours");
+                    String description = rs.getString("description");
+                    JSONObject object = new JSONObject();
+                    object.put("id", id);
+                    object.put("name", name);
+                    object.put("address", address);
+                    object.put("latitude", latitude);
+                    object.put("longitude", longitude);
+                    object.put("company_id", companyId);
+                    object.put("opening_hours", hours);
+                    object.put("description", description);
+                    array.put(object);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return array;
     }
 }

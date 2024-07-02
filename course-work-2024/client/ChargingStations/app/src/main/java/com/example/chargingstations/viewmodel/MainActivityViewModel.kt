@@ -1,19 +1,14 @@
 package com.example.chargingstations.viewmodel
+
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.ApiService
-import com.example.chargingstations.model.ChargingStation
 import com.example.chargingstations.model.ChargingStationDetails
-import com.yandex.mapkit.geometry.Point
-import kotlinx.coroutines.delay
+import com.example.chargingstations.model.ChargingStationMedium
+import com.example.chargingstations.model.ChargingStationMin
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,14 +20,23 @@ class MainActivityViewModel : ViewModel() {
 
     private val TAG: String = "MainActivityViewModel"
 
-    private val _chargingStations = MutableStateFlow<List<ChargingStation>>(emptyList())
-    val chargingStations: StateFlow<List<ChargingStation>> = _chargingStations
+    private val _chargingStations = MutableStateFlow<List<ChargingStationMin>>(emptyList())
+    val chargingStations: StateFlow<List<ChargingStationMin>> = _chargingStations
+
+    private val _filteredChargingStations = MutableStateFlow<List<ChargingStationMedium>>(emptyList())
+    val filteredChargingStations: StateFlow<List<ChargingStationMedium>> = _filteredChargingStations
 
     private val _chargingStationsFetching = MutableStateFlow(false)
     val chargingStationsFetching: StateFlow<Boolean> = _chargingStationsFetching
 
     private val _chargingStationsFetched = MutableStateFlow(false)
     val chargingStationsFetched: StateFlow<Boolean> = _chargingStationsFetched
+
+    private val _filteredChargingStationsFetching = MutableStateFlow(false)
+    val filteredChargingStationsFetching: StateFlow<Boolean> = _filteredChargingStationsFetching
+
+    private val _filteredChargingStationsFetched = MutableStateFlow(false)
+    val filteredChargingStationsFetched: StateFlow<Boolean> = _filteredChargingStationsFetched
 
     private val _internetConnectionDialogIsShown = MutableStateFlow(false)
     val internetConnectionDialogIsShown: StateFlow<Boolean> = _internetConnectionDialogIsShown
@@ -53,7 +57,8 @@ class MainActivityViewModel : ViewModel() {
     val badQRCodeDialogIsShown: StateFlow<Boolean> = _badQRCodeDialogIsShown
 
     private val _chargingStationNotFoundDialogIsShown = MutableStateFlow(false)
-    val chargingStationNotFoundDialogIsShown: StateFlow<Boolean> = _chargingStationNotFoundDialogIsShown
+    val chargingStationNotFoundDialogIsShown: StateFlow<Boolean> =
+        _chargingStationNotFoundDialogIsShown
 
     private val _connectionProblemDialogIsShown = MutableStateFlow(false)
     val connectionProblemDialogIsShown: StateFlow<Boolean> = _connectionProblemDialogIsShown
@@ -123,7 +128,6 @@ class MainActivityViewModel : ViewModel() {
     }
 
 
-
     fun showGPSProgressIndicator() {
         _gpsProgressIndicatorIsShown.value = true
     }
@@ -140,7 +144,8 @@ class MainActivityViewModel : ViewModel() {
     fun fetchChargingStationDetails(chargingStationId: Int) {
         viewModelScope.launch {
             try {
-                val response = apiService.getChargingStationDetails(chargingStationId).awaitResponse()
+                val response =
+                    apiService.getChargingStationDetails(chargingStationId).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _chargingStationDetails.value = it
@@ -160,7 +165,7 @@ class MainActivityViewModel : ViewModel() {
         _chargingStationDetails.value = null
     }
 
-    fun getChargingStationById(chargingStationId: Int): ChargingStation? {
+    fun getChargingStationById(chargingStationId: Int): ChargingStationMin? {
         return chargingStations.value.find {
             it.id == chargingStationId
         }
@@ -170,10 +175,13 @@ class MainActivityViewModel : ViewModel() {
         _chargingStationsFetching.value = true
         viewModelScope.launch {
             try {
-                val response = apiService.getChargingStations().awaitResponse()
+                val response = apiService.getChargingStations("min", null).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        _chargingStations.value = it
+                        val chargingStationList: List<ChargingStationMin> = it.map { station ->
+                            ChargingStationMin(station.id!! , station.latitude!!, station.longitude!!)
+                        }
+                        _chargingStations.value = chargingStationList
                         _chargingStationsFetched.value = true
                     }
                 } else {
@@ -188,19 +196,50 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    val filteredChargingStations: StateFlow<List<ChargingStation>> = _searchQuery
-        .map { query ->
-            if (query.isBlank()) {
-                _chargingStations.value
-            } else {
-                _chargingStations.value.filter { chargingStation ->
-                    chargingStation.name.contains(query, ignoreCase = true) || chargingStation.address.contains(query, ignoreCase = true)
+    fun fetchFilteredChargingStations() {
+        _filteredChargingStationsFetching.value = true
+        viewModelScope.launch {
+            try {
+                val response = apiService.getChargingStations("medium", searchQuery.value).awaitResponse()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        val chargingStationList: List<ChargingStationMedium> = it.map { station ->
+                            ChargingStationMedium(station.id!!, station.name!!, station.address!!, station.latitude!!, station.longitude!!)
+                        }
+                        _filteredChargingStations.value = chargingStationList
+                        _filteredChargingStationsFetched.value = true
+                    }
+                } else {
+                    Log.e(TAG, "error")
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(TAG, "exception")
+            } finally {
+                _filteredChargingStationsFetching.value = false
             }
         }
-        .stateIn(viewModelScope, SharingStarted.Lazily, _chargingStations.value)
+    }
+
+//    val filteredChargingStations: StateFlow<List<ChargingStationDeprecated>> = _searchQuery
+//        .map { query ->
+//            if (query.isBlank()) {
+//                _chargingStations.value
+//            } else {
+//                _chargingStations.value.filter { chargingStation ->
+//                    chargingStation.name.contains(query, ignoreCase = true) || chargingStation.address.contains(query, ignoreCase = true)
+//                }
+//            }
+//        }
+//        .stateIn(viewModelScope, SharingStarted.Lazily, _chargingStations.value)
 
     fun updateSearchQuery(newQuery: String) {
         _searchQuery.value = newQuery
+        if (newQuery != "") {
+            _filteredChargingStationsFetched.value = false
+            fetchFilteredChargingStations()
+        } else {
+            _filteredChargingStations.value = emptyList()
+        }
     }
 }

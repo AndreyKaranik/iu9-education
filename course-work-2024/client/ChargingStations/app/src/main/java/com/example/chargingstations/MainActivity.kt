@@ -31,13 +31,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -73,14 +72,9 @@ import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.chargingstations.model.ChargingMarkWithUserName
-import com.example.chargingstations.model.ChargingStationDetails
-import com.example.chargingstations.model.ChargingType
-import com.example.chargingstations.model.ConnectorDetails
 import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
 import com.example.chargingstations.ui.BasicIconButtonWithProgress
@@ -530,6 +524,9 @@ class MainActivity : ComponentActivity() {
     fun ChargingStationList() {
         val searchQuery by mainActivityViewModel.searchQuery.collectAsState()
         val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
+        val filteredChargingStationsFetched by mainActivityViewModel.filteredChargingStationsFetched.collectAsState()
+        val filteredChargingStationsFetching by mainActivityViewModel.filteredChargingStationsFetching.collectAsState()
+
 
         Column(
             modifier = Modifier
@@ -539,21 +536,32 @@ class MainActivity : ComponentActivity() {
             ChargingStationSearchBar(searchQuery = searchQuery,
                 onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 64.dp),
-                modifier = Modifier
-                    .fillMaxSize()
+            if (filteredChargingStationsFetched) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 64.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
 
-            ) {
-                item {
-                    Text(text = stringResource(R.string.charging_stations), fontSize = 16.sp)
-                }
-                items(filteredChargingStations, key = { it.id }) { station ->
-                    ChargingStationItem(station) {
-                        moveTo(station.id, Point(station.latitude, station.longitude))
+                ) {
+                    item {
+                        Text(text = stringResource(R.string.charging_stations), fontSize = 16.sp)
                     }
-                    HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
+                    items(filteredChargingStations, key = { it.id }) { station ->
+                        ChargingStationItem(station) {
+                            moveTo(station.id, Point(station.latitude, station.longitude))
+                        }
+                        HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
+                    }
+                }
+            } else {
+                if (filteredChargingStationsFetching) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
