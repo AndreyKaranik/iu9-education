@@ -75,6 +75,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.chargingstations.model.ChargingMarkWithUserName
 import com.example.chargingstations.model.ChargingStationDetails
@@ -210,7 +211,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChargingStationsTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     val chargingStationsFetched by mainActivityViewModel.chargingStationsFetched.collectAsState()
                     val chargingStationsFetching by mainActivityViewModel.chargingStationsFetching.collectAsState()
@@ -393,6 +394,7 @@ class MainActivity : ComponentActivity() {
         ModalBottomSheet(modifier = Modifier
             .fillMaxHeight()
             .padding(0.dp, 32.dp, 0.dp, 0.dp),
+            tonalElevation = 0.dp,
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
             ChargingStationList()
@@ -409,6 +411,7 @@ class MainActivity : ComponentActivity() {
         ModalBottomSheet(modifier = Modifier
             .fillMaxHeight()
             .padding(0.dp, 32.dp, 0.dp, 0.dp),
+            tonalElevation = 0.dp,
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
             ChargingStationDetails()
@@ -533,52 +536,24 @@ class MainActivity : ComponentActivity() {
                 .fillMaxSize()
                 .padding(16.dp, 0.dp)
         ) {
-//            var active by remember { mutableStateOf(false) }
-//            SearchBar(
-//                query = searchQuery,
-//                onQueryChange = { mainActivityViewModel.updateSearchQuery(it) },
-//                onSearch = {active = false},
-//                active = active,
-//                onActiveChange = {active = it},
-//                placeholder = { Text("Name/Address...")},
-//                leadingIcon = {Icon(imageVector = Icons.Filled.Search, contentDescription = "description")},
-//            ) {
-//                LazyColumn(
-//                    verticalArrangement = Arrangement.spacedBy(8.dp),
-//                    contentPadding = PaddingValues(bottom = 64.dp),
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .fillMaxHeight()
-//
-//                ) {
-//                    items(filteredChargingStations, key = { it.id }) { station ->
-//                        ChargingStationItem(station) {
-//                            moveTo(station.id, Point(station.latitude, station.longitude))
-//                        }
-//                        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
-//                    }
-//                }
-//            }
             ChargingStationSearchBar(searchQuery = searchQuery,
                 onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
             Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 64.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 64.dp),
+                modifier = Modifier
+                    .fillMaxSize()
 
-                ) {
-                    items(filteredChargingStations, key = { it.id }) { station ->
-                        ChargingStationItem(station) {
-                            moveTo(station.id, Point(station.latitude, station.longitude))
-                        }
-                        HorizontalDivider(color = Color.Gray, thickness = 1.dp)
+            ) {
+                item {
+                    Text(text = stringResource(R.string.charging_stations), fontSize = 16.sp)
+                }
+                items(filteredChargingStations, key = { it.id }) { station ->
+                    ChargingStationItem(station) {
+                        moveTo(station.id, Point(station.latitude, station.longitude))
                     }
+                    HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
                 }
             }
         }
@@ -709,7 +684,11 @@ class MainActivity : ComponentActivity() {
                         ) {
                             Column {
                                 if (it.userId != null) {
-                                    Text(text = it.userName!!, fontSize = 20.sp, color = Color.White)
+                                    Text(
+                                        text = it.userName!!,
+                                        fontSize = 20.sp,
+                                        color = Color.White
+                                    )
                                 } else {
                                     Text(text = "Anonymous", fontSize = 20.sp, color = Color.White)
                                 }

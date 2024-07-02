@@ -2,6 +2,8 @@ package com.example.chargingstations.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val Blue1 = Color(0xFF1976D2)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

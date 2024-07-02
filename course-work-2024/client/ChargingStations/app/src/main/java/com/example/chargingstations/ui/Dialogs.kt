@@ -74,7 +74,7 @@ fun BadQRCodeDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
             Icon(Icons.Default.Warning, contentDescription = "Icon")
         },
         title = {
-            Text(text = stringResource(R.string.bad_qrcode_dialog_title))
+            Text(text = stringResource(R.string.incorrect_qrcode_dialog_title))
         },
         text = {},
         onDismissRequest = { onDismissRequest() },

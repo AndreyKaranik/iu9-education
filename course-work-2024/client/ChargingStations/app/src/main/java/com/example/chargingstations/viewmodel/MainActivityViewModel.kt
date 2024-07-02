@@ -23,6 +23,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivityViewModel : ViewModel() {
 
+    private val TAG: String = "MainActivityViewModel"
+
     private val _chargingStations = MutableStateFlow<List<ChargingStation>>(emptyList())
     val chargingStations: StateFlow<List<ChargingStation>> = _chargingStations
 
@@ -144,11 +146,11 @@ class MainActivityViewModel : ViewModel() {
                         _chargingStationDetails.value = it
                     }
                 } else {
-                    Log.e("E", "error")
+                    Log.e(TAG, "error")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Log.e("E", "exception")
+                Log.e(TAG, "exception")
             }
         }
     }
@@ -175,11 +177,11 @@ class MainActivityViewModel : ViewModel() {
                         _chargingStationsFetched.value = true
                     }
                 } else {
-                    Log.e("E", "error")
+                    Log.e(TAG, "error")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Log.e("E", "exception")
+                Log.e(TAG, "exception")
             } finally {
                 _chargingStationsFetching.value = false
             }

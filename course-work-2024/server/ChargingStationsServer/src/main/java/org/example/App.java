@@ -3,6 +3,7 @@ package org.example;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
@@ -31,6 +32,16 @@ public class App {
         server.setExecutor(null);
         server.start();
         System.out.println("The server has started successfully.");
+
+        URI uri = new URI(
+                "http",
+                "example.com",
+                "/query",
+                "q=ул. Брусилова",
+                null);
+
+        String request = uri.toASCIIString();
+        System.out.println(request);
     }
 
     private static Map<String, String> parseQueryParams(String query) {

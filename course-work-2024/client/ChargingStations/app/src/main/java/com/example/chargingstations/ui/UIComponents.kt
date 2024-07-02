@@ -27,8 +27,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chargingstations.R
 import com.example.chargingstations.model.ChargingStation
 import com.example.chargingstations.viewmodel.MainActivityViewModel
 
@@ -78,20 +81,28 @@ fun ChargingStationSearchBar(searchQuery: String, onSearchQueryChanged: (String)
         value = searchQuery,
         singleLine = true,
         onValueChange = onSearchQueryChanged,
-        placeholder = { Text("Name/Address...") },
-        label = { Text("Search") },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.charging_station_search_bar_placeholder),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        label = { Text(text = stringResource(R.string.charging_station_search_bar_label)) },
         leadingIcon = {
-            IconButton(onClick = {
-                //
-            }) {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "description")
-            }
+//            IconButton(onClick = {
+//                //
+//            }) {
+                Icon(imageVector = Icons.Filled.Search, contentDescription = null)
+            //}
         },
         trailingIcon = {
             IconButton(onClick = {
                 onSearchQueryChanged("")
             }) {
-                Icon(imageVector = Icons.Filled.Clear, contentDescription = "description")
+                if (searchQuery != "") {
+                    Icon(imageVector = Icons.Filled.Clear, contentDescription = null)
+                }
             }
         },
         modifier = Modifier.fillMaxWidth()
@@ -104,10 +115,16 @@ fun ChargingStationItem(chargingStation: ChargingStation, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .background(Color.White)
     ) {
-        Text(text = chargingStation.name, fontSize = 20.sp)
+        Text(
+            text = chargingStation.name,
+            fontSize = 18.sp
+        )
         Spacer(modifier = Modifier.height(4.dp))
-        Text(text = chargingStation.address, fontSize = 16.sp)
+        Text(
+            color = Color.Gray,
+            text = chargingStation.address,
+            fontSize = 16.sp
+        )
     }
 }

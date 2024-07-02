@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="incorrect_qrcode_dialog_title">Неправильный QR-код</string>
+    <string name="charging_station_not_found_dialog_title">Зарядная станция не найдена</string>
+    <string name="connection_problem_dialog_title">Проблема с соединением</string>
+    <string name="charging_stations">Зарядные станции:</string>
+    <string name="charging_station_search_bar_placeholder">Введите название или адрес зарядной станции</string>
+    <string name="charging_station_search_bar_label">Поиск</string>
+</resources>

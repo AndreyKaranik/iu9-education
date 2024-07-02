@@ -1,7 +1,10 @@
 <resources>
-    <string name="app_name">ChargingStations</string>
-    <string name="title_activity_qrscanner">QRScannerActivity</string>
-    <string name="bad_qrcode_dialog_title">Bad QR Code</string>
-    <string name="charging_station_not_found_dialog_title">Charging Station Not Found</string>
-    <string name="connection_problem_dialog_title">Connection Problem</string>
+    <string name="app_name" translatable="false">ChargingStations</string>
+    <string name="title_activity_qrscanner" translatable="false">QRScannerActivity</string>
+    <string name="incorrect_qrcode_dialog_title">The QR code is incorrect</string>
+    <string name="charging_station_not_found_dialog_title">Charging station not found</string>
+    <string name="connection_problem_dialog_title">Connection problem</string>
+    <string name="charging_stations">Charging stations:</string>
+    <string name="charging_station_search_bar_placeholder">Enter the name or address of the charging station</string>
+    <string name="charging_station_search_bar_label">Search</string>
 </resources>
