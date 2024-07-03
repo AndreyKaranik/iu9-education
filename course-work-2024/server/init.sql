@@ -33,6 +33,13 @@ CREATE TABLE charging_stations (
     description VARCHAR(512)
 );
 
+CREATE TABLE charging_station_images (
+    id SERIAL PRIMARY KEY,
+    charging_station_id INT NOT NULL,
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations(id),
+    path VARCHAR(256) NOT NULL
+);
+
 CREATE TABLE charging_types (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
@@ -105,6 +112,12 @@ VALUES
     ('Станция 30', 'ул. Никольская, 29, Москва', 55.754, 37.619, 2, '10-21', 'Описание для Станции 30'),
     ('Станция 31', 'ул. Большая Лубянка, 14, Москва', 55.759, 37.626, 1, '10-21', 'Описание для Станции 31'),
     ('Станция 32', 'ул. Пречистенка, 24, Москва', 55.744, 37.593, 2, '10-21', 'Описание для Станции 32');
+
+
+INSERT INTO charging_station_images (charging_station_id, path)
+VALUES (1, '1_1.png'),
+        (1, '1_2.png'),
+        (2, '2_1.png');
 
 INSERT INTO charging_types (name, current_type)
 VALUES ('TYPE 2', 'AC'),
