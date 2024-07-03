@@ -160,7 +160,9 @@ class MainActivityViewModel : ViewModel() {
                     response.body()?.let {
                         _chargingStationDetails.value = it
                         _chargingStationImageBitmap.value = null
-                        fetchChargingStationImage(1)
+                        if (it.imageIds.isNotEmpty()) {
+                            fetchChargingStationImage(it.imageIds[0].id)
+                        }
                     }
                 } else {
                     Log.e(TAG, "error")

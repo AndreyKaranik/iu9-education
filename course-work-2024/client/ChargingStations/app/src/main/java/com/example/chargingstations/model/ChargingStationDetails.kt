@@ -15,5 +15,7 @@ data class ChargingStationDetails (
     val description: String?,
     val connectors: List<ConnectorDetails>,
     @SerializedName("charging_marks")
-    val chargingMarksWithUserName: List<ChargingMarkWithUserName>
+    val chargingMarksWithUserName: List<ChargingMarkWithUserName>,
+    @SerializedName("image_ids")
+    val imageIds: List<Id>
 )

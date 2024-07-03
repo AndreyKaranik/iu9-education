@@ -149,6 +149,7 @@ public class Utils {
             object.put("description", description);
             object.put("connectors", Utils.getConnectorsByChargingStationId(connection, id));
             object.put("charging_marks", Utils.getChargingMarksWithUserNameByChargingStationId(connection, id));
+            object.put("image_ids", Utils.getChargingStationImageIdsByChargingStationId(connection, id));
         } catch (SQLException e) {
             httpExchange.sendResponseHeaders(500, 0);
             OutputStream os = httpExchange.getResponseBody();
@@ -389,7 +390,6 @@ public class Utils {
             rs.next();
             int id = rs.getInt("id");
             String path = rs.getString("path");
-            
             File imageFile = new File("/root/images/" + path);
             byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
@@ -409,5 +409,33 @@ public class Utils {
             }
         }
         return object;
+    }
+
+    public static JSONArray getChargingStationImageIdsByChargingStationId(Connection connection, int chargingStationId) {
+        String sql = "SELECT id FROM charging_station_images WHERE charging_station_id = " + chargingStationId;
+        Statement stmt = null;
+        ResultSet rs = null;
+        JSONArray array = new JSONArray();
+
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                JSONObject o = new JSONObject();
+                o.put("id", id);
+                array.put(o);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return array;
     }
 }
