@@ -76,7 +76,9 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
@@ -609,10 +611,22 @@ class MainActivity : ComponentActivity() {
 
                 if (chargingStationImageBitmap != null) {
                     Image(
+                        modifier = Modifier.size(256.dp),
                         bitmap = chargingStationImageBitmap!!,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
+                        contentScale = ContentScale.Crop
                     )
+                } else {
+                    Box(
+                        modifier = Modifier.size(256.dp).background(color = Color.Gray, shape = RoundedCornerShape(8.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(64.dp),
+                            imageVector = ImageVector.vectorResource(R.drawable.baseline_image_24),
+                            contentDescription = null
+                        )
+                    }
                 }
 
                 Text(text = "Connectors", fontSize = 24.sp, color = Color.Black)

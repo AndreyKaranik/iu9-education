@@ -159,6 +159,7 @@ class MainActivityViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _chargingStationDetails.value = it
+                        _chargingStationImageBitmap.value = null
                         fetchChargingStationImage(1)
                     }
                 } else {

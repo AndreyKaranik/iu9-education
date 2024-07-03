@@ -389,8 +389,7 @@ public class Utils {
             rs.next();
             int id = rs.getInt("id");
             String path = rs.getString("path");
-
-            //File imageFile = new File("C:/Users/Golum/Desktop/" + path);
+            
             File imageFile = new File("/root/images/" + path);
             byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
             String base64Image = Base64.getEncoder().encodeToString(imageBytes);
