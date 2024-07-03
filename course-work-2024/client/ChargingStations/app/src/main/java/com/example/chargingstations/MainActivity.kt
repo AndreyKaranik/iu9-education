@@ -73,6 +73,7 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
@@ -527,6 +528,7 @@ class MainActivity : ComponentActivity() {
         val filteredChargingStations by mainActivityViewModel.filteredChargingStations.collectAsState()
         val filteredChargingStationsFetched by mainActivityViewModel.filteredChargingStationsFetched.collectAsState()
         val filteredChargingStationsFetching by mainActivityViewModel.filteredChargingStationsFetching.collectAsState()
+        val searchProblemIsShown by mainActivityViewModel.searchProblemIsShown.collectAsState()
 
 
         Column(
@@ -537,31 +539,52 @@ class MainActivity : ComponentActivity() {
             ChargingStationSearchBar(searchQuery = searchQuery,
                 onSearchQueryChanged = { mainActivityViewModel.updateSearchQuery(it) })
             Spacer(modifier = Modifier.height(16.dp))
-            if (filteredChargingStationsFetched) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 64.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(bottom = 64.dp),
+                modifier = Modifier
+                    .fillMaxSize()
 
-                ) {
+            ) {
+                item {
+                    Text(
+                        color = MaterialTheme.colorScheme.primary,
+                        text = stringResource(R.string.charging_stations),
+                        fontSize = 16.sp
+                    )
+                }
+                if (filteredChargingStationsFetching) {
                     item {
-                        Text(color = MaterialTheme.colorScheme.primary, text = stringResource(R.string.charging_stations), fontSize = 16.sp)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
+                }
+                if (filteredChargingStationsFetched) {
                     items(filteredChargingStations, key = { it.id }) { station ->
                         ChargingStationItem(station) {
                             moveTo(station.id, Point(station.latitude, station.longitude))
                         }
-                        HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
                     }
                 }
-            } else {
-                if (filteredChargingStationsFetching) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        CircularProgressIndicator()
+                if (searchProblemIsShown) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = stringResource(R.string.charging_station_search_problem_message))
+                            Button(
+                                onClick = {
+                                    mainActivityViewModel.tryAgainSearch()
+                                }) {
+                                Text(text = stringResource(R.string.charging_station_search_problem_button_label))
+                            }
+                        }
                     }
                 }
             }

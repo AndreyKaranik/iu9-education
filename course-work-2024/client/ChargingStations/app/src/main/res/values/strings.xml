@@ -7,4 +7,6 @@
     <string name="charging_stations">Charging stations:</string>
     <string name="charging_station_search_bar_placeholder">Enter the name or address of the charging station</string>
     <string name="charging_station_search_bar_label">Search</string>
+    <string name="charging_station_search_problem_message">Problems with connection</string>
+    <string name="charging_station_search_problem_button_label">Try again</string>
 </resources>

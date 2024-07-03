@@ -14,6 +14,8 @@ data class ChargingStationMedium (
     val address: String,
     val latitude: Double,
     val longitude: Double,
+    @SerializedName("charging_types")
+    val chargingTypes: List<ChargingType>
 )
 
 data class JsonChargingStation (
@@ -26,5 +28,7 @@ data class JsonChargingStation (
     val companyId: Int?,
     @SerializedName("opening_hours")
     val openingHours: String?,
-    val description: String?
+    val description: String?,
+    @SerializedName("charging_types")
+    val chargingTypes: List<ChargingType>?
 )

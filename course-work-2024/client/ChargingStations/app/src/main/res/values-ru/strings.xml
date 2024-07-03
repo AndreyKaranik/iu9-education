@@ -6,4 +6,6 @@
     <string name="charging_stations">Зарядные станции:</string>
     <string name="charging_station_search_bar_placeholder">Введите название или адрес зарядной станции</string>
     <string name="charging_station_search_bar_label">Поиск</string>
+    <string name="charging_station_search_problem_message">Проблемы с соединением</string>
+    <string name="charging_station_search_problem_button_label">Повторить</string>
 </resources>

@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c026a9e2-a77a-40fb-9acc-7f2a70240050" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/ApiService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/model/ChargingStation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/model/ChargingStation.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/ui/UIComponents.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/ui/UIComponents.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/viewmodel/MainActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/viewmodel/MainActivityViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dependency-reduced-pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/dependency-reduced-pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

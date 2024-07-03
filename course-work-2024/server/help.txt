@@ -65,3 +65,14 @@ sudo systemctl restart csserver.service
 
 
 
+
+
+SELECT DISTINCT ct.id, ct.name, ct.current_type
+        FROM charging_stations cs
+        JOIN connectors c ON cs.id = c.charging_station_id
+        JOIN charging_types ct ON c.charging_type_id = ct.id
+        WHERE cs.id = 3;
+
+
+
+

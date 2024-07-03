@@ -38,6 +38,9 @@ class MainActivityViewModel : ViewModel() {
     private val _filteredChargingStationsFetched = MutableStateFlow(false)
     val filteredChargingStationsFetched: StateFlow<Boolean> = _filteredChargingStationsFetched
 
+    private val _searchProblemIsShown = MutableStateFlow(false)
+    val searchProblemIsShown: StateFlow<Boolean> = _searchProblemIsShown
+
     private val _internetConnectionDialogIsShown = MutableStateFlow(false)
     val internetConnectionDialogIsShown: StateFlow<Boolean> = _internetConnectionDialogIsShown
 
@@ -204,15 +207,17 @@ class MainActivityViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.let {
                         val chargingStationList: List<ChargingStationMedium> = it.map { station ->
-                            ChargingStationMedium(station.id!!, station.name!!, station.address!!, station.latitude!!, station.longitude!!)
+                            ChargingStationMedium(station.id!!, station.name!!, station.address!!, station.latitude!!, station.longitude!!, station.chargingTypes!!)
                         }
                         _filteredChargingStations.value = chargingStationList
                         _filteredChargingStationsFetched.value = true
                     }
                 } else {
+                    _searchProblemIsShown.value = true
                     Log.e(TAG, "error")
                 }
             } catch (e: Exception) {
+                _searchProblemIsShown.value = true
                 e.printStackTrace()
                 Log.e(TAG, "exception")
             } finally {
@@ -220,18 +225,6 @@ class MainActivityViewModel : ViewModel() {
             }
         }
     }
-
-//    val filteredChargingStations: StateFlow<List<ChargingStationDeprecated>> = _searchQuery
-//        .map { query ->
-//            if (query.isBlank()) {
-//                _chargingStations.value
-//            } else {
-//                _chargingStations.value.filter { chargingStation ->
-//                    chargingStation.name.contains(query, ignoreCase = true) || chargingStation.address.contains(query, ignoreCase = true)
-//                }
-//            }
-//        }
-//        .stateIn(viewModelScope, SharingStarted.Lazily, _chargingStations.value)
 
     fun updateSearchQuery(newQuery: String) {
         _searchQuery.value = newQuery
@@ -241,5 +234,11 @@ class MainActivityViewModel : ViewModel() {
         } else {
             _filteredChargingStations.value = emptyList()
         }
+    }
+
+    fun tryAgainSearch() {
+        _searchProblemIsShown.value = false;
+        _filteredChargingStationsFetched.value = false
+        fetchFilteredChargingStations()
     }
 }

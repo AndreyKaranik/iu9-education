@@ -57,7 +57,7 @@ fun ChargingStationsTheme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme // LightColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current

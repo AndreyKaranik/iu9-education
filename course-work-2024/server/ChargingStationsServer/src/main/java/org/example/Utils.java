@@ -203,7 +203,7 @@ public class Utils {
         return name;
     }
 
-    public static JSONArray getChargingStations(Connection connection, String level, String query) throws IOException {
+    public static JSONArray getChargingStations(Connection connection, String level, String query) {
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -254,6 +254,7 @@ public class Utils {
                         object.put("address", address);
                         object.put("latitude", latitude);
                         object.put("longitude", longitude);
+                        object.put("charging_types", Utils.getChargingTypesByChargingStationId(connection, id));
                         if (query != null) {
                             if (name.toLowerCase().contains(query.toLowerCase()) ||
                                     address.toLowerCase().contains(query.toLowerCase())) {
@@ -349,6 +350,43 @@ public class Utils {
             }
         }
 
+        return array;
+    }
+
+
+    public static JSONArray getChargingTypesByChargingStationId(Connection connection, int chargingStationId) {
+        String sql = "SELECT DISTINCT ct.id, ct.name, ct.current_type\n" +
+        "FROM charging_stations cs\n" +
+        "JOIN connectors c ON cs.id = c.charging_station_id\n" +
+        "JOIN charging_types ct ON c.charging_type_id = ct.id\n" +
+        "WHERE cs.id = " + chargingStationId;
+        Statement stmt = null;
+        ResultSet rs = null;
+        JSONArray array = new JSONArray();
+
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String currentType = rs.getString("current_type");
+                JSONObject o = new JSONObject();
+                o.put("id", id);
+                o.put("name", name);
+                o.put("current_type", currentType);
+                array.put(o);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
         return array;
     }
 }
