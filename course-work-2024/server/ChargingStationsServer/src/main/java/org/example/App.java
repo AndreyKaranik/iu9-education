@@ -88,9 +88,50 @@ public class App {
                 // .getRequestURI().getPath() -> "/charging-stations"
                 // .getRequestURI().getQuery() -> "lang=ru&simplify=true"
 
-                String pattern = "/charging-stations/(\\d+)$";
+                String pattern = "/charging-station-images/(\\d+)$";
                 Pattern r = Pattern.compile(pattern);
                 Matcher m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    String chargingStationImageId = m.group(1);
+
+                    Connection connection = null;
+
+                    try {
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+
+                        JSONObject object = Utils.getChargingStationImageById(connection, Integer.parseInt(chargingStationImageId));
+
+                        String response = object.toString();
+                        ArrayList<String> list = new ArrayList<>();
+                        list.add("application/json");
+                        httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.write(response.getBytes());
+                        os.flush();
+                        os.close();
+                    } catch (SQLException e) {
+                        httpExchange.sendResponseHeaders(500, 0);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.flush();
+                        os.close();
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (connection != null) connection.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return;
+                }
+
+
+                pattern = "/charging-stations/(\\d+)$";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
 
                 if (m.find()) {
                     String chargingStationId = m.group(1);
@@ -125,6 +166,7 @@ public class App {
                             e.printStackTrace();
                         }
                     }
+                    return;
                 }
 
                 pattern = "/charging-stations";

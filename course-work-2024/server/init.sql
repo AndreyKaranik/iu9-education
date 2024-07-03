@@ -115,9 +115,9 @@ VALUES
 
 
 INSERT INTO charging_station_images (charging_station_id, path)
-VALUES (1, '1_1.png'),
-        (1, '1_2.png'),
-        (2, '2_1.png');
+VALUES (1, '1_1.jpg'),
+        (1, '1_2.jpg'),
+        (2, '2_1.jpg');
 
 INSERT INTO charging_types (name, current_type)
 VALUES ('TYPE 2', 'AC'),

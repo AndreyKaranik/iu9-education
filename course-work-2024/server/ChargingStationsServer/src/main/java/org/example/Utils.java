@@ -4,16 +4,19 @@ import com.sun.net.httpserver.HttpExchange;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Base64;
 
 public class Utils {
-    public static JSONArray getChargingMarksWithUserNameByChargingStationId(Connection connection, int chargingStationId, HttpExchange httpExchange) throws IOException {
+    public static JSONArray getChargingMarksWithUserNameByChargingStationId(Connection connection, int chargingStationId) {
         String sql = "SELECT * FROM charging_marks WHERE charging_station_id = " + chargingStationId;
         Statement stmt = null;
         ResultSet rs = null;
@@ -33,15 +36,11 @@ public class Utils {
                 object.put("status", status);
                 if (userId != 0) {
                     object.put("user_id", userId);
-                    object.put("user_name", Utils.getUserNameByUserId(connection, userId, httpExchange));
+                    object.put("user_name", Utils.getUserNameByUserId(connection, userId));
                 }
                 array.put(object);
             }
         } catch (SQLException e) {
-            httpExchange.sendResponseHeaders(500, 0);
-            OutputStream os = httpExchange.getResponseBody();
-            os.flush();
-            os.close();
             e.printStackTrace();
         } finally {
             try {
@@ -55,7 +54,7 @@ public class Utils {
     }
 
 
-    public static JSONArray getConnectorsByChargingStationId(Connection connection, int chargingStationId, HttpExchange httpExchange) throws IOException {
+    public static JSONArray getConnectorsByChargingStationId(Connection connection, int chargingStationId) throws IOException {
         String sql = "SELECT * FROM connectors WHERE charging_station_id = " + chargingStationId;
         Statement stmt = null;
         ResultSet rs = null;
@@ -75,15 +74,11 @@ public class Utils {
                 o.put("charging_station_id", connectorChargingStationId);
                 o.put("status", status);
                 o.put("rate", rate);
-                o.put("charging_type", Utils.getChargingTypeByChargingTypeId(connection, chargingTypeId, httpExchange));
+                o.put("charging_type", Utils.getChargingTypeByChargingTypeId(connection, chargingTypeId));
 
                 array.put(o);
             }
         } catch (SQLException e) {
-            httpExchange.sendResponseHeaders(500, 0);
-            OutputStream os = httpExchange.getResponseBody();
-            os.flush();
-            os.close();
             e.printStackTrace();
         } finally {
             try {
@@ -96,7 +91,7 @@ public class Utils {
         return array;
     }
 
-    public static JSONObject getChargingTypeByChargingTypeId(Connection connection, int chargingTypeId, HttpExchange httpExchange) throws IOException {
+    public static JSONObject getChargingTypeByChargingTypeId(Connection connection, int chargingTypeId) {
         String sql = "SELECT * FROM charging_types WHERE id = " + chargingTypeId;
         Statement stmt = null;
         ResultSet rs = null;
@@ -113,10 +108,6 @@ public class Utils {
             object.put("name", charging_type_name);
             object.put("current_type", currentType);
         } catch (SQLException e) {
-            httpExchange.sendResponseHeaders(500, 0);
-            OutputStream os = httpExchange.getResponseBody();
-            os.flush();
-            os.close();
             e.printStackTrace();
         } finally {
             try {
@@ -156,8 +147,8 @@ public class Utils {
             object.put("company_id", companyId);
             object.put("opening_hours", hours);
             object.put("description", description);
-            object.put("connectors", Utils.getConnectorsByChargingStationId(connection, id, httpExchange));
-            object.put("charging_marks", Utils.getChargingMarksWithUserNameByChargingStationId(connection, id, httpExchange));
+            object.put("connectors", Utils.getConnectorsByChargingStationId(connection, id));
+            object.put("charging_marks", Utils.getChargingMarksWithUserNameByChargingStationId(connection, id));
         } catch (SQLException e) {
             httpExchange.sendResponseHeaders(500, 0);
             OutputStream os = httpExchange.getResponseBody();
@@ -175,7 +166,7 @@ public class Utils {
         return object;
     }
 
-    public static String getUserNameByUserId(Connection connection, int userId, HttpExchange httpExchange) throws IOException {
+    public static String getUserNameByUserId(Connection connection, int userId) {
         String sql = "SELECT * FROM users WHERE id = " + userId;
         Statement stmt = null;
         ResultSet rs = null;
@@ -187,10 +178,6 @@ public class Utils {
             rs.next();
             name = rs.getString("name");
         } catch (SQLException e) {
-            httpExchange.sendResponseHeaders(500, 0);
-            OutputStream os = httpExchange.getResponseBody();
-            os.flush();
-            os.close();
             e.printStackTrace();
         } finally {
             try {
@@ -356,10 +343,10 @@ public class Utils {
 
     public static JSONArray getChargingTypesByChargingStationId(Connection connection, int chargingStationId) {
         String sql = "SELECT DISTINCT ct.id, ct.name, ct.current_type\n" +
-        "FROM charging_stations cs\n" +
-        "JOIN connectors c ON cs.id = c.charging_station_id\n" +
-        "JOIN charging_types ct ON c.charging_type_id = ct.id\n" +
-        "WHERE cs.id = " + chargingStationId;
+                "FROM charging_stations cs\n" +
+                "JOIN connectors c ON cs.id = c.charging_station_id\n" +
+                "JOIN charging_types ct ON c.charging_type_id = ct.id\n" +
+                "WHERE cs.id = " + chargingStationId;
         Statement stmt = null;
         ResultSet rs = null;
         JSONArray array = new JSONArray();
@@ -388,5 +375,40 @@ public class Utils {
             }
         }
         return array;
+    }
+
+    public static JSONObject getChargingStationImageById(Connection connection, int chargingStationImageId) {
+        String sql = "SELECT * FROM charging_station_images WHERE id = " + chargingStationImageId;
+        Statement stmt = null;
+        ResultSet rs = null;
+        JSONObject object = new JSONObject();
+
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            int id = rs.getInt("id");
+            String path = rs.getString("path");
+
+            //File imageFile = new File("C:/Users/Golum/Desktop/" + path);
+            File imageFile = new File("/root/images/" + path);
+            byte[] imageBytes = Files.readAllBytes(imageFile.toPath());
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            object.put("id", id);
+            object.put("data", base64Image);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return object;
     }
 }

@@ -1,6 +1,10 @@
 package com.example.chargingstations.viewmodel
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.ApiService
@@ -19,6 +23,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainActivityViewModel : ViewModel() {
 
     private val TAG: String = "MainActivityViewModel"
+
+    private val _chargingStationImageBitmap = MutableStateFlow<ImageBitmap?>(null)
+    val chargingStationImageBitmap: StateFlow<ImageBitmap?> = _chargingStationImageBitmap
 
     private val _chargingStations = MutableStateFlow<List<ChargingStationMin>>(emptyList())
     val chargingStations: StateFlow<List<ChargingStationMin>> = _chargingStations
@@ -152,6 +159,7 @@ class MainActivityViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.let {
                         _chargingStationDetails.value = it
+                        fetchChargingStationImage(1)
                     }
                 } else {
                     Log.e(TAG, "error")
@@ -222,6 +230,32 @@ class MainActivityViewModel : ViewModel() {
                 Log.e(TAG, "exception")
             } finally {
                 _filteredChargingStationsFetching.value = false
+            }
+        }
+    }
+
+    fun fetchChargingStationImage(chargingStationImageId: Int) {
+//        _filteredChargingStationsFetching.value = true
+        viewModelScope.launch {
+            try {
+                val response = apiService.getChargingStationImage(chargingStationImageId).awaitResponse()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                            val decodedString = Base64.decode(it.data, Base64.DEFAULT)
+                            val bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                            _chargingStationImageBitmap.value = bitmap.asImageBitmap()
+//                        _filteredChargingStationsFetched.value = true
+                    }
+                } else {
+//                    _searchProblemIsShown.value = true
+                    Log.e(TAG, "error")
+                }
+            } catch (e: Exception) {
+//                _searchProblemIsShown.value = true
+                e.printStackTrace()
+                Log.e(TAG, "exception")
+            } finally {
+//                _filteredChargingStationsFetching.value = false
             }
         }
     }

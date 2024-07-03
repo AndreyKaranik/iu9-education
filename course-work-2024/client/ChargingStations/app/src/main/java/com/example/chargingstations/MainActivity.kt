@@ -17,6 +17,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -594,6 +595,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ChargingStationDetails() {
         val chargingStationDetails by mainActivityViewModel.chargingStationDetails.collectAsState()
+        val chargingStationImageBitmap by mainActivityViewModel.chargingStationImageBitmap.collectAsState()
+
         if (chargingStationDetails != null) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -603,6 +606,15 @@ class MainActivity : ComponentActivity() {
             ) {
                 Text(text = chargingStationDetails!!.name, fontSize = 24.sp, color = Color.Black)
                 Text(text = chargingStationDetails!!.address, fontSize = 20.sp, color = Color.Gray)
+
+                if (chargingStationImageBitmap != null) {
+                    Image(
+                        bitmap = chargingStationImageBitmap!!,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
                 Text(text = "Connectors", fontSize = 24.sp, color = Color.Black)
                 if (chargingStationDetails!!.connectors.isEmpty()) {
                     Text(text = "No connectors", fontSize = 20.sp, color = Color.Gray)
