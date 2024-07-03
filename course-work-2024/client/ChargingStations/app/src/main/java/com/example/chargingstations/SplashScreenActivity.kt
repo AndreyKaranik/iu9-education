@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,34 +40,45 @@ class SplashScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SplashScreenContent()
+            ChargingStationsTheme {
+                SplashScreenContent()
+            }
         }
     }
 
     @Composable
     fun SplashScreenContent() {
-        val alpha = remember { Animatable(0f) }
+        Surface {
+            val alpha = remember { Animatable(0f) }
 
-        LaunchedEffect(Unit) {
-            val fadeOut = tween<Float>(durationMillis = 1000)
-            val scaleUp = tween<Float>(durationMillis = 1000)
+            LaunchedEffect(Unit) {
+                val fadeOut = tween<Float>(durationMillis = 1000)
+                val scaleUp = tween<Float>(durationMillis = 1000)
 
-            alpha.animateTo(1f, animationSpec = fadeOut)
-            delay(1000L)
-            startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
-            finish()
-        }
-
-        val text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color.Black.copy(alpha = alpha.value), fontWeight = FontWeight.Bold)) {
-                append("Charging")
+                alpha.animateTo(1f, animationSpec = fadeOut)
+                delay(1000L)
+                startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
+                finish()
             }
-            withStyle(style = SpanStyle(color = Color.Gray.copy(alpha = alpha.value), fontWeight = FontWeight.Bold)) {
-                append("Stations")
-            }
-        }
 
-        Surface(color = Color.White) {
+            val text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = alpha.value),
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append("Charging")
+                }
+                withStyle(
+                    style = SpanStyle(
+                        color = Color.Gray.copy(alpha = alpha.value),
+                        fontWeight = FontWeight.Bold
+                    )
+                ) {
+                    append("Stations")
+                }
+            }
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

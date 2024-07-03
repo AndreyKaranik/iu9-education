@@ -74,6 +74,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.res.stringResource
 import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
@@ -545,7 +546,7 @@ class MainActivity : ComponentActivity() {
 
                 ) {
                     item {
-                        Text(text = stringResource(R.string.charging_stations), fontSize = 16.sp)
+                        Text(color = MaterialTheme.colorScheme.primary, text = stringResource(R.string.charging_stations), fontSize = 16.sp)
                     }
                     items(filteredChargingStations, key = { it.id }) { station ->
                         ChargingStationItem(station) {
