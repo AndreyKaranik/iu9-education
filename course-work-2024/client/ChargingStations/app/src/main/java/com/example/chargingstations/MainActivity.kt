@@ -91,7 +91,6 @@ import com.example.chargingstations.model.ChargingMarkWithUserName
 import com.example.chargingstations.model.ChargingStationDetails
 import com.example.chargingstations.model.ChargingType
 import com.example.chargingstations.model.ConnectorDetails
-import com.example.chargingstations.ui.BadQRCodeDialog
 import com.example.chargingstations.ui.BasicIconButton
 import com.example.chargingstations.ui.BasicIconButtonWithProgress
 import com.example.chargingstations.ui.ChargingStationDetailsView
@@ -100,7 +99,8 @@ import com.example.chargingstations.ui.ChargingStationNotFoundDialog
 import com.example.chargingstations.ui.ChargingStationSearchBar
 import com.example.chargingstations.ui.ConnectionProblemDialog
 import com.example.chargingstations.ui.GPSDialog
-import com.example.chargingstations.ui.InternetConnectionDialog
+import com.example.chargingstations.ui.IncorrectQRCodeDialog
+import com.example.chargingstations.ui.NoInternetConnectionDialog
 import com.example.chargingstations.ui.theme.Gray1
 import com.example.chargingstations.ui.theme.Gray2
 
@@ -140,7 +140,7 @@ class MainActivity : ComponentActivity() {
             ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 if (!mainActivityViewModel.chargingStationsFetched.value) {
-                    mainActivityViewModel.hideInternetConnectionDialog()
+                    mainActivityViewModel.hideNoInternetConnectionDialog()
                     mainActivityViewModel.fetchChargingStations()
                 }
             }
@@ -208,7 +208,7 @@ class MainActivity : ComponentActivity() {
                             mainActivityViewModel.showChargingStationNotFoundDialogIsShown()
                         }
                     } else {
-                        mainActivityViewModel.showBadQRCodeDialogIsShown()
+                        mainActivityViewModel.showIncorrectQRCodeDialogIsShown()
                     }
                 }
             }
@@ -233,11 +233,10 @@ class MainActivity : ComponentActivity() {
                     val chargingStationsFetching by mainActivityViewModel.chargingStationsFetching.collectAsState()
                     val gpsProgressIndicatorIsShown by mainActivityViewModel.gpsProgressIndicatorIsShown.collectAsState()
                     val gpsDialogIsShown by mainActivityViewModel.gpsDialogIsShown.collectAsState()
-                    val internetConnectionDialogIsShown by mainActivityViewModel.internetConnectionDialogIsShown.collectAsState()
-                    val badQRCodeDialogIsShown by mainActivityViewModel.badQRCodeDialogIsShown.collectAsState()
+                    val noInternetConnectionDialogIsShown by mainActivityViewModel.noInternetConnectionDialogIsShown.collectAsState()
+                    val incorrectQRCodeDialogIsShown by mainActivityViewModel.incorrectQRCodeDialogIsShown.collectAsState()
                     val chargingStationNotFoundDialogIsShown by mainActivityViewModel.chargingStationNotFoundDialogIsShown.collectAsState()
                     val connectionProblemDialogIsShown by mainActivityViewModel.connectionProblemDialogIsShown.collectAsState()
-
 
                     val chargingStationDetailsSheetIsShown by mainActivityViewModel.chargingStationDetailsSheetIsShown.collectAsState()
                     var searchSheetIsShown by remember { mutableStateOf(false) }
@@ -248,39 +247,48 @@ class MainActivity : ComponentActivity() {
 
                     when {
                         gpsDialogIsShown -> {
-                            GPSDialog(onDismissRequest = {
-                                mainActivityViewModel.hideGPSDialog()
-                            }, onConfirmation = {
-                                mainActivityViewModel.hideGPSDialog()
-                                activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                            })
+                            GPSDialog(
+                                onDismissRequest = {
+                                    mainActivityViewModel.hideGPSDialog()
+                                }, onConfirmRequest = {
+                                    mainActivityViewModel.hideGPSDialog()
+                                    activityResultLauncher.launch(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+                                }
+                            )
                         }
 
-                        badQRCodeDialogIsShown -> {
-                            BadQRCodeDialog(onDismissRequest = {
-                                mainActivityViewModel.hideBadQRCodeDialogIsShown()
-                            }, onConfirmation = {
-                                mainActivityViewModel.hideBadQRCodeDialogIsShown()
-                            })
+                        incorrectQRCodeDialogIsShown -> {
+                            IncorrectQRCodeDialog(
+                                onDismissRequest = {
+                                    mainActivityViewModel.hideIncorrectQRCodeDialogIsShown()
+                                }, onConfirmRequest = {
+                                    mainActivityViewModel.hideIncorrectQRCodeDialogIsShown()
+                                }
+                            )
                         }
 
-                        internetConnectionDialogIsShown -> {
-                            InternetConnectionDialog()
+                        noInternetConnectionDialogIsShown -> {
+                            NoInternetConnectionDialog()
                         }
 
                         chargingStationNotFoundDialogIsShown -> {
-                            ChargingStationNotFoundDialog(onDismissRequest = {
-                                mainActivityViewModel.hideChargingStationNotFoundDialogIsShown()
-                            }, onConfirmation = {
-                                mainActivityViewModel.hideChargingStationNotFoundDialogIsShown()
-                            })
+                            ChargingStationNotFoundDialog(
+                                onDismissRequest = {
+                                    mainActivityViewModel.hideChargingStationNotFoundDialogIsShown()
+                                }, onConfirmRequest = {
+                                    mainActivityViewModel.hideChargingStationNotFoundDialogIsShown()
+                                }
+                            )
                         }
 
                         connectionProblemDialogIsShown -> {
-                            ConnectionProblemDialog(onDismissRequest = {}, onConfirmation = {
-                                mainActivityViewModel.hideConnectionProblemDialog()
-                                mainActivityViewModel.fetchChargingStations()
-                            })
+                            ConnectionProblemDialog(
+                                onDismissRequest = {},
+                                onConfirmRequest = {
+                                    mainActivityViewModel.hideConnectionProblemDialog()
+                                    mainActivityViewModel.fetchChargingStations()
+                                }
+                            )
                         }
 
                         else -> {
@@ -292,12 +300,12 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         if (!chargingStationsFetched) {
-                            if (!internetConnectionDialogIsShown && !connectionProblemDialogIsShown) {
+                            if (!noInternetConnectionDialogIsShown && !connectionProblemDialogIsShown) {
                                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                             }
                             if (!chargingStationsFetching) {
                                 if (!isNetworkAvailable(this@MainActivity)) {
-                                    mainActivityViewModel.showInternetConnectionDialog()
+                                    mainActivityViewModel.showNoInternetConnectionDialog()
                                 } else {
                                     mainActivityViewModel.showConnectionProblemDialog()
                                 }

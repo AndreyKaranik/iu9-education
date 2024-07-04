@@ -1,8 +1,14 @@
 <resources>
     <string name="app_name" translatable="false">ChargingStations</string>
     <string name="title_activity_qrscanner" translatable="false">QRScannerActivity</string>
+    <string name="enable">Enable</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_">Continue</string>
+    <string name="try_it_again">Try it again</string>
     <string name="incorrect_qrcode_dialog_title">The QR code is incorrect</string>
     <string name="charging_station_not_found_dialog_title">Charging station not found</string>
+    <string name="gps_dialog_title">GPS must be turned on</string>
+    <string name="no_internet_connection_dialog_title">No internet connection</string>
     <string name="connection_problem_dialog_title">Connection problem</string>
     <string name="charging_stations">Charging stations:</string>
     <string name="charging_station_search_bar_placeholder">Enter the name or address of the charging station</string>

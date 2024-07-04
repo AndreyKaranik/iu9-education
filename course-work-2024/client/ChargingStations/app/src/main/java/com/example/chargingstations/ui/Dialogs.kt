@@ -1,128 +1,279 @@
 package com.example.chargingstations.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.chargingstations.R
+
+
+@Composable
+fun ConfirmDismissDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit,
+    icon: ImageVector,
+    title: Int,
+    dismissButtonLabel: Int,
+    confirmButtonLabel: Int
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismissRequest()
+        }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.onSurface,
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 32.dp),
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = stringResource(title),
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 8.dp)
+                ) {
+                    TextButton(
+                        onClick = {
+                            onDismissRequest()
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(dismissButtonLabel)
+                        )
+                    }
+                    TextButton(
+                        onClick = {
+                            onConfirmRequest()
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(confirmButtonLabel)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ConfirmDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit,
+    icon: ImageVector,
+    title: Int,
+    confirmButtonLabel: Int
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismissRequest()
+        }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.onSurface,
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 32.dp),
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = stringResource(title),
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+                TextButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 8.dp),
+                    onClick = {
+                        onConfirmRequest()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(confirmButtonLabel)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DismissDialog(
+    onDismissRequest: () -> Unit,
+    icon: ImageVector,
+    title: Int
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismissRequest()
+        }
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardColors(
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.onSurface,
+                MaterialTheme.colorScheme.surface,
+                MaterialTheme.colorScheme.onSurface
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 32.dp),
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = stringResource(title),
+                    fontSize = 16.sp,
+                    color = Color.Black
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun GPSDialog(
-    onDismissRequest: () -> Unit, onConfirmation: () -> Unit
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
 ) {
-    AlertDialog(
-        icon = {
-            Icon(Icons.Default.Info, contentDescription = "Icon")
-        },
-        title = {
-            Text(text = "GPS Dialog")
-        },
-        text = {
-            Text(text = "Your GPS seems to be disabled, do you want to enable it?")
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onConfirmation()
-            }) {
-                Text("Yes")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = {
-                onDismissRequest()
-            }) {
-                Text("No")
-            }
-        },
-        modifier = Modifier.padding(32.dp)
+    ConfirmDismissDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Info,
+        title = R.string.gps_dialog_title,
+        dismissButtonLabel = R.string.cancel,
+        confirmButtonLabel = R.string.enable
     )
 }
 
 @Composable
-fun InternetConnectionDialog() {
-    AlertDialog(
-        icon = {
-            Icon(Icons.Default.Info, contentDescription = "Icon")
-        },
-        title = {
-            Text(text = "Internet Connection Dialog")
-        },
-        text = {
-            Text(text = "Your internet connection seems to be disabled. You need to enable it.")
-        },
+fun NoInternetConnectionDialog() {
+    DismissDialog(
         onDismissRequest = {},
-        confirmButton = {},
-        modifier = Modifier.padding(32.dp)
+        icon = Icons.Default.Warning,
+        title = R.string.no_internet_connection_dialog_title
     )
 }
 
 @Composable
-fun BadQRCodeDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
-    AlertDialog(
-        icon = {
-            Icon(Icons.Default.Warning, contentDescription = "Icon")
-        },
-        title = {
-            Text(text = stringResource(R.string.incorrect_qrcode_dialog_title))
-        },
-        text = {},
-        onDismissRequest = { onDismissRequest() },
-        confirmButton = {
-            TextButton(onClick = { onConfirmation() }) {
-                Text("continue")
-            }
-        },
-        modifier = Modifier.padding(32.dp)
+fun IncorrectQRCodeDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Warning,
+        title = R.string.incorrect_qrcode_dialog_title,
+        confirmButtonLabel = R.string.continue_
     )
 }
 
 @Composable
-fun ChargingStationNotFoundDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
-    AlertDialog(
-        icon = {
-            Icon(Icons.Default.Warning, contentDescription = "Icon")
-        },
-        title = {
-            Text(text = stringResource(R.string.charging_station_not_found_dialog_title))
-        },
-        text = {},
-        onDismissRequest = { onDismissRequest() },
-        confirmButton = {
-            TextButton(onClick = { onConfirmation() }) {
-                Text("continue")
-            }
-        },
-        modifier = Modifier.padding(32.dp)
+fun ChargingStationNotFoundDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Warning,
+        title = R.string.charging_station_not_found_dialog_title,
+        confirmButtonLabel = R.string.continue_
     )
 }
 
 @Composable
-fun ConnectionProblemDialog(onDismissRequest: () -> Unit, onConfirmation: () -> Unit) {
-    AlertDialog(
-        icon = {
-            Icon(Icons.Default.Warning, contentDescription = "Icon")
-        },
-        title = {
-            Text(text = stringResource(R.string.connection_problem_dialog_title))
-        },
-        text = {},
-        onDismissRequest = { onDismissRequest() },
-        confirmButton = {
-            TextButton(onClick = { onConfirmation() }) {
-                Text("Try it again")
-            }
-        },
-        modifier = Modifier.padding(32.dp)
+fun ConnectionProblemDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Warning,
+        title = R.string.connection_problem_dialog_title,
+        confirmButtonLabel = R.string.try_it_again
     )
 }

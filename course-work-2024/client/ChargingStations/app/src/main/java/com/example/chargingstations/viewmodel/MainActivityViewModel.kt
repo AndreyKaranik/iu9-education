@@ -48,8 +48,8 @@ class MainActivityViewModel : ViewModel() {
     private val _searchProblemIsShown = MutableStateFlow(false)
     val searchProblemIsShown: StateFlow<Boolean> = _searchProblemIsShown
 
-    private val _internetConnectionDialogIsShown = MutableStateFlow(false)
-    val internetConnectionDialogIsShown: StateFlow<Boolean> = _internetConnectionDialogIsShown
+    private val _noInternetConnectionDialogIsShown = MutableStateFlow(false)
+    val noInternetConnectionDialogIsShown: StateFlow<Boolean> = _noInternetConnectionDialogIsShown
 
     private val _chargingStationDetailsSheetIsShown = MutableStateFlow(false)
     val chargingStationDetailsSheetIsShown: StateFlow<Boolean> = _chargingStationDetailsSheetIsShown
@@ -63,8 +63,8 @@ class MainActivityViewModel : ViewModel() {
     private val _gpsDialogIsShown = MutableStateFlow(false)
     val gpsDialogIsShown: StateFlow<Boolean> = _gpsDialogIsShown
 
-    private val _badQRCodeDialogIsShown = MutableStateFlow(false)
-    val badQRCodeDialogIsShown: StateFlow<Boolean> = _badQRCodeDialogIsShown
+    private val _incorrectQRCodeDialogIsShown = MutableStateFlow(false)
+    val incorrectQRCodeDialogIsShown: StateFlow<Boolean> = _incorrectQRCodeDialogIsShown
 
     private val _chargingStationNotFoundDialogIsShown = MutableStateFlow(false)
     val chargingStationNotFoundDialogIsShown: StateFlow<Boolean> =
@@ -105,20 +105,20 @@ class MainActivityViewModel : ViewModel() {
         _gpsDialogIsShown.value = false
     }
 
-    fun showInternetConnectionDialog() {
-        _internetConnectionDialogIsShown.value = true
+    fun showNoInternetConnectionDialog() {
+        _noInternetConnectionDialogIsShown.value = true
     }
 
-    fun hideInternetConnectionDialog() {
-        _internetConnectionDialogIsShown.value = false
+    fun hideNoInternetConnectionDialog() {
+        _noInternetConnectionDialogIsShown.value = false
     }
 
-    fun showBadQRCodeDialogIsShown() {
-        _badQRCodeDialogIsShown.value = true
+    fun showIncorrectQRCodeDialogIsShown() {
+        _incorrectQRCodeDialogIsShown.value = true
     }
 
-    fun hideBadQRCodeDialogIsShown() {
-        _badQRCodeDialogIsShown.value = false
+    fun hideIncorrectQRCodeDialogIsShown() {
+        _incorrectQRCodeDialogIsShown.value = false
     }
 
     fun showChargingStationNotFoundDialogIsShown() {
