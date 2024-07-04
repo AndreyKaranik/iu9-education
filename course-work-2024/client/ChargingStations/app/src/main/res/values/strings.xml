@@ -22,5 +22,5 @@
     <string name="charging_station_details_mark_success">Charging was successful</string>
     <string name="charging_station_details_mark_failed">Charging failed</string>
     <string name="charging_station_details_anonymous">Unauthorized user</string>
-
+    <string name="charging_station_details_connector_button_label">Select</string>
 </resources>

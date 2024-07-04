@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -198,6 +199,11 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                                         }
                                     }
 
+                                    if (it.status == 1) {
+                                        Button(onClick = { /*TODO*/ }) {
+                                            Text(text = stringResource(R.string.charging_station_details_connector_button_label))
+                                        }
+                                    }
                                     Text(
                                         text = stringResource(connectorStatusName),
                                         fontSize = 14.sp,
@@ -310,7 +316,7 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                                 modifier = Modifier
                                     .background(
                                         MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(16.dp)
+                                        shape = RoundedCornerShape(4.dp)
                                     )
                                     .padding(8.dp, 0.dp)
                             ) {
@@ -513,6 +519,11 @@ fun ChargingStationDetailsPreview() {
                                             }
                                         }
 
+                                        if (it.status == 1) {
+                                            Button(onClick = { /*TODO*/ }) {
+                                                Text(text = stringResource(R.string.charging_station_details_connector_button_label))
+                                            }
+                                        }
                                         Text(
                                             text = stringResource(connectorStatusName),
                                             fontSize = 14.sp,
@@ -625,7 +636,7 @@ fun ChargingStationDetailsPreview() {
                                     modifier = Modifier
                                         .background(
                                             MaterialTheme.colorScheme.primary,
-                                            shape = RoundedCornerShape(16.dp)
+                                            shape = RoundedCornerShape(4.dp)
                                         )
                                         .padding(8.dp, 0.dp)
                                 ) {
