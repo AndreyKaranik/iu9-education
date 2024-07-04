@@ -15,4 +15,7 @@
     <string name="charging_station_details_no_description">Нет описания</string>
     <string name="charging_station_details_marks_title">Отметки</string>
     <string name="charging_station_details_no_marks">Нет отметок</string>
+    <string name="charging_station_details_connector_active">Свободен</string>
+    <string name="charging_station_details_connector_inactive">Не работает</string>
+    <string name="charging_station_details_connector_occupied">Занят</string>
 </resources>

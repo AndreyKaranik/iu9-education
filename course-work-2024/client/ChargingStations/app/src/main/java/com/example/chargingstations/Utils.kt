@@ -7,11 +7,16 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.example.chargingstations.viewmodel.MainActivityViewModel
+import com.yandex.mapkit.Animation
+import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.map.Map
+import com.yandex.mapkit.map.Map.CameraCallback
 import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 
 
@@ -91,4 +96,16 @@ fun isNetworkAvailable(context: Context): Boolean {
         }
     }
     return false
+}
+
+fun moveTo(mainActivityViewModel: MainActivityViewModel, mapView: MapView, cameraCallback: CameraCallback, chargingStationId: Int, point: Point) {
+    mainActivityViewModel.showChargingStationDetailsSheet(chargingStationId)
+    mapView.map.move(
+        CameraPosition(
+            Point(point.latitude, point.longitude),
+            20.0f,
+            mapView.map.cameraPosition.azimuth,
+            mapView.map.cameraPosition.tilt
+        ), Animation(Animation.Type.SMOOTH, 1f), cameraCallback
+    )
 }
