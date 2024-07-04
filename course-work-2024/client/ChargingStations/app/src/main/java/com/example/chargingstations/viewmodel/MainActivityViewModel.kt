@@ -158,6 +158,9 @@ class MainActivityViewModel : ViewModel() {
                     apiService.getChargingStationDetails(chargingStationId).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
+                        it.chargingMarksWithUserName.forEach {
+                            it.time = it.time.replace(Regex("[.].*"), "")
+                        }
                         _chargingStationDetails.value = it
                         _chargingStationImageBitmap.value = null
                         if (it.imageIds.isNotEmpty()) {

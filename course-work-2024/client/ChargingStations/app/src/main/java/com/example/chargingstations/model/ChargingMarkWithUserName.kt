@@ -13,5 +13,5 @@ data class ChargingMarkWithUserName (
     val userName: String?,
     @SerializedName("charging_type")
     val chargingType: ChargingType,
-    val time: String
+    var time: String
 )

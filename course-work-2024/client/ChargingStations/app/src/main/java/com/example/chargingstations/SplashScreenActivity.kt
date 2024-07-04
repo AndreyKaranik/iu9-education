@@ -53,8 +53,6 @@ class SplashScreenActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 val fadeOut = tween<Float>(durationMillis = 1000)
-                val scaleUp = tween<Float>(durationMillis = 1000)
-
                 alpha.animateTo(1f, animationSpec = fadeOut)
                 delay(1000L)
                 startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
