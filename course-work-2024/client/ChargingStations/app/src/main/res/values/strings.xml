@@ -19,5 +19,8 @@
     <string name="charging_station_details_connector_active">Active</string>
     <string name="charging_station_details_connector_inactive">Not working</string>
     <string name="charging_station_details_connector_occupied">Occupied</string>
+    <string name="charging_station_details_mark_success">Charging was successful</string>
+    <string name="charging_station_details_mark_failed">Charging failed</string>
+    <string name="charging_station_details_anonymous">Unauthorized user</string>
 
 </resources>

@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -45,6 +47,7 @@ import com.example.chargingstations.model.ConnectorDetails
 import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import com.example.chargingstations.ui.theme.Gray1
 import com.example.chargingstations.ui.theme.Gray2
+import com.example.chargingstations.ui.theme.Green1
 import com.example.chargingstations.viewmodel.MainActivityViewModel
 
 @Composable
@@ -57,6 +60,7 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Box(
@@ -183,7 +187,7 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
 
                                         2 -> {
                                             connectorStatusName =
-                                                R.string.charging_station_details_connector_active
+                                                R.string.charging_station_details_connector_occupied
                                             connectorStatusColor = Color.Yellow
                                         }
 
@@ -270,50 +274,62 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                     Box(
                         modifier = Modifier
                             .background(
-                                Color.Gray, shape = RoundedCornerShape(8.dp)
+                                Gray1, shape = RoundedCornerShape(8.dp)
                             )
                             .fillMaxWidth()
-                            .padding(4.dp)
+                            .padding(8.dp)
                     ) {
                         Column {
                             if (it.userId != null) {
                                 Text(
-                                    text = it.userName!!, fontSize = 20.sp, color = Color.White
+                                    text = it.userName!!,
+                                    fontSize = 16.sp,
+                                    color = Color.Black
                                 )
                             } else {
-                                Text(text = "Anonymous", fontSize = 20.sp, color = Color.White)
+                                Text(
+                                    text = stringResource(R.string.charging_station_details_anonymous),
+                                    fontSize = 16.sp,
+                                    color = Color.Black
+                                )
                             }
                             if (it.status == 1) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            Color.Green, shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(4.dp)
-                                ) {
-                                    Text(
-                                        text = "Success", fontSize = 12.sp, color = Color.White
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(R.string.charging_station_details_mark_success),
+                                    fontSize = 12.sp,
+                                    color = Green1
+                                )
                             } else {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            Color.Red, shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(4.dp)
-                                ) {
-                                    Text(
-                                        text = "Failed", fontSize = 12.sp, color = Color.White
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(R.string.charging_station_details_mark_failed),
+                                    fontSize = 12.sp,
+                                    color = Color.Red
+                                )
                             }
-                            Text(text = it.chargingType.name)
-                            Text(text = it.time)
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .padding(8.dp, 0.dp)
+                            ) {
+                                Text(
+                                    text = it.chargingType.name,
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                            Text(
+                                text = it.time,
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
                         }
                     }
                 }
             }
+            Spacer(modifier = Modifier.size(32.dp))
         }
     } else {
         Column(
@@ -359,6 +375,7 @@ fun ChargingStationDetailsPreview() {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box(
@@ -485,7 +502,7 @@ fun ChargingStationDetailsPreview() {
 
                                             2 -> {
                                                 connectorStatusName =
-                                                    R.string.charging_station_details_connector_active
+                                                    R.string.charging_station_details_connector_occupied
                                                 connectorStatusColor = Color.Yellow
                                             }
 
@@ -572,50 +589,62 @@ fun ChargingStationDetailsPreview() {
                         Box(
                             modifier = Modifier
                                 .background(
-                                    Color.Gray, shape = RoundedCornerShape(8.dp)
+                                    Gray1, shape = RoundedCornerShape(8.dp)
                                 )
                                 .fillMaxWidth()
-                                .padding(4.dp)
+                                .padding(8.dp)
                         ) {
                             Column {
                                 if (it.userId != null) {
                                     Text(
-                                        text = it.userName!!, fontSize = 20.sp, color = Color.White
+                                        text = it.userName!!,
+                                        fontSize = 16.sp,
+                                        color = Color.Black
                                     )
                                 } else {
-                                    Text(text = "Anonymous", fontSize = 20.sp, color = Color.White)
+                                    Text(
+                                        text = stringResource(R.string.charging_station_details_anonymous),
+                                        fontSize = 16.sp,
+                                        color = Color.Black
+                                    )
                                 }
                                 if (it.status == 1) {
-                                    Box(
-                                        modifier = Modifier
-                                            .background(
-                                                Color.Green, shape = RoundedCornerShape(8.dp)
-                                            )
-                                            .padding(4.dp)
-                                    ) {
-                                        Text(
-                                            text = "Success", fontSize = 12.sp, color = Color.White
-                                        )
-                                    }
+                                    Text(
+                                        text = stringResource(R.string.charging_station_details_mark_success),
+                                        fontSize = 12.sp,
+                                        color = Green1
+                                    )
                                 } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .background(
-                                                Color.Red, shape = RoundedCornerShape(8.dp)
-                                            )
-                                            .padding(4.dp)
-                                    ) {
-                                        Text(
-                                            text = "Failed", fontSize = 12.sp, color = Color.White
-                                        )
-                                    }
+                                    Text(
+                                        text = stringResource(R.string.charging_station_details_mark_failed),
+                                        fontSize = 12.sp,
+                                        color = Color.Red
+                                    )
                                 }
-                                Text(text = it.chargingType.name)
-                                Text(text = it.time)
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        .padding(8.dp, 0.dp)
+                                ) {
+                                    Text(
+                                        text = it.chargingType.name,
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                                Text(
+                                    text = it.time,
+                                    fontSize = 12.sp,
+                                    color = Color.Gray
+                                )
                             }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.size(32.dp))
             }
         }
     }

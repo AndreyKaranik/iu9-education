@@ -18,4 +18,7 @@
     <string name="charging_station_details_connector_active">Свободен</string>
     <string name="charging_station_details_connector_inactive">Не работает</string>
     <string name="charging_station_details_connector_occupied">Занят</string>
+    <string name="charging_station_details_mark_success">Зарядка прошла успешно</string>
+    <string name="charging_station_details_mark_failed">Зарядка не удалась</string>
+    <string name="charging_station_details_anonymous">Неавторизованный пользователь</string>
 </resources>

@@ -115,8 +115,10 @@ VALUES ('TYPE 2', 'AC'),
 INSERT INTO connectors (charging_station_id, status, charging_type_id, rate)
 VALUES (1, 0, 1, 22),
         (1, 1, 1, 15),
+        (1, 2, 1, 22),
+        (1, 2, 1, 22),
         (2, 1, 1, 22),
-        (2, 1, 2, 30);
+        (2, 2, 2, 30);
 
 INSERT INTO users (name, email, password)
 VALUES ('John', 'john@gmail.com', 'john123'),
@@ -124,6 +126,6 @@ VALUES ('John', 'john@gmail.com', 'john123'),
 
 INSERT INTO charging_marks (charging_station_id, status, user_id, charging_type_id, time)
 VALUES (1, 1, 1, 1, CURRENT_TIMESTAMP),
-        (1, 2, 2, 1, CURRENT_TIMESTAMP),
+        (1, 1, 2, 1, CURRENT_TIMESTAMP),
         (2, 1, NULL, 1, CURRENT_TIMESTAMP),
         (2, 0, 2, 2, CURRENT_TIMESTAMP);
