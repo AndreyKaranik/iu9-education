@@ -30,6 +30,8 @@ public class Utils {
                 int markChargingStationId = rs.getInt("charging_station_id");
                 int status = rs.getInt("status");
                 int userId = rs.getInt("user_id");
+                int chargingTypeId = rs.getInt("charging_type_id");
+                Timestamp timestamp = rs.getTimestamp("time");
                 JSONObject object = new JSONObject();
                 object.put("id", id);
                 object.put("charging_station_id", markChargingStationId);
@@ -38,6 +40,8 @@ public class Utils {
                     object.put("user_id", userId);
                     object.put("user_name", Utils.getUserNameByUserId(connection, userId));
                 }
+                object.put("charging_type", Utils.getChargingTypeByChargingTypeId(connection, chargingTypeId));
+                object.put("time", timestamp);
                 array.put(object);
             }
         } catch (SQLException e) {
@@ -136,7 +140,6 @@ public class Utils {
             String address = rs.getString("address");
             double latitude = rs.getDouble("latitude");
             double longitude = rs.getDouble("longitude");
-            int companyId = rs.getInt("company_id");
             String hours = rs.getString("opening_hours");
             String description = rs.getString("description");
             object.put("id", id);
@@ -144,7 +147,6 @@ public class Utils {
             object.put("address", address);
             object.put("latitude", latitude);
             object.put("longitude", longitude);
-            object.put("company_id", companyId);
             object.put("opening_hours", hours);
             object.put("description", description);
             object.put("connectors", Utils.getConnectorsByChargingStationId(connection, id));
@@ -275,7 +277,6 @@ public class Utils {
                         String address = rs.getString("address");
                         double latitude = rs.getDouble("latitude");
                         double longitude = rs.getDouble("longitude");
-                        int companyId = rs.getInt("company_id");
                         String hours = rs.getString("opening_hours");
                         String description = rs.getString("description");
                         JSONObject object = new JSONObject();
@@ -284,7 +285,6 @@ public class Utils {
                         object.put("address", address);
                         object.put("latitude", latitude);
                         object.put("longitude", longitude);
-                        object.put("company_id", companyId);
                         object.put("opening_hours", hours);
                         object.put("description", description);
                         array.put(object);
@@ -312,7 +312,6 @@ public class Utils {
                     String address = rs.getString("address");
                     double latitude = rs.getDouble("latitude");
                     double longitude = rs.getDouble("longitude");
-                    int companyId = rs.getInt("company_id");
                     String hours = rs.getString("opening_hours");
                     String description = rs.getString("description");
                     JSONObject object = new JSONObject();
@@ -321,7 +320,6 @@ public class Utils {
                     object.put("address", address);
                     object.put("latitude", latitude);
                     object.put("longitude", longitude);
-                    object.put("company_id", companyId);
                     object.put("opening_hours", hours);
                     object.put("description", description);
                     array.put(object);

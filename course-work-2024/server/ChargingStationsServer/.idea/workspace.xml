@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c026a9e2-a77a-40fb-9acc-7f2a70240050" name="Changes" comment="" />
+    <list default="true" id="c026a9e2-a77a-40fb-9acc-7f2a70240050" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/model/ChargingStation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/model/ChargingStation.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/ui/ChargingStationDetailsView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/ui/ChargingStationDetailsView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../init.sql" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

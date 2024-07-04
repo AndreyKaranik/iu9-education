@@ -24,8 +24,6 @@ data class JsonChargingStation (
     val address: String?,
     val latitude: Double?,
     val longitude: Double?,
-    @SerializedName("company_id")
-    val companyId: Int?,
     @SerializedName("opening_hours")
     val openingHours: String?,
     val description: String?,

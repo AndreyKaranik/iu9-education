@@ -46,6 +46,7 @@ import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import com.example.chargingstations.ui.theme.Gray1
 import com.example.chargingstations.ui.theme.Gray2
 import com.example.chargingstations.viewmodel.MainActivityViewModel
+
 @Composable
 fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
     val chargingStationDetails by mainActivityViewModel.chargingStationDetails.collectAsState()
@@ -94,6 +95,7 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                         fontSize = 16.sp,
                         color = Color.Gray
                     )
+                    Spacer(modifier = Modifier.size(4.dp))
                     Row(
                         modifier = Modifier
                             .background(
@@ -174,15 +176,20 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                                     val connectorStatusColor: Color
                                     when (it.status) {
                                         1 -> {
-                                            connectorStatusName = R.string.charging_station_details_connector_active
+                                            connectorStatusName =
+                                                R.string.charging_station_details_connector_active
                                             connectorStatusColor = Color.Green
                                         }
+
                                         2 -> {
-                                            connectorStatusName = R.string.charging_station_details_connector_active
+                                            connectorStatusName =
+                                                R.string.charging_station_details_connector_active
                                             connectorStatusColor = Color.Yellow
                                         }
+
                                         else -> {
-                                            connectorStatusName = R.string.charging_station_details_connector_inactive
+                                            connectorStatusName =
+                                                R.string.charging_station_details_connector_inactive
                                             connectorStatusColor = Color.Red
                                         }
                                     }
@@ -301,6 +308,8 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                                     )
                                 }
                             }
+                            Text(text = it.chargingType.name)
+                            Text(text = it.time)
                         }
                     }
                 }
@@ -328,8 +337,8 @@ fun ChargingStationDetailsPreview() {
                 ConnectorDetails(1, 1, 1, ChargingType(0, "GB/T", "DC"), 65.0)
             )
             val marks = listOf<ChargingMarkWithUserName>(
-                ChargingMarkWithUserName(0, 1, 0, 1, "John"),
-                ChargingMarkWithUserName(1, 1, 1, null, null)
+                ChargingMarkWithUserName(0, 1, 0, 1, "John", ChargingType(0, "TYPE 2", "AC"), "12:12:12"),
+                ChargingMarkWithUserName(1, 1, 1, null, null, ChargingType(0, "GB/T", "DC"), "12:12:12")
             )
             val chargingStationImageBitmap = null
             val chargingStationDetails = ChargingStationDetails(
@@ -388,30 +397,31 @@ fun ChargingStationDetailsPreview() {
                             fontSize = 16.sp,
                             color = Color.Gray
                         )
-                            Row(
+                        Spacer(modifier = Modifier.size(4.dp))
+                        Row(
+                            modifier = Modifier
+                                .background(
+                                    MaterialTheme.colorScheme.primary,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(4.dp, 0.dp)
+                        ) {
+                            Icon(
                                 modifier = Modifier
-                                    .background(
-                                        MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(4.dp, 0.dp)
-                            ) {
-                                Icon(
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .align(Alignment.CenterVertically),
-                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_access_time_24),
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                                Spacer(modifier = Modifier.size(2.dp))
-                                Text(
-                                    text = chargingStationDetails!!.openingHours,
-                                    fontSize = 12.sp,
-                                    color = Color.White
-                                )
-                            }
+                                    .size(20.dp)
+                                    .align(Alignment.CenterVertically),
+                                imageVector = ImageVector.vectorResource(R.drawable.baseline_access_time_24),
+                                contentDescription = null,
+                                tint = Color.White
+                            )
+                            Spacer(modifier = Modifier.size(2.dp))
+                            Text(
+                                text = chargingStationDetails!!.openingHours,
+                                fontSize = 12.sp,
+                                color = Color.White
+                            )
                         }
+                    }
                 }
                 HorizontalDivider(color = Color.LightGray, thickness = 0.5.dp)
                 Text(
@@ -468,15 +478,20 @@ fun ChargingStationDetailsPreview() {
                                         val connectorStatusColor: Color
                                         when (it.status) {
                                             1 -> {
-                                                connectorStatusName = R.string.charging_station_details_connector_active
+                                                connectorStatusName =
+                                                    R.string.charging_station_details_connector_active
                                                 connectorStatusColor = Color.Green
                                             }
+
                                             2 -> {
-                                                connectorStatusName = R.string.charging_station_details_connector_active
+                                                connectorStatusName =
+                                                    R.string.charging_station_details_connector_active
                                                 connectorStatusColor = Color.Yellow
                                             }
+
                                             else -> {
-                                                connectorStatusName = R.string.charging_station_details_connector_inactive
+                                                connectorStatusName =
+                                                    R.string.charging_station_details_connector_inactive
                                                 connectorStatusColor = Color.Red
                                             }
                                         }
@@ -595,6 +610,8 @@ fun ChargingStationDetailsPreview() {
                                         )
                                     }
                                 }
+                                Text(text = it.chargingType.name)
+                                Text(text = it.time)
                             }
                         }
                     }

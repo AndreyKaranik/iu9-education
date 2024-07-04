@@ -57,11 +57,11 @@ psql
 
 pscp "C:\Users\Golum\Desktop\1_1.jpg" "C:\Users\Golum\Desktop\1_2.jpg" "C:\Users\Golum\Desktop\2_1.jpg" root@89.111.172.144:/root/images
 
-pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
-
 pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" root@89.111.172.144:/root
 pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
 
+
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
 ssh root@89.111.172.144
 sudo mv /root/init.sql /var/lib/postgresql/
 sudo chmod 644 /var/lib/postgresql/init.sql
