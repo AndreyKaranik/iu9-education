@@ -30,4 +30,18 @@
     <string name="continue_">Продолжить</string>
     <string name="no_internet_connection_dialog_title">Нет соединения с интернетом</string>
     <string name="charging_station_details_fetch_problem_button_label">Повторить</string>
+    <string name="registration_title">Регистрация</string>
+    <string name="authorization_title">Авторизация</string>
+    <string name="user_name_text_field_placeholder">Введите имя пользователя</string>
+    <string name="user_password_text_field_placeholder">Введите пароль пользователя</string>
+    <string name="user_name_text_field_label">Имя пользователя</string>
+    <string name="user_email_text_field_label">Почта</string>
+    <string name="user_password_text_field_label">Пароль</string>
+    <string name="user_name_must_contain_at_least_n_characters_valid_message">Имя пользователя должно содержать как минимум 5 символов</string>
+    <string name="password_must_contain_at_least_n_characters_valid_message">Пароль должен содержать как минимум 5 символов</string>
+    <string name="incorrect_email_valid_message">Некорректная почта</string>
+    <string name="only_latin_characters_and_numbers_are_allowed_valid_message">Допустимы только символы латинского алфавита и цифры</string>
+    <string name="sign_in_button_label">Войти</string>
+    <string name="sign_up_button_label">Зарегистрироваться</string>
+    <string name="skip_button_label">Пропустить</string>
 </resources>

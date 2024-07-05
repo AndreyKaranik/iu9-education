@@ -319,7 +319,15 @@ class MainActivity : ComponentActivity() {
                                     .padding(16.dp)
                             ) {
                                 BasicIconButton(
-                                    onClick = { /*TODO*/ }, imageVector = ImageVector.vectorResource(R.drawable.baseline_account_circle_24)
+                                    onClick = {
+                                        startActivity(
+                                            Intent(
+                                                this@MainActivity,
+                                                AuthenticationActivity::class.java
+                                            )
+                                        )
+                                    },
+                                    imageVector = ImageVector.vectorResource(R.drawable.baseline_account_circle_24)
                                 )
                                 Spacer(modifier = Modifier.size(8.dp))
                                 Column(modifier = Modifier.align(Alignment.CenterEnd)) {

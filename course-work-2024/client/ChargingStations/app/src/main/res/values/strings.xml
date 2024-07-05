@@ -31,5 +31,20 @@
     <string name="charging_station_details_mark_failed">Charging failed</string>
     <string name="charging_station_details_anonymous">Unauthorized user</string>
     <string name="charging_station_details_connector_button_label">Select</string>
-    <string name="title_activity_authentication">AuthenticationActivity</string>
+    <string name="title_activity_authentication" translatable="false">AuthenticationActivity</string>
+    <string name="registration_title">Registration</string>
+    <string name="authorization_title">Authorization</string>
+    <string name="user_name_text_field_placeholder">Enter the username</string>
+    <string name="user_email_text_field_placeholder" translatable="false">this@example.com</string>
+    <string name="user_password_text_field_placeholder">Enter the user password</string>
+    <string name="user_name_text_field_label">Username</string>
+    <string name="user_email_text_field_label">Email</string>
+    <string name="user_password_text_field_label">Password</string>
+    <string name="user_name_must_contain_at_least_n_characters_valid_message">The username must contain at least 5 characters</string>
+    <string name="password_must_contain_at_least_n_characters_valid_message">The password must contain at least 5 characters</string>
+    <string name="incorrect_email_valid_message">Incorrect email</string>
+    <string name="only_latin_characters_and_numbers_are_allowed_valid_message">Only Latin characters and numbers are allowed</string>
+    <string name="sign_in_button_label">Sign in</string>
+    <string name="sign_up_button_label">Sign up</string>
+    <string name="skip_button_label">Skip</string>
 </resources>

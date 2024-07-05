@@ -1,5 +1,7 @@
 package com.example.chargingstations
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import androidx.activity.ComponentActivity
@@ -23,6 +25,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
 import com.example.chargingstations.ui.theme.ChargingStationsTheme
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -59,9 +64,16 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 class AuthenticationActivity : ComponentActivity() {
 
+    private var skipButtonIsShown: Boolean = false
+
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        intent.extras?.let {
+            skipButtonIsShown = it.getBoolean("skip_button")
+        }
+
         setContent {
             ChargingStationsTheme {
                 Surface(
@@ -81,6 +93,24 @@ class AuthenticationActivity : ComponentActivity() {
                             }
                         ) {
                             AuthorizationSheet(navController = navController)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(bottom = 32.dp),
+                                contentAlignment = Alignment.BottomCenter,
+                            ) {
+                                if (skipButtonIsShown) {
+                                    SkipButton {
+                                        startActivity(
+                                            Intent(
+                                                this@AuthenticationActivity,
+                                                MainActivity::class.java
+                                            )
+                                        )
+                                        finish()
+                                    }
+                                }
+                            }
                         }
                         composable(
                             "register",
@@ -97,6 +127,20 @@ class AuthenticationActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun SkipButton(onClick: () -> Unit) {
+    Button(
+        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.Gray),
+        onClick = {
+            onClick()
+        }
+    ) {
+        Text(
+            text = "Пропустить"
+        )
     }
 }
 
@@ -203,6 +247,7 @@ fun NameTextField() {
     var validStatus by remember { mutableStateOf(0) }
     val minLength = 5
     val maxLength = 30
+    val pattern = "^[a-zA-Z0-9]*$".toRegex()
     TextField(
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors().copy(
@@ -219,6 +264,8 @@ fun NameTextField() {
             }
             if (name.length < minLength) {
                 validStatus = 1
+            } else if (!it.matches(pattern)) {
+                validStatus = 2
             } else {
                 validStatus = 0
             }
@@ -239,6 +286,7 @@ fun NameTextField() {
     )
     val validMessage = when (validStatus) {
         1 -> "Имя должно содержать не менее 5 символов"
+        2 -> "Допустимы только символы латинского алфавита и цифры"
         else -> ""
     }
     if (validStatus != 0 && name != "") {
@@ -253,6 +301,7 @@ fun PasswordTextField() {
     var validStatus by remember { mutableStateOf(0) }
     val minLength = 5
     val maxLength = 30
+    val pattern = "^[a-zA-Z0-9]*$".toRegex()
     TextField(
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors().copy(
@@ -269,6 +318,8 @@ fun PasswordTextField() {
             }
             if (password.length < minLength) {
                 validStatus = 1
+            } else if (!it.matches(pattern)) {
+                validStatus = 2
             } else {
                 validStatus = 0
             }
@@ -303,6 +354,7 @@ fun PasswordTextField() {
     )
     val validMessage = when (validStatus) {
         1 -> "Пароль должен содержать не менее 5 символов"
+        2 -> "Допустимы только символы латинского алфавита и цифры"
         else -> ""
     }
     if (validStatus != 0 && password != "") {
@@ -350,7 +402,7 @@ fun EmailTextField() {
     )
 
     if (!isValid && email != "") {
-        ErrorText(text = "invalid email")
+        ErrorText(text = "Некорректная почта")
     }
 }
 

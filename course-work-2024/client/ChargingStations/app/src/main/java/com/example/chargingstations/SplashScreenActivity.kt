@@ -59,11 +59,15 @@ class SplashScreenActivity : ComponentActivity() {
                 val sharedPref = this@SplashScreenActivity.getPreferences(Context.MODE_PRIVATE)
                 val isFirstLaunch = sharedPref.getBoolean("first_launch", true)
                 if (isFirstLaunch) {
-//                    with (sharedPref.edit()) {
-//                        putBoolean("first_launch", false)
-//                        apply()
-//                    }
-                    startActivity(Intent(this@SplashScreenActivity, AuthenticationActivity::class.java))
+                    with(sharedPref.edit()) {
+                        putBoolean("first_launch", false)
+                        apply()
+                    }
+                    val bundle = Bundle()
+                    bundle.putBoolean("skip_button", true)
+                    val intent = Intent(this@SplashScreenActivity, AuthenticationActivity::class.java)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
                 } else {
                     startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
                 }
