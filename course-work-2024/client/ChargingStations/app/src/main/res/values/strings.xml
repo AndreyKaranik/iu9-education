@@ -35,7 +35,7 @@
     <string name="registration_title">Registration</string>
     <string name="authorization_title">Authorization</string>
     <string name="user_name_text_field_placeholder">Enter the username</string>
-    <string name="user_email_text_field_placeholder" translatable="false">this@example.com</string>
+    <string name="user_email_text_field_placeholder" translatable="false">example@email.com</string>
     <string name="user_password_text_field_placeholder">Enter the user password</string>
     <string name="user_name_text_field_label">Username</string>
     <string name="user_email_text_field_label">Email</string>
@@ -49,4 +49,6 @@
     <string name="skip_button_label">Skip</string>
     <string name="create_a_new_account_button_label">Create a new account</string>
     <string name="already_have_an_account_button_label">Already have an account</string>
+    <string name="privacy_policy_button_label">Privacy policy</string>
+    <string name="privacy_policy_text">By signing up, you agree to our</string>
 </resources>

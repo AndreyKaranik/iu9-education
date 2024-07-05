@@ -161,6 +161,7 @@ class MainActivityViewModel : ViewModel() {
     fun showChargingStationDetailsSheet(chargingStationId: Int) {
         _chargingStationDetailsSheetIsShown.value = true
         lastChargingStationDetailsId = chargingStationId
+        _cSDetailsFetchProblemIsShown.value = false
         fetchChargingStationDetails(chargingStationId)
     }
 

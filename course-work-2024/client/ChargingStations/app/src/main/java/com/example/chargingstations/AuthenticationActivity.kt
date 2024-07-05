@@ -2,7 +2,9 @@ package com.example.chargingstations
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -48,9 +51,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,9 +88,9 @@ class AuthenticationActivity : ComponentActivity() {
                 ) {
                     val navController = rememberAnimatedNavController()
 
-                    AnimatedNavHost(navController, startDestination = "login") {
+                    AnimatedNavHost(navController, startDestination = "sign_in") {
                         composable(
-                            "login",
+                            "sign_in",
                             enterTransition = {
                                 slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
                             },
@@ -113,7 +119,7 @@ class AuthenticationActivity : ComponentActivity() {
                             }
                         }
                         composable(
-                            "register",
+                            "sign_up",
                             enterTransition = {
                                 slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
                             },
@@ -121,13 +127,19 @@ class AuthenticationActivity : ComponentActivity() {
                                 slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
                             }
                         ) {
-                            RegistrationSheet(navController = navController)
+                            RegistrationSheet(this@AuthenticationActivity, navController = navController)
                         }
                     }
                 }
             }
         }
     }
+}
+
+fun openUrlInBrowser(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(intent)
 }
 
 @Composable
@@ -145,7 +157,7 @@ fun SkipButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RegistrationSheet(navController: NavController) {
+fun RegistrationSheet(context: Context, navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -180,7 +192,7 @@ fun RegistrationSheet(navController: NavController) {
             Spacer(modifier = Modifier.size(16.dp))
             TextButton(
                 onClick = {
-                    navController.navigate("login")
+                    navController.popBackStack()
                 }
             ) {
                 Text(
@@ -189,6 +201,25 @@ fun RegistrationSheet(navController: NavController) {
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+        }
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(bottom = 8.dp, start = 8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.privacy_policy_text),
+                fontSize = 12.sp,
+                color = Color.Black
+            )
+            ClickableText(
+                text = AnnotatedString(stringResource(R.string.privacy_policy_button_label)),
+                onClick = {
+                    val url = "http://89.111.172.144:8000/privacy-policy"
+                    openUrlInBrowser(context, url)
+                },
+                style = TextStyle.Default.copy(textDecoration = TextDecoration.Underline, color = Color.Gray),
+            )
         }
     }
 }
@@ -228,7 +259,7 @@ fun AuthorizationSheet(navController: NavController) {
             Spacer(modifier = Modifier.size(16.dp))
             TextButton(
                 onClick = {
-                    navController.navigate("register")
+                    navController.navigate("sign_up")
                 }
             ) {
                 Text(

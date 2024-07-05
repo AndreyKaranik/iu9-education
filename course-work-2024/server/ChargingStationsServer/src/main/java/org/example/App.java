@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -7,6 +8,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -128,6 +130,23 @@ public class App {
                     return;
                 }
 
+                pattern = "/privacy-policy$";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    File file = new File("/root/privacy-policy.html");
+                    String response = Files.readString(file.toPath());
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add("text/html");
+                    httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                    httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+                    OutputStream os = httpExchange.getResponseBody();
+                    os.write(response.getBytes());
+                    os.flush();
+                    os.close();
+                }
 
                 pattern = "/charging-stations/(\\d+)$";
                 r = Pattern.compile(pattern);
