@@ -14,7 +14,9 @@
     <string name="charging_station_search_bar_placeholder">Enter the name or address of the charging station</string>
     <string name="charging_station_search_bar_label">Search</string>
     <string name="charging_station_search_problem_message">Problems with connection</string>
-    <string name="charging_station_search_problem_button_label">Try again</string>
+    <string name="charging_station_search_problem_button_label">Try it again</string>
+    <string name="charging_station_details_fetch_problem_message">Failed to fetch charging station information</string>
+    <string name="charging_station_details_fetch_problem_button_label">Try it again</string>
     <string name="charging_station_details_opening_hours">Opening hours:</string>
     <string name="charging_station_details_connectors_title">Connectors at the station</string>
     <string name="charging_station_details_no_connectors">No connectors</string>

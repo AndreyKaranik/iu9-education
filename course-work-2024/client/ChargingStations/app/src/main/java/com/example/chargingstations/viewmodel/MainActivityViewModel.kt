@@ -30,7 +30,8 @@ class MainActivityViewModel : ViewModel() {
     private val _chargingStations = MutableStateFlow<List<ChargingStationMin>>(emptyList())
     val chargingStations: StateFlow<List<ChargingStationMin>> = _chargingStations
 
-    private val _filteredChargingStations = MutableStateFlow<List<ChargingStationMedium>>(emptyList())
+    private val _filteredChargingStations =
+        MutableStateFlow<List<ChargingStationMedium>>(emptyList())
     val filteredChargingStations: StateFlow<List<ChargingStationMedium>> = _filteredChargingStations
 
     private val _chargingStationsFetching = MutableStateFlow(false)
@@ -38,6 +39,15 @@ class MainActivityViewModel : ViewModel() {
 
     private val _chargingStationsFetched = MutableStateFlow(false)
     val chargingStationsFetched: StateFlow<Boolean> = _chargingStationsFetched
+
+    private val _chargingStationDetailsFetched = MutableStateFlow(false)
+    val chargingStationDetailsFetched: StateFlow<Boolean> = _chargingStationDetailsFetched
+
+    private val _chargingStationDetailsFetching = MutableStateFlow(false)
+    val chargingStationDetailsFetching: StateFlow<Boolean> = _chargingStationDetailsFetching
+
+    private val _cSDetailsFetchProblemIsShown = MutableStateFlow(false)
+    val cSDetailsFetchProblemIsShown: StateFlow<Boolean> = _cSDetailsFetchProblemIsShown
 
     private val _filteredChargingStationsFetching = MutableStateFlow(false)
     val filteredChargingStationsFetching: StateFlow<Boolean> = _filteredChargingStationsFetching
@@ -84,6 +94,8 @@ class MainActivityViewModel : ViewModel() {
     val httpClient = OkHttpClient.Builder().apply {
         addInterceptor(logging)
     }.build()
+
+    private var lastChargingStationDetailsId: Int? = null
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("http://89.111.172.144:8000/")
@@ -148,31 +160,38 @@ class MainActivityViewModel : ViewModel() {
 
     fun showChargingStationDetailsSheet(chargingStationId: Int) {
         _chargingStationDetailsSheetIsShown.value = true
+        lastChargingStationDetailsId = chargingStationId
         fetchChargingStationDetails(chargingStationId)
     }
 
     fun fetchChargingStationDetails(chargingStationId: Int) {
+        _chargingStationDetailsFetching.value = true
         viewModelScope.launch {
             try {
                 val response =
                     apiService.getChargingStationDetails(chargingStationId).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        it.chargingMarksWithUserName.forEach {
-                            it.time = it.time.replace(Regex("[.].*"), "")
+                        it.chargingMarksWithUserName.forEach { mark ->
+                            mark.time = mark.time.replace(Regex("[.].*"), "")
                         }
                         _chargingStationDetails.value = it
                         _chargingStationImageBitmap.value = null
+                        _chargingStationDetailsFetched.value = true
                         if (it.imageIds.isNotEmpty()) {
                             fetchChargingStationImage(it.imageIds[0].id)
                         }
                     }
                 } else {
+                    _cSDetailsFetchProblemIsShown.value = true
                     Log.e(TAG, "error")
                 }
             } catch (e: Exception) {
+                _cSDetailsFetchProblemIsShown.value = true
                 e.printStackTrace()
                 Log.e(TAG, "exception")
+            } finally {
+                _chargingStationDetailsFetching.value = false
             }
         }
     }
@@ -196,7 +215,11 @@ class MainActivityViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     response.body()?.let {
                         val chargingStationList: List<ChargingStationMin> = it.map { station ->
-                            ChargingStationMin(station.id!! , station.latitude!!, station.longitude!!)
+                            ChargingStationMin(
+                                station.id!!,
+                                station.latitude!!,
+                                station.longitude!!
+                            )
                         }
                         _chargingStations.value = chargingStationList
                         _chargingStationsFetched.value = true
@@ -217,11 +240,19 @@ class MainActivityViewModel : ViewModel() {
         _filteredChargingStationsFetching.value = true
         viewModelScope.launch {
             try {
-                val response = apiService.getChargingStations("medium", searchQuery.value).awaitResponse()
+                val response =
+                    apiService.getChargingStations("medium", searchQuery.value).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         val chargingStationList: List<ChargingStationMedium> = it.map { station ->
-                            ChargingStationMedium(station.id!!, station.name!!, station.address!!, station.latitude!!, station.longitude!!, station.chargingTypes!!)
+                            ChargingStationMedium(
+                                station.id!!,
+                                station.name!!,
+                                station.address!!,
+                                station.latitude!!,
+                                station.longitude!!,
+                                station.chargingTypes!!
+                            )
                         }
                         _filteredChargingStations.value = chargingStationList
                         _filteredChargingStationsFetched.value = true
@@ -244,12 +275,14 @@ class MainActivityViewModel : ViewModel() {
 //        _filteredChargingStationsFetching.value = true
         viewModelScope.launch {
             try {
-                val response = apiService.getChargingStationImage(chargingStationImageId).awaitResponse()
+                val response =
+                    apiService.getChargingStationImage(chargingStationImageId).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                            val decodedString = Base64.decode(it.data, Base64.DEFAULT)
-                            val bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-                            _chargingStationImageBitmap.value = bitmap.asImageBitmap()
+                        val decodedString = Base64.decode(it.data, Base64.DEFAULT)
+                        val bitmap =
+                            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+                        _chargingStationImageBitmap.value = bitmap.asImageBitmap()
 //                        _filteredChargingStationsFetched.value = true
                     }
                 } else {
@@ -280,5 +313,13 @@ class MainActivityViewModel : ViewModel() {
         _searchProblemIsShown.value = false;
         _filteredChargingStationsFetched.value = false
         fetchFilteredChargingStations()
+    }
+
+    fun tryAgainFetchCSDetails() {
+        _cSDetailsFetchProblemIsShown.value = false
+        _chargingStationDetailsFetched.value = false
+        lastChargingStationDetailsId?.let {
+            fetchChargingStationDetails(it)
+        }
     }
 }

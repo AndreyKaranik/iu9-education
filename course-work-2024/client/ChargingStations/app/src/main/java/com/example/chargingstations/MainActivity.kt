@@ -79,6 +79,7 @@ import com.yandex.runtime.image.ImageProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -318,7 +319,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(16.dp)
                             ) {
                                 BasicIconButton(
-                                    onClick = { /*TODO*/ }, imageVector = Icons.Default.Settings
+                                    onClick = { /*TODO*/ }, imageVector = ImageVector.vectorResource(R.drawable.baseline_account_circle_24)
                                 )
                                 Spacer(modifier = Modifier.size(8.dp))
                                 Column(modifier = Modifier.align(Alignment.CenterEnd)) {

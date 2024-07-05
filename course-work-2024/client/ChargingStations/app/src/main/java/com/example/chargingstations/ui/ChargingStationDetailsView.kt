@@ -6,19 +6,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -55,6 +52,7 @@ import com.example.chargingstations.viewmodel.MainActivityViewModel
 fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
     val chargingStationDetails by mainActivityViewModel.chargingStationDetails.collectAsState()
     val chargingStationImageBitmap by mainActivityViewModel.chargingStationImageBitmap.collectAsState()
+    val cSDetailsFetchProblemIsShown by mainActivityViewModel.cSDetailsFetchProblemIsShown.collectAsState()
     if (chargingStationDetails != null) {
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -340,9 +338,31 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
     } else {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp)
         ) {
-            CircularProgressIndicator()
+            if (cSDetailsFetchProblemIsShown) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.charging_station_details_fetch_problem_message)
+                    )
+                    Button(
+                        onClick = {
+                            mainActivityViewModel.tryAgainFetchCSDetails()
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.charging_station_details_fetch_problem_button_label)
+                        )
+                    }
+                }
+            } else {
+                CircularProgressIndicator()
+            }
         }
     }
 }
@@ -359,10 +379,27 @@ fun ChargingStationDetailsPreview() {
                 ConnectorDetails(1, 1, 1, ChargingType(0, "GB/T", "DC"), 65.0)
             )
             val marks = listOf<ChargingMarkWithUserName>(
-                ChargingMarkWithUserName(0, 1, 0, 1, "John", ChargingType(0, "TYPE 2", "AC"), "12:12:12"),
-                ChargingMarkWithUserName(1, 1, 1, null, null, ChargingType(0, "GB/T", "DC"), "12:12:12")
+                ChargingMarkWithUserName(
+                    0,
+                    1,
+                    0,
+                    1,
+                    "John",
+                    ChargingType(0, "TYPE 2", "AC"),
+                    "12:12:12"
+                ),
+                ChargingMarkWithUserName(
+                    1,
+                    1,
+                    1,
+                    null,
+                    null,
+                    ChargingType(0, "GB/T", "DC"),
+                    "12:12:12"
+                )
             )
             val chargingStationImageBitmap = null
+            val cSDetailsFetchProblemIsShown = false
             val chargingStationDetails = ChargingStationDetails(
                 0,
                 "SuperCharger",

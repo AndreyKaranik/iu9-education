@@ -27,7 +27,11 @@ fun ChargingStationSearchBar(searchQuery: String, onSearchQueryChanged: (String)
                 overflow = TextOverflow.Ellipsis
             )
         },
-        label = { Text(text = stringResource(R.string.charging_station_search_bar_label)) },
+        label = {
+            Text(
+                text = stringResource(R.string.charging_station_search_bar_label)
+            )
+        },
         leadingIcon = {
             Icon(imageVector = Icons.Filled.Search, contentDescription = null)
         },
