@@ -1,5 +1,6 @@
 package com.example.chargingstations
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -55,7 +56,17 @@ class SplashScreenActivity : ComponentActivity() {
                 val fadeOut = tween<Float>(durationMillis = 1000)
                 alpha.animateTo(1f, animationSpec = fadeOut)
                 delay(1000L)
-                startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
+                val sharedPref = this@SplashScreenActivity.getPreferences(Context.MODE_PRIVATE)
+                val isFirstLaunch = sharedPref.getBoolean("first_launch", true)
+                if (isFirstLaunch) {
+//                    with (sharedPref.edit()) {
+//                        putBoolean("first_launch", false)
+//                        apply()
+//                    }
+                    startActivity(Intent(this@SplashScreenActivity, AuthenticationActivity::class.java))
+                } else {
+                    startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
+                }
                 finish()
             }
 

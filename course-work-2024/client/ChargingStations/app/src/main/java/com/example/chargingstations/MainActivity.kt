@@ -418,7 +418,7 @@ class MainActivity : ComponentActivity() {
 
         ModalBottomSheet(modifier = Modifier
             .fillMaxHeight()
-            .padding(0.dp, 32.dp, 0.dp, 0.dp),
+            .padding(top = 32.dp),
             tonalElevation = 0.dp,
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
@@ -435,8 +435,9 @@ class MainActivity : ComponentActivity() {
 
         ModalBottomSheet(modifier = Modifier
             .fillMaxHeight()
-            .padding(0.dp, 32.dp, 0.dp, 0.dp),
+            .padding(top = 32.dp),
             tonalElevation = 0.dp,
+            scrimColor = Color.Transparent,
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
             ChargingStationDetailsView(mainActivityViewModel)

@@ -31,4 +31,5 @@
     <string name="charging_station_details_mark_failed">Charging failed</string>
     <string name="charging_station_details_anonymous">Unauthorized user</string>
     <string name="charging_station_details_connector_button_label">Select</string>
+    <string name="title_activity_authentication">AuthenticationActivity</string>
 </resources>

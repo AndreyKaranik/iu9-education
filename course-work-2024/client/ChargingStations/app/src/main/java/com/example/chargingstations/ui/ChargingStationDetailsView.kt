@@ -181,7 +181,7 @@ fun ChargingStationDetailsView(mainActivityViewModel: MainActivityViewModel) {
                                         1 -> {
                                             connectorStatusName =
                                                 R.string.charging_station_details_connector_active
-                                            connectorStatusColor = Color.Green
+                                            connectorStatusColor = Green1
                                         }
 
                                         2 -> {
@@ -540,7 +540,7 @@ fun ChargingStationDetailsPreview() {
                                             1 -> {
                                                 connectorStatusName =
                                                     R.string.charging_station_details_connector_active
-                                                connectorStatusColor = Color.Green
+                                                connectorStatusColor = Green1
                                             }
 
                                             2 -> {

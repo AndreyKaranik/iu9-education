@@ -21,7 +21,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ChargingStations"
-        tools:targetApi="31" >
+        tools:targetApi="31">
+        <activity
+            android:name=".AuthenticationActivity"
+            android:exported="false"
+            android:label="@string/title_activity_authentication"
+            android:theme="@style/Theme.ChargingStations" />
         <activity
             android:name=".QRScannerActivity"
             android:exported="false"
@@ -31,16 +36,18 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.ChargingStations">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".SplashScreenActivity"
             android:exported="true"
-            android:theme="@style/Theme.ChargingStations" >
+            android:theme="@style/Theme.ChargingStations">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

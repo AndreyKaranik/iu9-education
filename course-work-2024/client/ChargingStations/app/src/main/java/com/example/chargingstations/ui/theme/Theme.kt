@@ -16,12 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
-
 private val LightColorScheme = lightColorScheme(
     primary = Blue1,
     background = Color.White,
@@ -29,26 +23,11 @@ private val LightColorScheme = lightColorScheme(
     onSurface = Color.Black,
     onPrimary = Color.White,
 
-
-
-//    surfaceContainer = Color.White,
-//    surfaceContainerHigh = Color.White,
-//    surfaceContainerHighest = Color.White,
-//    surfaceContainerLow = Color.White,
-//    surfaceContainerLowest = Color.White
-
-//    secondary = PurpleGrey40,
-//    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    surfaceContainer = Color.White,
+    surfaceContainerHigh = Color.White,
+    surfaceContainerHighest = Color.White,
+    surfaceContainerLow = Color.White,
+    surfaceContainerLowest = Color.White
 )
 
 @Composable
@@ -56,10 +35,7 @@ fun ChargingStationsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        darkTheme -> LightColorScheme // LightColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = LightColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
