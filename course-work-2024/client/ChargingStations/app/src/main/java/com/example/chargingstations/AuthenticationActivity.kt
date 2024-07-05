@@ -139,7 +139,7 @@ fun SkipButton(onClick: () -> Unit) {
         }
     ) {
         Text(
-            text = "Пропустить"
+            text = stringResource(R.string.skip_button_label)
         )
     }
 }
@@ -156,7 +156,7 @@ fun RegistrationSheet(navController: NavController) {
         ) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Регистрация",
+                text = stringResource(R.string.registration_title),
                 fontSize = 32.sp,
                 color = Color.Black
             )
@@ -174,7 +174,7 @@ fun RegistrationSheet(navController: NavController) {
                 onClick = { /*TODO*/ }
             ) {
                 Text(
-                    text = "Зарегистрироваться"
+                    text = stringResource(R.string.sign_up_button_label)
                 )
             }
             Spacer(modifier = Modifier.size(16.dp))
@@ -184,7 +184,7 @@ fun RegistrationSheet(navController: NavController) {
                 }
             ) {
                 Text(
-                    text = "Уже есть учетная запись",
+                    text = stringResource(R.string.already_have_an_account_button_label),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -206,7 +206,7 @@ fun AuthorizationSheet(navController: NavController) {
         ) {
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Авторизация",
+                text = stringResource(R.string.authorization_title),
                 fontSize = 32.sp,
                 color = Color.Black
             )
@@ -222,7 +222,7 @@ fun AuthorizationSheet(navController: NavController) {
                 onClick = { /*TODO*/ }
             ) {
                 Text(
-                    text = "Войти"
+                    text = stringResource(R.string.sign_in_button_label)
                 )
             }
             Spacer(modifier = Modifier.size(16.dp))
@@ -232,7 +232,7 @@ fun AuthorizationSheet(navController: NavController) {
                 }
             ) {
                 Text(
-                    text = "Создать новую учетную запись",
+                    text = stringResource(R.string.create_a_new_account_button_label),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -273,20 +273,20 @@ fun NameTextField() {
         isError = validStatus != 0 && name != "",
         placeholder = {
             Text(
-                text = "Введите имя пользователя",
+                text = stringResource(R.string.user_name_text_field_placeholder),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
         label = {
             Text(
-                text = "Имя пользователя"
+                text = stringResource(R.string.user_name_text_field_label)
             )
         }
     )
     val validMessage = when (validStatus) {
-        1 -> "Имя должно содержать не менее 5 символов"
-        2 -> "Допустимы только символы латинского алфавита и цифры"
+        1 -> stringResource(R.string.user_name_must_contain_at_least_n_characters_valid_message)
+        2 -> stringResource(R.string.only_latin_characters_and_numbers_are_allowed_valid_message)
         else -> ""
     }
     if (validStatus != 0 && name != "") {
@@ -341,20 +341,20 @@ fun PasswordTextField() {
         },
         placeholder = {
             Text(
-                text = "Введите пароль пользователя",
+                text = stringResource(R.string.user_password_text_field_placeholder),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
         label = {
             Text(
-                text = "Пароль"
+                text = stringResource(R.string.user_password_text_field_label)
             )
         }
     )
     val validMessage = when (validStatus) {
-        1 -> "Пароль должен содержать не менее 5 символов"
-        2 -> "Допустимы только символы латинского алфавита и цифры"
+        1 -> stringResource(R.string.password_must_contain_at_least_n_characters_valid_message)
+        2 -> stringResource(R.string.only_latin_characters_and_numbers_are_allowed_valid_message)
         else -> ""
     }
     if (validStatus != 0 && password != "") {
@@ -389,20 +389,20 @@ fun EmailTextField() {
         },
         placeholder = {
             Text(
-                text = "this@example.com",
+                text = stringResource(R.string.user_email_text_field_placeholder),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
         label = {
             Text(
-                text = "Почта"
+                text = stringResource(R.string.user_email_text_field_label)
             )
         }
     )
 
     if (!isValid && email != "") {
-        ErrorText(text = "Некорректная почта")
+        ErrorText(text = stringResource(R.string.incorrect_email_valid_message))
     }
 }
 

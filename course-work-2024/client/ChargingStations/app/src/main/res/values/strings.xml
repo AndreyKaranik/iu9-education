@@ -47,4 +47,6 @@
     <string name="sign_in_button_label">Sign in</string>
     <string name="sign_up_button_label">Sign up</string>
     <string name="skip_button_label">Skip</string>
+    <string name="create_a_new_account_button_label">Create a new account</string>
+    <string name="already_have_an_account_button_label">Already have an account</string>
 </resources>

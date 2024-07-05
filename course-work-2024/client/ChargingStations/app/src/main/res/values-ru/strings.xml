@@ -44,4 +44,6 @@
     <string name="sign_in_button_label">Войти</string>
     <string name="sign_up_button_label">Зарегистрироваться</string>
     <string name="skip_button_label">Пропустить</string>
+    <string name="create_a_new_account_button_label">Создать новую учетную запись</string>
+    <string name="already_have_an_account_button_label">Уже есть учетная запись</string>
 </resources>
