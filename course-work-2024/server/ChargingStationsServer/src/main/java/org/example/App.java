@@ -1,8 +1,6 @@
 package org.example;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -10,13 +8,13 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -72,7 +70,7 @@ public class App {
             for (String key : httpExchange.getRequestHeaders().keySet()) {
                 System.out.println(key + ": " + httpExchange.getRequestHeaders().get(key).toString());
             }
-            System.out.println(new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+            String body = new String(httpExchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
 
             if (httpExchange.getRequestMethod().equals("GET")) {
                 Map<String, String> queryParams = parseQueryParams(httpExchange.getRequestURI().getQuery());
@@ -227,6 +225,7 @@ public class App {
                             e.printStackTrace();
                         }
                     }
+                    return;
                 }
 //                } else {
 ////                    String response = "Hello from server!";
@@ -236,8 +235,79 @@ public class App {
 ////                    os.flush();
 ////                    os.close();
 //                }
+
+                pattern = "/confirm";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+
+                }
+            }
+
+
+            if (httpExchange.getRequestMethod().equals("POST")) {
+                String pattern = "/register";
+                Pattern r = Pattern.compile(pattern);
+                Matcher m = r.matcher(httpExchange.getRequestURI().toString());
+
+
+                if (m.find()) {
+                    RegistrationData registrationData = null;
+                    try {
+                        Gson gson = new Gson();
+                        registrationData = gson.fromJson(body, RegistrationData.class);
+                    } catch (JsonSyntaxException | JsonIOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Connection connection = null;
+                    int usernameStatus = -1;
+                    int emailStatus = -1;
+
+                    boolean success = false;
+
+                    if (registrationData != null) {
+                        try {
+                            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                            usernameStatus = Utils.checkUsername(connection, registrationData.getUsername());
+                            emailStatus = Utils.checkEmail(connection, registrationData.getEmail());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (connection != null) connection.close();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (usernameStatus == 0 && emailStatus == 0) {
+                            success = EmailSender.sendEmail(registrationData.getEmail());
+                        }
+                    }
+
+                    JSONObject response = new JSONObject();
+                    if (usernameStatus == 0 && emailStatus == 0 && success) {
+                        response.put("status", 0);      // success
+                    } else if (usernameStatus == 2) {
+                        response.put("status", 2);      // username exists
+                    } else if (emailStatus == 2) {
+                        response.put("status", 3);      // email exist
+                    } else {
+                        response.put("status", 1);      // failed
+                    }
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add("application/json");
+                    httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                    httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
+                    OutputStream os = httpExchange.getResponseBody();
+                    os.write(response.toString().getBytes());
+                    os.flush();
+                    os.close();
+                }
             }
         }
     }
-
 }

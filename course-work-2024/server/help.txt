@@ -22,13 +22,14 @@ Response-Body:
 6. curl -X GET "127.0.0.1:8000/orders/{id}/charging-information"
 
 
-
-
 curl -X GET "89.111.172.144:8000/charging-stations" -v
 
 java -jar ChargingStationsServer-1.0.jar
 
+curl -X POST 127.0.0.1:8000/register -H "Content-Type: application/json" -d @body.json
 
+
+SELECT COUNT(1) FROM users WHERE name = "john";
 
 /charging-stations?level=min                // id, latitude, longitude
 /charging-stations?level=medium             // id, latitude, longitude, name, address, charging_types

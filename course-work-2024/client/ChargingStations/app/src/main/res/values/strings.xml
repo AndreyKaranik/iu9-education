@@ -32,8 +32,8 @@
     <string name="charging_station_details_anonymous">Unauthorized user</string>
     <string name="charging_station_details_connector_button_label">Select</string>
     <string name="title_activity_authentication" translatable="false">AuthenticationActivity</string>
-    <string name="registration_title">Registration</string>
-    <string name="authorization_title">Authorization</string>
+    <string name="registration_title">Sign up</string>
+    <string name="authorization_title">Sign in</string>
     <string name="user_name_text_field_placeholder">Enter the username</string>
     <string name="user_email_text_field_placeholder" translatable="false">example@email.com</string>
     <string name="user_password_text_field_placeholder">Enter the user password</string>

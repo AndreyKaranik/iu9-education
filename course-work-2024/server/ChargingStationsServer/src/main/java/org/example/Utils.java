@@ -11,11 +11,22 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Base64;
 
 public class Utils {
+
+    private static final SecureRandom secureRandom = new SecureRandom(); //threadsafe
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder(); //threadsafe
+
+    public static String generateNewToken() {
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        return base64Encoder.encodeToString(randomBytes);
+    }
+
     public static JSONArray getChargingMarksWithUserNameByChargingStationId(Connection connection, int chargingStationId) {
         String sql = "SELECT * FROM charging_marks WHERE charging_station_id = " + chargingStationId;
         Statement stmt = null;
@@ -435,5 +446,60 @@ public class Utils {
             }
         }
         return array;
+    }
+
+    public static int checkUsername(Connection connection, String username) {
+        String sql = "SELECT COUNT(1) FROM users WHERE name = " + '\'' + username + '\'';
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        JSONObject object = new JSONObject();
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            int count = rs.getInt("count");
+            if (count == 1) {
+                return 2;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 1;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public static int checkEmail(Connection connection, String email) {
+        String sql = "SELECT COUNT(1) FROM users WHERE email = " + '\'' + email + '\'';
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            int count = rs.getInt("count");
+            if (count == 1) {
+                return 2;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 1;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 }
