@@ -10,12 +10,12 @@ import java.util.Properties;
 
 public class EmailSender {
 
-    public static boolean sendEmail(String to) throws IOException {
-        String content = new String(Files.readAllBytes(Path.of("C:\\Users\\Golum\\Desktop\\email.txt")));
+    public static boolean sendEmail(String to, String token) throws IOException {
+        String path = "C:\\Users\\Golum\\Desktop\\email.txt"; // "/root/email.txt"
+        String content = new String(Files.readAllBytes(Path.of(path)));
         String[] lines = content.split("\n");
         String username = lines[0].strip();
         String password = lines[1].strip();
-        String token = Utils.generateNewToken();
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

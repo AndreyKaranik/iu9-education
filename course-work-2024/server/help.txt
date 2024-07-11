@@ -29,6 +29,7 @@ java -jar ChargingStationsServer-1.0.jar
 curl -X POST 127.0.0.1:8000/register -H "Content-Type: application/json" -d @body.json
 
 
+
 SELECT COUNT(1) FROM users WHERE name = "john";
 
 /charging-stations?level=min                // id, latitude, longitude

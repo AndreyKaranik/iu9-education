@@ -11,6 +11,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.ArrayList;
@@ -448,18 +449,58 @@ public class Utils {
         return array;
     }
 
+    /**
+     *
+     * @param connection
+     * @param username
+     * @param email
+     * @return (userId, 0) - is active, (userId, 1) - is not active, (0, 2) - not found or exception
+     */
+    public static Pair<Integer, Integer> checkUserIsActive(Connection connection, String username, String email) {
+        String sql = "SELECT id, is_active FROM users WHERE name = ? AND email = ?";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, email);
+            rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                return new Pair<>(0, 2);
+            }
+
+            boolean isActive = rs.getBoolean("is_active");
+            int id = rs.getInt("id");
+
+            if (isActive) {
+                return new Pair<>(id, 0);
+
+            } else {
+                return new Pair<>(id, 1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return new Pair<>(0, 2);
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static int checkUsername(Connection connection, String username) {
         String sql = "SELECT COUNT(1) FROM users WHERE name = " + '\'' + username + '\'';
         Statement stmt = null;
         ResultSet rs = null;
-
-        JSONObject object = new JSONObject();
         try {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(sql);
-            rs.next();
-            int count = rs.getInt("count");
-            if (count == 1) {
+            if (rs.next()) {
                 return 2;
             }
         } catch (SQLException e) {
@@ -484,9 +525,7 @@ public class Utils {
         try {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(sql);
-            rs.next();
-            int count = rs.getInt("count");
-            if (count == 1) {
+            if (rs.next()) {
                 return 2;
             }
         } catch (SQLException e) {
@@ -501,5 +540,115 @@ public class Utils {
             }
         }
         return 0;
+    }
+
+    public static boolean confirm(Connection connection, String token) {
+        if (token == null) {
+            return false;
+        }
+
+        String sql = "SELECT id FROM users WHERE token = " + '\'' + token + '\'';
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = connection.createStatement();
+            rs = stmt.executeQuery(sql);
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                if (updateUserIsActive(connection, id, true)) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        return false;
+    }
+
+    public static boolean updateUserIsActive(Connection connection, int userId, boolean isActive) {
+        String sql = "UPDATE users SET is_active = ? WHERE id = ?";
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = connection.prepareStatement(sql);
+            stmt.setBoolean(1, isActive);
+            stmt.setInt(2, userId);
+            int updatedRows = stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String getUserTokenByUserId(Connection connection, int userId) {
+        String sql = "SELECT token FROM users WHERE id = ?";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = connection.prepareStatement(sql);
+            stmt.setInt(1, userId);
+            rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                return "";
+            }
+            String token = rs.getString("token");
+
+            return token;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static boolean insertUser(Connection connection, String name, String email, String password, String token, boolean isActive) {
+        String sql = "INSERT INTO users(name, email, password, token, is_active) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, name);
+            stmt.setString(2, email);
+            stmt.setString(3, password);
+            stmt.setString(4, token);
+            stmt.setBoolean(5, isActive);
+            int insertedRows = stmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

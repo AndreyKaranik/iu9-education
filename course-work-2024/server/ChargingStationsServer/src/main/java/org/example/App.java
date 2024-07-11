@@ -241,7 +241,39 @@ public class App {
                 m = r.matcher(httpExchange.getRequestURI().toString());
 
                 if (m.find()) {
+                    Connection connection = null;
+                    try {
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
+                        boolean success = Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
+
+                        JSONObject object = new JSONObject();
+                        object.put("success", success);
+
+                        String response = object.toString();
+                        ArrayList<String> list = new ArrayList<>();
+                        list.add("application/json");
+                        httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.write(response.getBytes());
+                        os.flush();
+                        os.close();
+                    } catch (SQLException e) {
+                        httpExchange.sendResponseHeaders(500, 0);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.flush();
+                        os.close();
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (connection != null) connection.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return;
                 }
             }
 
@@ -262,16 +294,38 @@ public class App {
                     }
 
                     Connection connection = null;
-                    int usernameStatus = -1;
-                    int emailStatus = -1;
+                    int usernameStatus = 1;
+                    int emailStatus = 1;
+                    Pair<Integer, Integer> isActiveStatusPair;
+                    int userId = -1;
 
                     boolean success = false;
 
                     if (registrationData != null) {
                         try {
                             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            usernameStatus = Utils.checkUsername(connection, registrationData.getUsername());
-                            emailStatus = Utils.checkEmail(connection, registrationData.getEmail());
+                            isActiveStatusPair = Utils.checkUserIsActive(connection, registrationData.getUsername(), registrationData.getEmail());
+                            if (isActiveStatusPair.getRight() == 1) {
+                                usernameStatus = 0;
+                                emailStatus = 0;
+                                userId = isActiveStatusPair.getLeft();
+                            } else {
+                                usernameStatus = Utils.checkUsername(connection, registrationData.getUsername());
+                                emailStatus = Utils.checkEmail(connection, registrationData.getEmail());
+                            }
+
+                            if (usernameStatus == 0 && emailStatus == 0 && isActiveStatusPair.getRight() != 0) {
+                                String token;
+                                if (isActiveStatusPair.getRight() == 1) {
+                                    token = Utils.getUserTokenByUserId(connection, userId);
+                                } else {
+                                    token = Utils.generateNewToken();
+                                    Utils.insertUser(connection, registrationData.getUsername(), registrationData.getEmail(), registrationData.getPassword(), token, false);
+                                }
+                                if (token != null && !token.isEmpty()) {
+                                    success = EmailSender.sendEmail(registrationData.getEmail(), token);
+                                }
+                            }
                         } catch (SQLException e) {
                             e.printStackTrace();
                         } finally {
@@ -280,10 +334,6 @@ public class App {
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
-                        }
-
-                        if (usernameStatus == 0 && emailStatus == 0) {
-                            success = EmailSender.sendEmail(registrationData.getEmail());
                         }
                     }
 

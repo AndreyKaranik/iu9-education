@@ -52,7 +52,10 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
     email VARCHAR(320) NOT NULL,
-    password VARCHAR(32) NOT NULL
+    password VARCHAR(256) NOT NULL,
+    token VARCHAR(256) NULL UNIQUE,
+    token_expiration TIMESTAMP NULL,
+    is_active BOOLEAN NOT NULL
 );
 
 CREATE TABLE charging_marks (
@@ -120,9 +123,9 @@ VALUES (1, 0, 1, 22),
         (2, 1, 1, 22),
         (2, 2, 2, 30);
 
-INSERT INTO users (name, email, password)
-VALUES ('John', 'john@gmail.com', 'john123'),
-        ('Andrey', 'andrey@yandex.ru', 'andrey2003');
+INSERT INTO users (name, email, password, is_active)
+VALUES ('John', 'john@gmail.com', 'john123', true),
+        ('Andrey', 'andrey@yandex.ru', 'andrey2003', true);
 
 INSERT INTO charging_marks (charging_station_id, status, user_id, charging_type_id, time)
 VALUES (1, 1, 1, 1, CURRENT_TIMESTAMP),
