@@ -12,6 +12,7 @@ import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -241,6 +242,7 @@ class MainActivity : ComponentActivity() {
 
                     val chargingStationDetailsSheetIsShown by mainActivityViewModel.chargingStationDetailsSheetIsShown.collectAsState()
                     var searchSheetIsShown by remember { mutableStateOf(false) }
+                    val accountSheetIsShown by mainActivityViewModel.accountSheetIsShown.collectAsState()
 
                     if (chargingStationsFetched && placemarkMapObjectList.isEmpty()) {
                         addMarkers()
@@ -320,12 +322,18 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 BasicIconButton(
                                     onClick = {
-                                        startActivity(
-                                            Intent(
-                                                this@MainActivity,
-                                                AuthenticationActivity::class.java
+                                        val sharedPref = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+                                        val auth = sharedPref.getBoolean("auth", false)
+                                        if (!auth) {
+                                            startActivity(
+                                                Intent(
+                                                    this@MainActivity,
+                                                    AuthenticationActivity::class.java
+                                                )
                                             )
-                                        )
+                                        } else {
+                                            mainActivityViewModel.showAccountSheet()
+                                        }
                                     },
                                     imageVector = ImageVector.vectorResource(R.drawable.baseline_account_circle_24)
                                 )
@@ -410,6 +418,11 @@ class MainActivity : ComponentActivity() {
                                     searchSheetIsShown = false
                                 })
                             }
+                            if (accountSheetIsShown) {
+                                AccountSheet(onDismissRequest = {
+                                    mainActivityViewModel.hideAccountSheet()
+                                })
+                            }
                         }
                     }
                 }
@@ -431,6 +444,40 @@ class MainActivity : ComponentActivity() {
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
             ChargingStationListView(mainActivityViewModel, mapView, cameraCallback)
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun AccountSheet(onDismissRequest: () -> Unit) {
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+        )
+
+        ModalBottomSheet(modifier = Modifier
+            .fillMaxHeight()
+            .padding(top = 32.dp),
+            tonalElevation = 0.dp,
+            sheetState = sheetState,
+            onDismissRequest = { onDismissRequest() }) {
+            Column (
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "Вы авторизованы"
+                )
+                Button(onClick = {
+                    startActivity(
+                        Intent(
+                            this@MainActivity,
+                            AuthenticationActivity::class.java
+                        )
+                    )
+                }) {
+                    Text("Войти в другой аккаунт")
+                }
+            }
         }
     }
 

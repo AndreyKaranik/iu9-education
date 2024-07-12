@@ -2,7 +2,7 @@ package com.example.chargingstations.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Blue1 = Color(0xFF1C5598)
+val Blue1 = Color(0xFF00cc66)
 
 val Gray1 = Color(0xFFEEEEEE)
 val Gray2 = Color(0xFFDDDDDD)

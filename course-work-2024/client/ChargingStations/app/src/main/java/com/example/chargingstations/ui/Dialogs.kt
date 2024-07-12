@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.chargingstations.R
 
-
 @Composable
 fun ConfirmDismissDialog(
     onDismissRequest: () -> Unit,
@@ -108,8 +107,8 @@ fun ConfirmDialog(
     onDismissRequest: () -> Unit,
     onConfirmRequest: () -> Unit,
     icon: ImageVector,
-    title: Int,
-    confirmButtonLabel: Int
+    title: String,
+    confirmButtonLabel: String
 ) {
     Dialog(
         onDismissRequest = {
@@ -143,7 +142,7 @@ fun ConfirmDialog(
                 Text(
                     modifier = Modifier
                         .align(Alignment.Center),
-                    text = stringResource(title),
+                    text = title,
                     fontSize = 16.sp,
                     color = Color.Black
                 )
@@ -156,7 +155,7 @@ fun ConfirmDialog(
                     },
                 ) {
                     Text(
-                        text = stringResource(confirmButtonLabel)
+                        text = confirmButtonLabel
                     )
                 }
             }
@@ -245,8 +244,8 @@ fun IncorrectQRCodeDialog(
         onDismissRequest = onDismissRequest,
         onConfirmRequest = onConfirmRequest,
         icon = Icons.Default.Warning,
-        title = R.string.incorrect_qrcode_dialog_title,
-        confirmButtonLabel = R.string.continue_
+        title = stringResource(R.string.incorrect_qrcode_dialog_title),
+        confirmButtonLabel = stringResource(R.string.continue_)
     )
 }
 
@@ -259,8 +258,8 @@ fun ChargingStationNotFoundDialog(
         onDismissRequest = onDismissRequest,
         onConfirmRequest = onConfirmRequest,
         icon = Icons.Default.Warning,
-        title = R.string.charging_station_not_found_dialog_title,
-        confirmButtonLabel = R.string.continue_
+        title = stringResource(R.string.charging_station_not_found_dialog_title),
+        confirmButtonLabel = stringResource(R.string.continue_)
     )
 }
 
@@ -273,7 +272,64 @@ fun ConnectionProblemDialog(
         onDismissRequest = onDismissRequest,
         onConfirmRequest = onConfirmRequest,
         icon = Icons.Default.Warning,
-        title = R.string.connection_problem_dialog_title,
-        confirmButtonLabel = R.string.try_it_again
+        title = stringResource(R.string.connection_problem_dialog_title),
+        confirmButtonLabel = stringResource(R.string.try_it_again)
+    )
+}
+
+
+@Composable
+fun RegistrationConfirmDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Info,
+        title = "Подтвердите регистрацию на почте",
+        confirmButtonLabel = "ok"
+    )
+}
+
+@Composable
+fun ErrorDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Info,
+        title = "Произошла ошибка",
+        confirmButtonLabel = "ok"
+    )
+}
+
+@Composable
+fun RegistrationUsernameDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Info,
+        title = "Данное имя пользователя уже занято",
+        confirmButtonLabel = "ok"
+    )
+}
+
+@Composable
+fun RegistrationEmailDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmRequest: () -> Unit
+) {
+    ConfirmDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirmRequest = onConfirmRequest,
+        icon = Icons.Default.Info,
+        title = "Данная почта уже занята",
+        confirmButtonLabel = "ok"
     )
 }

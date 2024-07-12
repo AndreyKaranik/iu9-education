@@ -3,6 +3,7 @@ package org.example;
 import com.sun.net.httpserver.HttpExchange;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.File;
 import java.io.IOException;
@@ -476,7 +477,6 @@ public class Utils {
 
             if (isActive) {
                 return new Pair<>(id, 0);
-
             } else {
                 return new Pair<>(id, 1);
             }
@@ -500,7 +500,9 @@ public class Utils {
         try {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(sql);
-            if (rs.next()) {
+            rs.next();
+            int count = rs.getInt("count");
+            if (count == 1) {
                 return 2;
             }
         } catch (SQLException e) {
@@ -525,7 +527,9 @@ public class Utils {
         try {
             stmt = connection.createStatement();
             rs = stmt.executeQuery(sql);
-            if (rs.next()) {
+            rs.next();
+            int count = rs.getInt("count");
+            if (count == 1) {
                 return 2;
             }
         } catch (SQLException e) {
@@ -645,6 +649,39 @@ public class Utils {
             return false;
         } finally {
             try {
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static String auth(Connection connection, String name, String password) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String sql = "SELECT password, token FROM users WHERE name = ?";
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = connection.prepareStatement(sql);
+            stmt.setString(1, name);
+            rs = stmt.executeQuery();
+            if (!rs.next()) {
+                return "";
+            }
+            String hashedPassword = rs.getString("password");
+            if (passwordEncoder.matches(password, hashedPassword)) {
+                String token = rs.getString("token");
+                return token;
+            } else {
+                return "";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        } finally {
+            try {
+                if (rs != null) rs.close();
                 if (stmt != null) stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();

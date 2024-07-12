@@ -51,4 +51,5 @@
     <string name="already_have_an_account_button_label">Already have an account</string>
     <string name="privacy_policy_button_label">Privacy policy</string>
     <string name="privacy_policy_text">By signing up, you agree to our</string>
+    <string name="title_activity_order">OrderActivity</string>
 </resources>

@@ -24,6 +24,9 @@ class MainActivityViewModel : ViewModel() {
 
     private val TAG: String = "MainActivityViewModel"
 
+    private val _accountSheetIsShown = MutableStateFlow(false)
+    val accountSheetIsShown: StateFlow<Boolean> = _accountSheetIsShown
+
     private val _chargingStationImageBitmap = MutableStateFlow<ImageBitmap?>(null)
     val chargingStationImageBitmap: StateFlow<ImageBitmap?> = _chargingStationImageBitmap
 
@@ -158,6 +161,13 @@ class MainActivityViewModel : ViewModel() {
         _gpsProgressIndicatorIsShown.value = false
     }
 
+    fun showAccountSheet() {
+        _accountSheetIsShown.value = true
+    }
+
+    fun hideAccountSheet() {
+        _accountSheetIsShown.value = false
+    }
     fun showChargingStationDetailsSheet(chargingStationId: Int) {
         _chargingStationDetailsSheetIsShown.value = true
         lastChargingStationDetailsId = chargingStationId

@@ -124,8 +124,8 @@ VALUES (1, 0, 1, 22),
         (2, 2, 2, 30);
 
 INSERT INTO users (name, email, password, is_active)
-VALUES ('John', 'john@gmail.com', 'john123', true),
-        ('Andrey', 'andrey@yandex.ru', 'andrey2003', true);
+VALUES ('Dmitry', 'dmitry@gmail.com', '$2a$10$RmeP/zA/5x3YHcnC8sY8VO2FeAENCdC0HFGv4tXYiya6vHQV.PtMy', true),
+        ('Andrey', 'andrey@yandex.ru', '$2a$10$/WGAGy4DORJNAqtJUB4Sme/lsT9PMdjShQBkO3RepYtazzO9MN93q', true);
 
 INSERT INTO charging_marks (charging_station_id, status, user_id, charging_type_id, time)
 VALUES (1, 1, 1, 1, CURRENT_TIMESTAMP),

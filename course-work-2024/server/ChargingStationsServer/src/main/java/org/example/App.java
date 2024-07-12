@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -21,6 +22,7 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class App {
 
@@ -34,6 +36,12 @@ public class App {
         server.setExecutor(null);
         server.start();
         System.out.println("The server has started successfully.");
+
+
+//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String rawPassword = "andrey2003";
+//        String hashedPassword = passwordEncoder.encode(rawPassword);
+//        System.out.println(hashedPassword);
 
 
 //        URI uri = new URI(
@@ -245,10 +253,10 @@ public class App {
                     try {
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
 
-                        boolean success = Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
+                        boolean status = Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
 
                         JSONObject object = new JSONObject();
-                        object.put("success", success);
+                        object.put("status", status);
 
                         String response = object.toString();
                         ArrayList<String> list = new ArrayList<>();
@@ -305,6 +313,7 @@ public class App {
                         try {
                             connection = DriverManager.getConnection(URL, USER, PASSWORD);
                             isActiveStatusPair = Utils.checkUserIsActive(connection, registrationData.getUsername(), registrationData.getEmail());
+                            System.out.println("LOOK AT HERE: " + isActiveStatusPair.getRight());
                             if (isActiveStatusPair.getRight() == 1) {
                                 usernameStatus = 0;
                                 emailStatus = 0;
@@ -320,7 +329,9 @@ public class App {
                                     token = Utils.getUserTokenByUserId(connection, userId);
                                 } else {
                                     token = Utils.generateNewToken();
-                                    Utils.insertUser(connection, registrationData.getUsername(), registrationData.getEmail(), registrationData.getPassword(), token, false);
+                                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                                    String hashedPassword = passwordEncoder.encode(registrationData.getPassword());
+                                    Utils.insertUser(connection, registrationData.getUsername(), registrationData.getEmail(), hashedPassword, token, false);
                                 }
                                 if (token != null && !token.isEmpty()) {
                                     success = EmailSender.sendEmail(registrationData.getEmail(), token);
@@ -347,6 +358,51 @@ public class App {
                     } else {
                         response.put("status", 1);      // failed
                     }
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add("application/json");
+                    httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                    httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
+                    OutputStream os = httpExchange.getResponseBody();
+                    os.write(response.toString().getBytes());
+                    os.flush();
+                    os.close();
+                }
+
+                pattern = "/auth";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    AuthData authData = null;
+                    try {
+                        Gson gson = new Gson();
+                        authData = gson.fromJson(body, AuthData.class);
+                    } catch (JsonSyntaxException | JsonIOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Connection connection = null;
+
+                    String token = "";
+
+                    if (authData != null) {
+                        try {
+                            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                            token = Utils.auth(connection, authData.getUsername(), authData.getPassword());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (connection != null) connection.close();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("token", token);
                     ArrayList<String> list = new ArrayList<>();
                     list.add("application/json");
                     httpExchange.getResponseHeaders().put("Content-Type", list);

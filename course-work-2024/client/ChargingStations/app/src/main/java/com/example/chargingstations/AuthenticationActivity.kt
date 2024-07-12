@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.util.Patterns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,6 +43,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,7 +67,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavController
+import com.example.chargingstations.ui.ErrorDialog
+import com.example.chargingstations.ui.GPSDialog
+import com.example.chargingstations.ui.RegistrationConfirmDialog
+import com.example.chargingstations.ui.RegistrationEmailDialog
+import com.example.chargingstations.ui.RegistrationUsernameDialog
 import com.example.chargingstations.ui.theme.ChargingStationsTheme
+import com.example.chargingstations.viewmodel.AuthenticationActivityViewModel
+import com.example.chargingstations.viewmodel.MainActivityViewModel
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -71,6 +82,8 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 class AuthenticationActivity : ComponentActivity() {
 
     private var skipButtonIsShown: Boolean = false
+
+    private val authenticationActivityViewModel: AuthenticationActivityViewModel by viewModels()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,6 +99,31 @@ class AuthenticationActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val confirmDialogIsShown by authenticationActivityViewModel.confirmDialogIsShown.collectAsState()
+                    val errorDialogIsShown by authenticationActivityViewModel.errorDialogIsShown.collectAsState()
+                    val usernameDialogIsShown by authenticationActivityViewModel.usernameDialogIsShown.collectAsState()
+                    val emailDialogIsShown by authenticationActivityViewModel.emailDialogIsShown.collectAsState()
+                    val isAuth by authenticationActivityViewModel.isAuth.collectAsState()
+                    val token by authenticationActivityViewModel.token.collectAsState()
+
+                    if (isAuth) {
+                        val sharedPref = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putBoolean("auth", true)
+                            putString("token", token)
+                            apply()
+                        }
+                        if (skipButtonIsShown) {
+                            startActivity(
+                                Intent(
+                                    this@AuthenticationActivity,
+                                    MainActivity::class.java
+                                )
+                            )
+                        }
+                        finish()
+                    }
+
                     val navController = rememberAnimatedNavController()
 
                     AnimatedNavHost(navController, startDestination = "sign_in") {
@@ -98,7 +136,7 @@ class AuthenticationActivity : ComponentActivity() {
                                 slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
                             }
                         ) {
-                            AuthorizationSheet(navController = navController)
+                            AuthorizationSheet(authenticationActivityViewModel, navController = navController)
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -127,7 +165,48 @@ class AuthenticationActivity : ComponentActivity() {
                                 slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
                             }
                         ) {
-                            RegistrationSheet(this@AuthenticationActivity, navController = navController)
+                            RegistrationSheet(authenticationActivityViewModel,this@AuthenticationActivity, navController = navController)
+                        }
+                    }
+
+                    when {
+                        confirmDialogIsShown -> {
+                            RegistrationConfirmDialog(
+                                onDismissRequest = {
+                                    authenticationActivityViewModel.hideConfirmDialog()
+                                    navController.popBackStack()
+                                }, onConfirmRequest = {
+                                    authenticationActivityViewModel.hideConfirmDialog()
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
+                        errorDialogIsShown -> {
+                            ErrorDialog(
+                                onDismissRequest = {
+                                    authenticationActivityViewModel.hideErrorDialog()
+                                }, onConfirmRequest = {
+                                    authenticationActivityViewModel.hideErrorDialog()
+                                }
+                            )
+                        }
+                        usernameDialogIsShown -> {
+                            RegistrationUsernameDialog(
+                                onDismissRequest = {
+                                    authenticationActivityViewModel.hideUsernameDialog()
+                                }, onConfirmRequest = {
+                                    authenticationActivityViewModel.hideUsernameDialog()
+                                }
+                            )
+                        }
+                        emailDialogIsShown -> {
+                            RegistrationEmailDialog(
+                                onDismissRequest = {
+                                    authenticationActivityViewModel.hideEmailDialog()
+                                }, onConfirmRequest = {
+                                    authenticationActivityViewModel.hideEmailDialog()
+                                }
+                            )
                         }
                     }
                 }
@@ -157,7 +236,7 @@ fun SkipButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RegistrationSheet(context: Context, navController: NavController) {
+fun RegistrationSheet(authenticationActivityViewModel: AuthenticationActivityViewModel, context: Context, navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -166,6 +245,9 @@ fun RegistrationSheet(context: Context, navController: NavController) {
                 .align(Alignment.Center)
                 .padding(horizontal = 48.dp)
         ) {
+            var name = remember { mutableStateOf("") }
+            var password = remember { mutableStateOf("") }
+            var email = remember { mutableStateOf("") }
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = stringResource(R.string.registration_title),
@@ -173,17 +255,19 @@ fun RegistrationSheet(context: Context, navController: NavController) {
                 color = Color.Black
             )
             Spacer(modifier = Modifier.size(24.dp))
-            NameTextField()
+            NameTextField(name)
             Spacer(modifier = Modifier.size(8.dp))
-            EmailTextField()
+            EmailTextField(email)
             Spacer(modifier = Modifier.size(8.dp))
-            PasswordTextField()
+            PasswordTextField(password)
             Spacer(modifier = Modifier.size(24.dp))
             Button(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = {
+                    authenticationActivityViewModel.register(name.value, email.value, password.value)
+                }
             ) {
                 Text(
                     text = stringResource(R.string.sign_up_button_label)
@@ -226,7 +310,7 @@ fun RegistrationSheet(context: Context, navController: NavController) {
 
 
 @Composable
-fun AuthorizationSheet(navController: NavController) {
+fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityViewModel, navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -235,6 +319,8 @@ fun AuthorizationSheet(navController: NavController) {
                 .align(Alignment.Center)
                 .padding(horizontal = 48.dp)
         ) {
+            var name = remember { mutableStateOf("") }
+            var password = remember { mutableStateOf("") }
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = stringResource(R.string.authorization_title),
@@ -242,15 +328,15 @@ fun AuthorizationSheet(navController: NavController) {
                 color = Color.Black
             )
             Spacer(modifier = Modifier.size(24.dp))
-            NameTextField()
+            NameTextField(name)
             Spacer(modifier = Modifier.size(8.dp))
-            PasswordTextField()
+            PasswordTextField(password)
             Spacer(modifier = Modifier.size(24.dp))
             Button(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = { authenticationActivityViewModel.auth(name.value, password.value) }
             ) {
                 Text(
                     text = stringResource(R.string.sign_in_button_label)
@@ -273,8 +359,7 @@ fun AuthorizationSheet(navController: NavController) {
 }
 
 @Composable
-fun NameTextField() {
-    var name by remember { mutableStateOf("") }
+fun NameTextField(name: MutableState<String>) {
     var validStatus by remember { mutableStateOf(0) }
     val minLength = 5
     val maxLength = 30
@@ -287,13 +372,13 @@ fun NameTextField() {
             unfocusedContainerColor = Color.White,
             errorContainerColor = Color.White
         ),
-        value = name,
+        value = name.value,
         singleLine = true,
         onValueChange = {
             if (it.length <= maxLength) {
-                name = it
+                name.value = it
             }
-            if (name.length < minLength) {
+            if (name.value.length < minLength) {
                 validStatus = 1
             } else if (!it.matches(pattern)) {
                 validStatus = 2
@@ -301,7 +386,7 @@ fun NameTextField() {
                 validStatus = 0
             }
         },
-        isError = validStatus != 0 && name != "",
+        isError = validStatus != 0 && name.value != "",
         placeholder = {
             Text(
                 text = stringResource(R.string.user_name_text_field_placeholder),
@@ -320,14 +405,13 @@ fun NameTextField() {
         2 -> stringResource(R.string.only_latin_characters_and_numbers_are_allowed_valid_message)
         else -> ""
     }
-    if (validStatus != 0 && name != "") {
+    if (validStatus != 0 && name.value != "") {
         ErrorText(text = validMessage)
     }
 }
 
 @Composable
-fun PasswordTextField() {
-    var password by remember { mutableStateOf("") }
+fun PasswordTextField(password: MutableState<String>) {
     var passwordVisible by remember { mutableStateOf(false) }
     var validStatus by remember { mutableStateOf(0) }
     val minLength = 5
@@ -341,13 +425,13 @@ fun PasswordTextField() {
             unfocusedContainerColor = Color.White,
             errorContainerColor = Color.White
         ),
-        value = password,
+        value = password.value,
         singleLine = true,
         onValueChange = {
             if (it.length <= maxLength) {
-                password = it
+                password.value = it
             }
-            if (password.length < minLength) {
+            if (password.value.length < minLength) {
                 validStatus = 1
             } else if (!it.matches(pattern)) {
                 validStatus = 2
@@ -355,7 +439,7 @@ fun PasswordTextField() {
                 validStatus = 0
             }
         },
-        isError = validStatus != 0 && password != "",
+        isError = validStatus != 0 && password.value != "",
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
@@ -388,14 +472,13 @@ fun PasswordTextField() {
         2 -> stringResource(R.string.only_latin_characters_and_numbers_are_allowed_valid_message)
         else -> ""
     }
-    if (validStatus != 0 && password != "") {
+    if (validStatus != 0 && password.value != "") {
         ErrorText(text = validMessage)
     }
 }
 
 @Composable
-fun EmailTextField() {
-    var email by remember { mutableStateOf("") }
+fun EmailTextField(email: MutableState<String>) {
     var isValid by remember { mutableStateOf(true) }
     val maxLength = 319
     TextField(
@@ -406,15 +489,15 @@ fun EmailTextField() {
             unfocusedContainerColor = Color.White,
             errorContainerColor = Color.White
         ),
-        value = email,
+        value = email.value,
         singleLine = true,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email
         ),
-        isError = !isValid && email != "",
+        isError = !isValid && email.value != "",
         onValueChange = {
             if (it.length <= maxLength) {
-                email = it
+                email.value = it
             }
             isValid = Patterns.EMAIL_ADDRESS.matcher(it).matches()
         },
@@ -432,7 +515,7 @@ fun EmailTextField() {
         }
     )
 
-    if (!isValid && email != "") {
+    if (!isValid && email.value != "") {
         ErrorText(text = stringResource(R.string.incorrect_email_valid_message))
     }
 }
