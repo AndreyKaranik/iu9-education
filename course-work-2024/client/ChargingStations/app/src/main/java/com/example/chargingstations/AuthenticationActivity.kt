@@ -248,6 +248,13 @@ fun RegistrationSheet(authenticationActivityViewModel: AuthenticationActivityVie
             var name = remember { mutableStateOf("") }
             var password = remember { mutableStateOf("") }
             var email = remember { mutableStateOf("") }
+
+            var nameValidStatus = remember { mutableStateOf(-1) }
+            var passwordValidStatus = remember { mutableStateOf(-1) }
+            var emailValidStatus = remember { mutableStateOf(-1) }
+
+
+
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = stringResource(R.string.registration_title),
@@ -255,16 +262,17 @@ fun RegistrationSheet(authenticationActivityViewModel: AuthenticationActivityVie
                 color = Color.Black
             )
             Spacer(modifier = Modifier.size(24.dp))
-            NameTextField(name)
+            NameTextField(name, nameValidStatus)
             Spacer(modifier = Modifier.size(8.dp))
-            EmailTextField(email)
+            EmailTextField(email, emailValidStatus)
             Spacer(modifier = Modifier.size(8.dp))
-            PasswordTextField(password)
+            PasswordTextField(password, passwordValidStatus)
             Spacer(modifier = Modifier.size(24.dp))
             Button(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(),
+                enabled = nameValidStatus.value == 0 && emailValidStatus.value == 0 && passwordValidStatus.value == 0,
                 onClick = {
                     authenticationActivityViewModel.register(name.value, email.value, password.value)
                 }
@@ -321,6 +329,8 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
         ) {
             var name = remember { mutableStateOf("") }
             var password = remember { mutableStateOf("") }
+            var nameValidStatus = remember { mutableStateOf(-1) }
+            var passwordValidStatus = remember { mutableStateOf(-1) }
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 text = stringResource(R.string.authorization_title),
@@ -328,14 +338,15 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
                 color = Color.Black
             )
             Spacer(modifier = Modifier.size(24.dp))
-            NameTextField(name)
+            NameTextField(name, nameValidStatus)
             Spacer(modifier = Modifier.size(8.dp))
-            PasswordTextField(password)
+            PasswordTextField(password, passwordValidStatus)
             Spacer(modifier = Modifier.size(24.dp))
             Button(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(),
+                enabled = nameValidStatus.value == 0 && passwordValidStatus.value == 0,
                 onClick = { authenticationActivityViewModel.auth(name.value, password.value) }
             ) {
                 Text(
@@ -359,8 +370,7 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
 }
 
 @Composable
-fun NameTextField(name: MutableState<String>) {
-    var validStatus by remember { mutableStateOf(0) }
+fun NameTextField(name: MutableState<String>, validStatus: MutableState<Int>) {
     val minLength = 5
     val maxLength = 30
     val pattern = "^[a-zA-Z0-9]*$".toRegex()
@@ -379,14 +389,14 @@ fun NameTextField(name: MutableState<String>) {
                 name.value = it
             }
             if (name.value.length < minLength) {
-                validStatus = 1
+                validStatus.value = 1
             } else if (!it.matches(pattern)) {
-                validStatus = 2
+                validStatus.value = 2
             } else {
-                validStatus = 0
+                validStatus.value = 0
             }
         },
-        isError = validStatus != 0 && name.value != "",
+        isError = validStatus.value != 0 && name.value != "",
         placeholder = {
             Text(
                 text = stringResource(R.string.user_name_text_field_placeholder),
@@ -400,20 +410,19 @@ fun NameTextField(name: MutableState<String>) {
             )
         }
     )
-    val validMessage = when (validStatus) {
+    val validMessage = when (validStatus.value) {
         1 -> stringResource(R.string.user_name_must_contain_at_least_n_characters_valid_message)
         2 -> stringResource(R.string.only_latin_characters_and_numbers_are_allowed_valid_message)
         else -> ""
     }
-    if (validStatus != 0 && name.value != "") {
+    if (validStatus.value != 0 && name.value != "") {
         ErrorText(text = validMessage)
     }
 }
 
 @Composable
-fun PasswordTextField(password: MutableState<String>) {
+fun PasswordTextField(password: MutableState<String>, validStatus: MutableState<Int>) {
     var passwordVisible by remember { mutableStateOf(false) }
-    var validStatus by remember { mutableStateOf(0) }
     val minLength = 5
     val maxLength = 30
     val pattern = "^[a-zA-Z0-9]*$".toRegex()
@@ -432,14 +441,14 @@ fun PasswordTextField(password: MutableState<String>) {
                 password.value = it
             }
             if (password.value.length < minLength) {
-                validStatus = 1
+                validStatus.value = 1
             } else if (!it.matches(pattern)) {
-                validStatus = 2
+                validStatus.value = 2
             } else {
-                validStatus = 0
+                validStatus.value = 0
             }
         },
-        isError = validStatus != 0 && password.value != "",
+        isError = validStatus.value != 0 && password.value != "",
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
@@ -467,19 +476,18 @@ fun PasswordTextField(password: MutableState<String>) {
             )
         }
     )
-    val validMessage = when (validStatus) {
+    val validMessage = when (validStatus.value) {
         1 -> stringResource(R.string.password_must_contain_at_least_n_characters_valid_message)
         2 -> stringResource(R.string.only_latin_characters_and_numbers_are_allowed_valid_message)
         else -> ""
     }
-    if (validStatus != 0 && password.value != "") {
+    if (validStatus.value != 0 && password.value != "") {
         ErrorText(text = validMessage)
     }
 }
 
 @Composable
-fun EmailTextField(email: MutableState<String>) {
-    var isValid by remember { mutableStateOf(true) }
+fun EmailTextField(email: MutableState<String>, validStatus: MutableState<Int>) {
     val maxLength = 319
     TextField(
         modifier = Modifier.fillMaxWidth(),
@@ -494,12 +502,16 @@ fun EmailTextField(email: MutableState<String>) {
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Email
         ),
-        isError = !isValid && email.value != "",
+        isError = validStatus.value != 0 && email.value != "",
         onValueChange = {
             if (it.length <= maxLength) {
                 email.value = it
             }
-            isValid = Patterns.EMAIL_ADDRESS.matcher(it).matches()
+            if (Patterns.EMAIL_ADDRESS.matcher(it).matches()) {
+                validStatus.value = 0
+            } else {
+                validStatus.value = 1
+            }
         },
         placeholder = {
             Text(
@@ -515,7 +527,7 @@ fun EmailTextField(email: MutableState<String>) {
         }
     )
 
-    if (!isValid && email.value != "") {
+    if (validStatus.value != 0 && email.value != "") {
         ErrorText(text = stringResource(R.string.incorrect_email_valid_message))
     }
 }
