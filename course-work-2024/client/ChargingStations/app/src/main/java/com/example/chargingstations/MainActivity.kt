@@ -322,7 +322,8 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 BasicIconButton(
                                     onClick = {
-                                        val sharedPref = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+                                        val sharedPref =
+                                            getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
                                         val auth = sharedPref.getBoolean("auth", false)
                                         if (!auth) {
                                             startActivity(
@@ -460,7 +461,7 @@ class MainActivity : ComponentActivity() {
             tonalElevation = 0.dp,
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
-            Column (
+            Column(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Text(
@@ -495,7 +496,10 @@ class MainActivity : ComponentActivity() {
             scrimColor = Color.Transparent,
             sheetState = sheetState,
             onDismissRequest = { onDismissRequest() }) {
-            ChargingStationDetailsView(mainActivityViewModel)
+            ChargingStationDetailsView(
+                this@MainActivity,
+                mainActivityViewModel
+            )
         }
     }
 
