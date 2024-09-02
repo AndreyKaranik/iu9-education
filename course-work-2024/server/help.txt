@@ -55,19 +55,21 @@ psql
 \i '/var/lib/postgresql/init.sql'
 
 
+OLD IP: 89.111.172.144
+NEW IP: 194.67.88.154
 
 
-pscp "C:\Users\Golum\Desktop\1_1.jpg" "C:\Users\Golum\Desktop\1_2.jpg" "C:\Users\Golum\Desktop\2_1.jpg" root@89.111.172.144:/root/images
-pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\privacy-policy.html" root@89.111.172.144:/root
-pscp "C:\Users\Golum\Desktop\email.txt" root@89.111.172.144:/root
+pscp "C:\Users\Golum\Desktop\1_1.jpg" "C:\Users\Golum\Desktop\1_2.jpg" "C:\Users\Golum\Desktop\2_1.jpg" root@194.67.88.154:/root/chargingstations/images
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\privacy-policy.html" root@194.67.88.154:/root/chargingstations
+pscp "C:\Users\Golum\Desktop\email.txt" root@194.67.88.154:/root/chargingstations
 
-pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" root@89.111.172.144:/root
-pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" root@194.67.88.154:/root/chargingstations
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@194.67.88.154:/root/chargingstations
 
 
-pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@89.111.172.144:/root
-ssh root@89.111.172.144
-sudo mv /root/init.sql /var/lib/postgresql/
+pscp "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\init.sql" "C:\Users\Golum\Desktop\iu9-education\course-work-2024\server\ChargingStationsServer\target\ChargingStationsServer-1.0.jar" root@194.67.88.154:/root/chargingstations
+ssh root@194.67.88.154
+sudo mv /root/chargingstations/init.sql /var/lib/postgresql/
 sudo chmod 644 /var/lib/postgresql/init.sql
 sudo -i -u postgres
 psql

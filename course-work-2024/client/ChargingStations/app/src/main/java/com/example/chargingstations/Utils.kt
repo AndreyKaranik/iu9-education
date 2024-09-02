@@ -7,7 +7,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.example.chargingstations.viewmodel.MainActivityViewModel
+import com.example.chargingstations.presentation.viewmodel.MainActivityViewModel
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener

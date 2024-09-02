@@ -11,7 +11,7 @@ import java.util.Properties;
 public class EmailSender {
 
     public static boolean sendEmail(String to, String token) throws IOException {
-        String path = "/root/email.txt";
+        String path = "/root/chargingstations/email.txt";
         //String path = "C:\\Users\\Golum\\Desktop\\email.txt";
         String content = new String(Files.readAllBytes(Path.of(path)));
         String[] lines = content.split("\n");
