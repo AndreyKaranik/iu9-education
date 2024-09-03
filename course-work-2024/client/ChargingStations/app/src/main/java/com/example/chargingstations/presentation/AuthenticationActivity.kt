@@ -310,9 +310,9 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
                 .align(Alignment.Center)
                 .padding(horizontal = 48.dp)
         ) {
-            var name = remember { mutableStateOf("") }
+            var email = remember { mutableStateOf("") }
             var password = remember { mutableStateOf("") }
-            var nameValidStatus = remember { mutableStateOf(-1) }
+            var emailValidStatus = remember { mutableStateOf(-1) }
             var passwordValidStatus = remember { mutableStateOf(-1) }
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -321,7 +321,7 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
                 color = Color.Black
             )
             Spacer(modifier = Modifier.size(24.dp))
-            NameTextField(name, nameValidStatus)
+            EmailTextField(email, emailValidStatus)
             Spacer(modifier = Modifier.size(8.dp))
             PasswordTextField(password, passwordValidStatus)
             Spacer(modifier = Modifier.size(24.dp))
@@ -329,8 +329,8 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .fillMaxWidth(),
-                enabled = nameValidStatus.value == 0 && passwordValidStatus.value == 0,
-                onClick = { authenticationActivityViewModel.auth(name.value, password.value) }
+                enabled = emailValidStatus.value == 0 && passwordValidStatus.value == 0,
+                onClick = { authenticationActivityViewModel.auth(email.value, password.value) }
             ) {
                 Text(
                     text = stringResource(R.string.sign_in_button_label)

@@ -51,7 +51,7 @@ CREATE TABLE connectors (
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
-    email VARCHAR(320) NOT NULL,
+    email VARCHAR(320) NOT NULL UNIQUE,
     password VARCHAR(256) NOT NULL,
     token VARCHAR(256) NULL UNIQUE,
     token_expiration TIMESTAMP NULL,

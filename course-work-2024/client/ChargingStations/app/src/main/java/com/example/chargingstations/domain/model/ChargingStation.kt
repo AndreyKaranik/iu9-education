@@ -18,7 +18,7 @@ data class ChargingStationMedium (
     val chargingTypes: List<ChargingType>
 )
 
-data class JsonChargingStation (
+data class ChargingStationJson (
     val id: Int?,
     val name: String?,
     val address: String?,

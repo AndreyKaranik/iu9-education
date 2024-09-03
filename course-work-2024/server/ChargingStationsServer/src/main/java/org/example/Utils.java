@@ -453,19 +453,18 @@ public class Utils {
     /**
      *
      * @param connection
-     * @param username
+     * @param name
      * @param email
      * @return (userId, 0) - is active, (userId, 1) - is not active, (0, 2) - not found or exception
      */
-    public static Pair<Integer, Integer> checkUserIsActive(Connection connection, String username, String email) {
-        String sql = "SELECT id, is_active FROM users WHERE name = ? AND email = ?";
+    public static Pair<Integer, Integer> checkUserIsActive(Connection connection, String email) {
+        String sql = "SELECT id, is_active FROM users WHERE email = ?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
             stmt = connection.prepareStatement(sql);
-            stmt.setString(1, username);
-            stmt.setString(2, email);
+            stmt.setString(1, email);
             rs = stmt.executeQuery();
 
             if (!rs.next()) {
@@ -656,15 +655,15 @@ public class Utils {
         }
     }
 
-    public static String auth(Connection connection, String name, String password) {
+    public static String auth(Connection connection, String email, String password) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String sql = "SELECT password, token FROM users WHERE name = ?";
+        String sql = "SELECT password, token FROM users WHERE email = ?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
             stmt = connection.prepareStatement(sql);
-            stmt.setString(1, name);
+            stmt.setString(1, email);
             rs = stmt.executeQuery();
             if (!rs.next()) {
                 return "";

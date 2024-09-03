@@ -72,10 +72,10 @@ class AuthenticationActivityViewModel : ViewModel() {
     }
 
 
-    fun register(username: String, email: String, password: String) {
+    fun register(name: String, email: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = apiService.register(RegistrationData(username, email, password)).awaitResponse()
+                val response = apiService.register(RegistrationData(name, email, password)).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         when (it.status) {
@@ -86,9 +86,6 @@ class AuthenticationActivityViewModel : ViewModel() {
                                 _errorDialogIsShown.value = true
                             }
                             2 -> {
-                                _usernameDialogIsShown.value = true
-                            }
-                            3 -> {
                                 _emailDialogIsShown.value = true
                             }
                         }
@@ -107,10 +104,10 @@ class AuthenticationActivityViewModel : ViewModel() {
         }
     }
 
-    fun auth(username: String, password: String) {
+    fun auth(email: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = apiService.auth(AuthData(username, password)).awaitResponse()
+                val response = apiService.auth(AuthData(email, password)).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         if (it.token != "") {

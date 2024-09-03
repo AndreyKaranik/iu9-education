@@ -141,7 +141,7 @@ public class App {
                 m = r.matcher(httpExchange.getRequestURI().toString());
 
                 if (m.find()) {
-                    File file = new File("/root/privacy-policy.html");
+                    File file = new File("/root/chargingstations/privacy-policy.html");
                     String response = Files.readString(file.toPath());
                     ArrayList<String> list = new ArrayList<>();
                     list.add("text/html");
@@ -302,7 +302,6 @@ public class App {
                     }
 
                     Connection connection = null;
-                    int usernameStatus = 1;
                     int emailStatus = 1;
                     Pair<Integer, Integer> isActiveStatusPair;
                     int userId = -1;
@@ -312,18 +311,15 @@ public class App {
                     if (registrationData != null) {
                         try {
                             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            isActiveStatusPair = Utils.checkUserIsActive(connection, registrationData.getUsername(), registrationData.getEmail());
-                            System.out.println("LOOK AT HERE: " + isActiveStatusPair.getRight());
+                            isActiveStatusPair = Utils.checkUserIsActive(connection, registrationData.getEmail());
                             if (isActiveStatusPair.getRight() == 1) {
-                                usernameStatus = 0;
                                 emailStatus = 0;
                                 userId = isActiveStatusPair.getLeft();
                             } else {
-                                usernameStatus = Utils.checkUsername(connection, registrationData.getUsername());
                                 emailStatus = Utils.checkEmail(connection, registrationData.getEmail());
                             }
 
-                            if (usernameStatus == 0 && emailStatus == 0 && isActiveStatusPair.getRight() != 0) {
+                            if (emailStatus == 0 && isActiveStatusPair.getRight() != 0) {
                                 String token;
                                 if (isActiveStatusPair.getRight() == 1) {
                                     token = Utils.getUserTokenByUserId(connection, userId);
@@ -331,7 +327,7 @@ public class App {
                                     token = Utils.generateNewToken();
                                     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
                                     String hashedPassword = passwordEncoder.encode(registrationData.getPassword());
-                                    Utils.insertUser(connection, registrationData.getUsername(), registrationData.getEmail(), hashedPassword, token, false);
+                                    Utils.insertUser(connection, registrationData.getName(), registrationData.getEmail(), hashedPassword, token, false);
                                 }
                                 if (token != null && !token.isEmpty()) {
                                     success = EmailSender.sendEmail(registrationData.getEmail(), token);
@@ -349,12 +345,10 @@ public class App {
                     }
 
                     JSONObject response = new JSONObject();
-                    if (usernameStatus == 0 && emailStatus == 0 && success) {
+                    if (emailStatus == 0 && success) {
                         response.put("status", 0);      // success
-                    } else if (usernameStatus == 2) {
-                        response.put("status", 2);      // username exists
                     } else if (emailStatus == 2) {
-                        response.put("status", 3);      // email exist
+                        response.put("status", 2);      // email exist
                     } else {
                         response.put("status", 1);      // failed
                     }
@@ -389,7 +383,7 @@ public class App {
                     if (authData != null) {
                         try {
                             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            token = Utils.auth(connection, authData.getUsername(), authData.getPassword());
+                            token = Utils.auth(connection, authData.getEmail(), authData.getPassword());
                         } catch (SQLException e) {
                             e.printStackTrace();
                         } finally {
@@ -403,6 +397,53 @@ public class App {
 
                     JSONObject response = new JSONObject();
                     response.put("token", token);
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add("application/json");
+                    httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                    httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
+                    OutputStream os = httpExchange.getResponseBody();
+                    os.write(response.toString().getBytes());
+                    os.flush();
+                    os.close();
+                }
+
+                pattern = "/charge";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    OrderForm orderForm = null;
+                    try {
+                        Gson gson = new Gson();
+                        orderForm = gson.fromJson(body, OrderForm.class);
+                    } catch (JsonSyntaxException | JsonIOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Connection connection = null;
+
+                    String token = "";
+
+                    if (orderForm != null) {
+                        try {
+                            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                            //token = Utils.charge(connection, orderForm.getUsername(), authData.getPassword());
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (connection != null) {
+                                    connection.close();
+                                }
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    JSONObject response = new JSONObject();
+                    response.put("status", 1);
                     ArrayList<String> list = new ArrayList<>();
                     list.add("application/json");
                     httpExchange.getResponseHeaders().put("Content-Type", list);
