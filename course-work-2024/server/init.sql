@@ -15,6 +15,22 @@ CREATE DATABASE charging_stations_database
 
 \c charging_stations_database
 
+CREATE OR REPLACE FUNCTION prevent_pk_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'PK PREVENT EXCEPTION %', TG_TABLE_NAME;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION prevent_fk_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'FK PREVENT EXCEPTION %', TG_TABLE_NAME;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE charging_stations (
     id INT PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
@@ -29,7 +45,7 @@ CREATE TABLE charging_station_images (
     id INT GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY,
     charging_station_id INT NOT NULL,
     path VARCHAR(256) NOT NULL,
-    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id)
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id) ON DELETE CASCADE
 );
 
 CREATE TABLE charging_types (
@@ -44,7 +60,7 @@ CREATE TABLE connectors (
     status INT NOT NULL,
     charging_type_id INT NOT NULL,
     rate REAL NOT NULL,
-    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id),
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id) ON DELETE CASCADE,
     FOREIGN KEY (charging_type_id) REFERENCES charging_types (id)
 );
 
@@ -64,8 +80,8 @@ CREATE TABLE charging_marks (
     user_id INT NULL,
     charging_type_id INT NOT NULL,
     time TIMESTAMP NOT NULL,
-    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE orders (
@@ -75,9 +91,79 @@ CREATE TABLE orders (
     amount REAL NOT NULL,
     status INT NOT NULL,
     progress INT NOT NULL,
-    FOREIGN KEY (connector_id) REFERENCES connectors (id),
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    FOREIGN KEY (connector_id) REFERENCES connectors (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE TRIGGER charging_stations_pk_update_trigger
+BEFORE UPDATE ON charging_stations
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER connectors_pk_update_trigger
+BEFORE UPDATE ON connectors
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER charging_station_images_pk_update_trigger
+BEFORE UPDATE ON charging_station_images
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER charging_marks_pk_update_trigger
+BEFORE UPDATE ON charging_marks
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER charging_types_pk_update_trigger
+BEFORE UPDATE ON charging_types
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER orders_pk_update_trigger
+BEFORE UPDATE ON orders
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER users_pk_update_trigger
+BEFORE UPDATE ON users
+FOR EACH ROW
+WHEN (OLD.id IS DISTINCT FROM NEW.id)
+EXECUTE FUNCTION prevent_pk_update();
+
+CREATE TRIGGER connectors_fk_update_trigger
+BEFORE UPDATE ON connectors
+FOR EACH ROW
+WHEN (OLD.charging_station_id IS DISTINCT FROM NEW.charging_station_id
+    OR OLD.charging_type_id IS DISTINCT FROM NEW.charging_type_id)
+EXECUTE FUNCTION prevent_fk_update();
+
+CREATE TRIGGER charging_station_images_fk_update_trigger
+BEFORE UPDATE ON charging_station_images
+FOR EACH ROW
+WHEN (OLD.charging_station_id IS DISTINCT FROM NEW.charging_station_id)
+EXECUTE FUNCTION prevent_fk_update();
+
+CREATE TRIGGER charging_marks_fk_update_trigger
+BEFORE UPDATE ON charging_marks
+FOR EACH ROW
+WHEN (OLD.charging_station_id IS DISTINCT FROM NEW.charging_station_id
+    OR OLD.charging_type_id IS DISTINCT FROM NEW.charging_type_id
+    OR OLD.user_id IS DISTINCT FROM NEW.user_id)
+EXECUTE FUNCTION prevent_fk_update();
+
+CREATE TRIGGER orders_fk_update_trigger
+BEFORE UPDATE ON orders
+FOR EACH ROW
+WHEN (OLD.connector_id IS DISTINCT FROM NEW.connector_id
+    OR OLD.user_id IS DISTINCT FROM NEW.user_id)
+EXECUTE FUNCTION prevent_fk_update();
 
 
 INSERT INTO charging_stations (id, name, address, latitude, longitude, opening_hours, description)
