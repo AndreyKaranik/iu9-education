@@ -378,14 +378,27 @@ public class App {
 
                     Connection connection = null;
 
-                    String token = "";
-
                     if (authData != null) {
                         try {
                             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            token = Utils.auth(connection, authData.getEmail(), authData.getPassword());
+                            String token = Utils.auth(connection, authData.getEmail(), authData.getPassword());
+                            JSONObject response = new JSONObject();
+                            response.put("token", token);
+                            ArrayList<String> list = new ArrayList<>();
+                            list.add("application/json");
+                            httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                            httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
+                            OutputStream os = httpExchange.getResponseBody();
+                            os.write(response.toString().getBytes());
+                            os.flush();
+                            os.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
+                            httpExchange.sendResponseHeaders(500, 0);
+                            OutputStream os = httpExchange.getResponseBody();
+                            os.flush();
+                            os.close();
                         } finally {
                             try {
                                 if (connection != null) connection.close();
@@ -394,18 +407,6 @@ public class App {
                             }
                         }
                     }
-
-                    JSONObject response = new JSONObject();
-                    response.put("token", token);
-                    ArrayList<String> list = new ArrayList<>();
-                    list.add("application/json");
-                    httpExchange.getResponseHeaders().put("Content-Type", list);
-
-                    httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
-                    OutputStream os = httpExchange.getResponseBody();
-                    os.write(response.toString().getBytes());
-                    os.flush();
-                    os.close();
                 }
 
                 pattern = "/charge";
@@ -423,14 +424,27 @@ public class App {
 
                     Connection connection = null;
 
-                    String token = "";
-
                     if (orderForm != null) {
                         try {
                             connection = DriverManager.getConnection(URL, USER, PASSWORD);
                             //token = Utils.charge(connection, orderForm.getUsername(), authData.getPassword());
+                            JSONObject response = new JSONObject();
+                            response.put("status", 1);
+                            ArrayList<String> list = new ArrayList<>();
+                            list.add("application/json");
+                            httpExchange.getResponseHeaders().put("Content-Type", list);
+
+                            httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
+                            OutputStream os = httpExchange.getResponseBody();
+                            os.write(response.toString().getBytes());
+                            os.flush();
+                            os.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
+                            httpExchange.sendResponseHeaders(500, 0);
+                            OutputStream os = httpExchange.getResponseBody();
+                            os.flush();
+                            os.close();
                         } finally {
                             try {
                                 if (connection != null) {
@@ -441,18 +455,6 @@ public class App {
                             }
                         }
                     }
-
-                    JSONObject response = new JSONObject();
-                    response.put("status", 1);
-                    ArrayList<String> list = new ArrayList<>();
-                    list.add("application/json");
-                    httpExchange.getResponseHeaders().put("Content-Type", list);
-
-                    httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
-                    OutputStream os = httpExchange.getResponseBody();
-                    os.write(response.toString().getBytes());
-                    os.flush();
-                    os.close();
                 }
             }
         }

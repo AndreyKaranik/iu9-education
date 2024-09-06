@@ -1,13 +1,13 @@
 
 Запрос:
 
-GET http://194.67.88.154:8000/charging-stations?level=min HTTP/1.1
+GET http://194.67.88.154:8000/charging-stations/1 HTTP/1.1
 
 Ответ:
 
 HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 1492
+Content-Length: 3570
 
 {
     "id": 1,
@@ -52,3 +52,4 @@ Content-Length: 1492
         ...
     ]
 }
+

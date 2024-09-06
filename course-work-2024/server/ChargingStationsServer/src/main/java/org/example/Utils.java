@@ -8,14 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Base64;
 
 public class Utils {
@@ -453,7 +448,6 @@ public class Utils {
     /**
      *
      * @param connection
-     * @param name
      * @param email
      * @return (userId, 0) - is active, (userId, 1) - is not active, (0, 2) - not found or exception
      */

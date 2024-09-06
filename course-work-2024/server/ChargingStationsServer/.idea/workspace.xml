@@ -5,17 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c026a9e2-a77a-40fb-9acc-7f2a70240050" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/ApiService.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/AuthData.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/AuthData.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/ChargingStation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/ChargingStation.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/AuthenticationActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/AuthenticationActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/AuthenticationActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/AuthenticationActivityViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/AuthData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/AuthData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/RegistrationData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/RegistrationData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/OrderForm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/OrderForm.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../init.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../examples/example4.http" beforeDir="false" afterPath="$PROJECT_DIR$/../examples/example4.http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
