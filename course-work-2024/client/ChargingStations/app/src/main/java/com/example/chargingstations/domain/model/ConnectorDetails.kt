@@ -9,5 +9,5 @@ data class ConnectorDetails (
     val status: Int,
     @SerializedName("charging_type")
     val chargingType: ChargingType,
-    val rate: Double
+    val rate: Float
 )

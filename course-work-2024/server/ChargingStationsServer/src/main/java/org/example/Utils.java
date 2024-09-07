@@ -1,6 +1,7 @@
 package org.example;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.example.request.ChargeRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -662,6 +663,37 @@ public class Utils {
         } else {
             return null;
         }
+    }
+
+    public static int charge(Connection connection, ChargeRequest chargeRequest) throws Exception {
+        String sql = "INSERT INTO orders(connector_id, user_id, amount, status) VALUES (?, ?, ?, ?)";
+        PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        stmt.setInt(1, chargeRequest.getConnector_id());
+        if (chargeRequest.getToken() == null) {
+            stmt.setNull(2, java.sql.Types.NULL);
+        } else {
+            int userId = getUserIdByToken(connection, chargeRequest.getToken());
+            stmt.setInt(2, userId);
+        }
+        stmt.setFloat(3, chargeRequest.getAmount());
+        stmt.setInt(4, 0);
+        int insertedRows = stmt.executeUpdate();
+        ResultSet rs = stmt.getGeneratedKeys();
+        if (rs.next()) {
+            return rs.getInt("id");
+        }
+        return -1;
+    }
+
+    public static int getUserIdByToken(Connection connection, String token) throws Exception {
+        String sql = "SELECT user_id FROM users WHERE token = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, token);
+        ResultSet rs = stmt.executeQuery();
+        if (!rs.next()) {
+            return -1;
+        }
+        return rs.getInt("user_id");
     }
 
 

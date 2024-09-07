@@ -89,4 +89,8 @@ SELECT DISTINCT ct.id, ct.name, ct.current_type
 
 
 
+nohup java -cp /root/reportgen Server > server.log 2>&1 &
+kill -9 $(lsof -t -i:8000)
+
+
 

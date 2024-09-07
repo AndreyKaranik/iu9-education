@@ -26,7 +26,7 @@ class MyCameraListener(
     zoomValue: Float
 ) : CameraListener {
 
-    val ZOOM_BOUNDARY = 16.4f
+    val ZOOM_BOUNDARY = 12f
     var changed = zoomValue >= ZOOM_BOUNDARY
 
     override fun onCameraPositionChanged(

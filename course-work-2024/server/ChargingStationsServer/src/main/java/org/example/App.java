@@ -21,7 +21,9 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
 import org.example.request.AuthRequest;
+import org.example.request.ChargeRequest;
 import org.example.response.AuthResponse;
+import org.example.response.ChargeResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -346,7 +348,7 @@ public class App {
                         String token = Utils.auth(connection, request.getEmail(), request.getPassword());
                         AuthResponse authResponse = new AuthResponse();
                         authResponse.setToken(token);
-                        String response = authResponse.getToken();
+                        String response = gson.toJson(authResponse);
                         ArrayList<String> list = new ArrayList<>();
                         list.add("application/json");
                         httpExchange.getResponseHeaders().put("Content-Type", list);
@@ -375,45 +377,34 @@ public class App {
                 m = r.matcher(httpExchange.getRequestURI().toString());
 
                 if (m.find()) {
-                    OrderForm orderForm = null;
+                    Connection connection = null;
                     try {
                         Gson gson = new Gson();
-                        orderForm = gson.fromJson(body, OrderForm.class);
-                    } catch (JsonSyntaxException | JsonIOException e) {
-                        e.printStackTrace();
-                    }
-
-                    Connection connection = null;
-
-                    if (orderForm != null) {
+                        ChargeRequest request = gson.fromJson(body, ChargeRequest.class);
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                        int order_id = Utils.charge(connection, request);
+                        ChargeResponse chargeResponse = new ChargeResponse();
+                        chargeResponse.setOrder_id(order_id);
+                        String response = gson.toJson(chargeResponse);
+                        ArrayList<String> list = new ArrayList<>();
+                        list.add("application/json");
+                        httpExchange.getResponseHeaders().put("Content-Type", list);
+                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.write(response.getBytes());
+                        os.flush();
+                        os.close();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        httpExchange.sendResponseHeaders(500, 0);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.flush();
+                        os.close();
+                    } finally {
                         try {
-                            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            //token = Utils.charge(connection, orderForm.getUsername(), authData.getPassword());
-                            JSONObject response = new JSONObject();
-                            response.put("status", 1);
-                            ArrayList<String> list = new ArrayList<>();
-                            list.add("application/json");
-                            httpExchange.getResponseHeaders().put("Content-Type", list);
-
-                            httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
-                            OutputStream os = httpExchange.getResponseBody();
-                            os.write(response.toString().getBytes());
-                            os.flush();
-                            os.close();
+                            if (connection != null) connection.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                            httpExchange.sendResponseHeaders(500, 0);
-                            OutputStream os = httpExchange.getResponseBody();
-                            os.flush();
-                            os.close();
-                        } finally {
-                            try {
-                                if (connection != null) {
-                                    connection.close();
-                                }
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
                         }
                     }
                 }

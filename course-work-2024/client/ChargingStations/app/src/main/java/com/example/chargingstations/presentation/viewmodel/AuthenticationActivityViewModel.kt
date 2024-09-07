@@ -53,8 +53,8 @@ class AuthenticationActivityViewModel : ViewModel() {
     private val _isAuth = MutableStateFlow(false)
     val isAuth: StateFlow<Boolean> = _isAuth
 
-    private val _token = MutableStateFlow("")
-    val token: StateFlow<String> = _token
+    private val _token = MutableStateFlow<String?>(null)
+    val token: StateFlow<String?> = _token
 
     fun hideConfirmDialog() {
         _confirmDialogIsShown.value = false;
@@ -110,7 +110,7 @@ class AuthenticationActivityViewModel : ViewModel() {
                 val response = apiService.auth(AuthData(email, password)).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
-                        if (it.token != "") {
+                        if (it.token != null) {
                             _isAuth.value = true
                             _token.value = it.token
                         } else {

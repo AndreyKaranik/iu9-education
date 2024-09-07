@@ -6,6 +6,11 @@ import com.example.chargingstations.domain.model.ChargingStationJson
 import com.example.chargingstations.domain.model.IntStatus
 import com.example.chargingstations.domain.model.RegistrationData
 import com.example.chargingstations.domain.model.Token
+import com.example.chargingstations.domain.model.request.ChargeRequest
+import com.example.chargingstations.domain.model.request.MarkRequest
+import com.example.chargingstations.domain.model.response.ChargeResponse
+import com.example.chargingstations.domain.model.response.GetOrderResponse
+import com.example.chargingstations.domain.model.response.MarkResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,4 +36,14 @@ interface ApiService {
 
     @POST("auth")
     fun auth(@Body body: AuthData): Call<Token>
+
+    @POST("charge")
+    fun charge(@Body body: ChargeRequest): Call<ChargeResponse>
+
+    @POST("mark")
+    fun mark(@Body body: MarkRequest): Call<MarkResponse>
+
+    @GET("orders/{id}")
+    fun getOrder(@Path("id") orderId: Int): Call<GetOrderResponse>
+
 }

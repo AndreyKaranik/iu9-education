@@ -204,7 +204,7 @@ fun ChargingStationDetailsView(
                                                 bundle.putInt("charging_station_id", chargingStationDetails!!.id)
                                                 bundle.putString("charging_station_address", chargingStationDetails!!.address)
                                                 bundle.putString("charging_type_name", it.chargingType.name)
-                                                bundle.putDouble("connector_rate", it.rate)
+                                                bundle.putFloat("connector_rate", it.rate)
                                                 val intent =
                                                     Intent(context, OrderActivity::class.java)
                                                 intent.putExtras(bundle)
