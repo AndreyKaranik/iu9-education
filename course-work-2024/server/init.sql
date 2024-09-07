@@ -189,7 +189,7 @@ VALUES (1, 1, 0, 1, 22),
         (3, 1, 1, 1, 22),
         (4, 1, 1, 1, 22),
         (5, 2, 1, 1, 22),
-        (6, 2, 2, 2, 30);
+        (6, 2, 1, 2, 30);
 
 INSERT INTO users (name, email, password, is_active)
 VALUES ('Dmitry', 'dmitry@gmail.com', '$2a$10$RmeP/zA/5x3YHcnC8sY8VO2FeAENCdC0HFGv4tXYiya6vHQV.PtMy', true),
