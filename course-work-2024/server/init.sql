@@ -6,30 +6,13 @@ CREATE DATABASE charging_stations_database
     WITH
     OWNER = postgres
     ENCODING = 'UTF8'
-    LC_COLLATE = 'en_US.UTF-8' --'Russian_Russia.1251'
-    LC_CTYPE = 'en_US.UTF-8' --'Russian_Russia.1251'
-    --LOCALE_PROVIDER = 'libc'
+    LC_COLLATE = 'en_US.UTF-8'
+    LC_CTYPE = 'en_US.UTF-8'
     TABLESPACE = pg_default
     CONNECTION LIMIT = -1
     TEMPLATE template0;
 
 \c charging_stations_database
-
-CREATE OR REPLACE FUNCTION prevent_pk_update()
-RETURNS TRIGGER AS $$
-BEGIN
-    RAISE EXCEPTION 'PK PREVENT EXCEPTION %', TG_TABLE_NAME;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION prevent_fk_update()
-RETURNS TRIGGER AS $$
-BEGIN
-    RAISE EXCEPTION 'FK PREVENT EXCEPTION %', TG_TABLE_NAME;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
 
 CREATE TABLE charging_stations (
     id INT PRIMARY KEY,
@@ -38,7 +21,7 @@ CREATE TABLE charging_stations (
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     opening_hours VARCHAR(10) NOT NULL,
-    description VARCHAR(512)
+    description VARCHAR(512) NULL
 );
 
 CREATE TABLE charging_station_images (
@@ -70,7 +53,7 @@ CREATE TABLE users (
     email VARCHAR(320) NOT NULL UNIQUE,
     password VARCHAR(256) NOT NULL,
     token VARCHAR(256) NULL UNIQUE,
-    is_active BOOLEAN NOT NULL
+    is_active BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE charging_marks (
@@ -90,10 +73,26 @@ CREATE TABLE orders (
     user_id INT NULL,
     amount REAL NOT NULL,
     status INT NOT NULL,
-    progress INT NOT NULL,
+    progress INT NOT NULL DEFAULT 0,
     FOREIGN KEY (connector_id) REFERENCES connectors (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE OR REPLACE FUNCTION prevent_pk_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'PK PREVENT EXCEPTION %', TG_TABLE_NAME;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION prevent_fk_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'FK PREVENT EXCEPTION %', TG_TABLE_NAME;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER charging_stations_pk_update_trigger
 BEFORE UPDATE ON charging_stations
@@ -174,7 +173,6 @@ VALUES
     (4, 'Станция 4', 'ул. Новый Арбат, 8, Москва', 55.751, 37.596, '10-21', 'Описание для Станции 4'),
     (5, 'Станция 5', 'ул. Лубянка, 2, Москва', 55.758, 37.625, '10-21', 'Описание для Станции 5');
 
-
 INSERT INTO charging_station_images (charging_station_id, path)
 VALUES (1, '1_1.jpg'),
         (1, '1_2.jpg'),
@@ -188,8 +186,8 @@ VALUES ('TYPE 1', 'AC'),
 INSERT INTO connectors (id, charging_station_id, status, charging_type_id, rate)
 VALUES (1, 1, 0, 1, 22),
         (2, 1, 1, 1, 15),
-        (3, 1, 2, 1, 22),
-        (4, 1, 2, 1, 22),
+        (3, 1, 1, 1, 22),
+        (4, 1, 1, 1, 22),
         (5, 2, 1, 1, 22),
         (6, 2, 2, 2, 30);
 

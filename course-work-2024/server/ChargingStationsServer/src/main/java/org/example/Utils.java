@@ -428,9 +428,7 @@ public class Utils {
             rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 int id = rs.getInt("id");
-                JSONObject o = new JSONObject();
-                o.put("id", id);
-                array.put(o);
+                array.put(id);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -649,36 +647,22 @@ public class Utils {
         }
     }
 
-    public static String auth(Connection connection, String email, String password) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    public static String auth(Connection connection, String email, String password) throws Exception {
         String sql = "SELECT password, token FROM users WHERE email = ?";
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = connection.prepareStatement(sql);
-            stmt.setString(1, email);
-            rs = stmt.executeQuery();
-            if (!rs.next()) {
-                return "";
-            }
-            String hashedPassword = rs.getString("password");
-            if (passwordEncoder.matches(password, hashedPassword)) {
-                String token = rs.getString("token");
-                return token;
-            } else {
-                return "";
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "";
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, email);
+        ResultSet rs = stmt.executeQuery();
+        if (!rs.next()) {
+            return null;
+        }
+        String hashedPassword = rs.getString("password");
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (passwordEncoder.matches(password, hashedPassword)) {
+            return rs.getString("token");
+        } else {
+            return null;
         }
     }
+
+
 }

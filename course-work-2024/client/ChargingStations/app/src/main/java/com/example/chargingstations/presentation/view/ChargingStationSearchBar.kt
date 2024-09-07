@@ -1,4 +1,4 @@
-package com.example.chargingstations.presentation
+package com.example.chargingstations.presentation.view
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons

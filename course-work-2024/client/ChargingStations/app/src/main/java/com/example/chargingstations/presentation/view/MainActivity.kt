@@ -1,4 +1,4 @@
-package com.example.chargingstations.presentation
+package com.example.chargingstations.presentation.view
 
 import android.Manifest
 import android.content.Context

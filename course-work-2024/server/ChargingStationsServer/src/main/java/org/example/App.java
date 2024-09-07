@@ -20,6 +20,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpsServer;
+import org.example.request.AuthRequest;
+import org.example.response.AuthResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,28 +33,13 @@ public class App {
     private static final String PASSWORD = "postgres";
 
     public static void main(String[] args) throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8000), 0); // new InetSocketAddress("localhost",8080)
+
+        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", 8000), 0);
         server.createContext("/", new MyHandler());
         server.setExecutor(null);
         server.start();
         System.out.println("The server has started successfully.");
 
-
-//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-//        String rawPassword = "andrey2003";
-//        String hashedPassword = passwordEncoder.encode(rawPassword);
-//        System.out.println(hashedPassword);
-
-
-//        URI uri = new URI(
-//                "http",
-//                "example.com",
-//                "/query",
-//                "q=ул. Брусилова",
-//                null);
-//
-//        String request = uri.toASCIIString();
-//        System.out.println(request);
     }
 
     private static Map<String, String> parseQueryParams(String query) {
@@ -87,15 +74,6 @@ public class App {
                     System.out.println(entry.getKey() + " = " + entry.getValue());
                 }
 
-//                if (queryParams.containsKey("lang")) {
-//                    System.out.println("HERE: " + queryParams.get("lang"));
-//                }
-
-
-                // /charging-stations?lang=ru&simplify=true - example
-                // .getRequestURI().getPath() -> "/charging-stations"
-                // .getRequestURI().getQuery() -> "lang=ru&simplify=true"
-
                 String pattern = "/charging-station-images/(\\d+)$";
                 Pattern r = Pattern.compile(pattern);
                 Matcher m = r.matcher(httpExchange.getRequestURI().toString());
@@ -121,11 +99,11 @@ public class App {
                         os.flush();
                         os.close();
                     } catch (SQLException e) {
+                        e.printStackTrace();
                         httpExchange.sendResponseHeaders(500, 0);
                         OutputStream os = httpExchange.getResponseBody();
                         os.flush();
                         os.close();
-                        e.printStackTrace();
                     } finally {
                         try {
                             if (connection != null) connection.close();
@@ -235,14 +213,6 @@ public class App {
                     }
                     return;
                 }
-//                } else {
-////                    String response = "Hello from server!";
-////                    httpExchange.sendResponseHeaders(200, response.getBytes().length);
-////                    OutputStream os = httpExchange.getResponseBody();
-////                    os.write(response.getBytes());
-////                    os.flush();
-////                    os.close();
-//                }
 
                 pattern = "/confirm";
                 r = Pattern.compile(pattern);
@@ -368,43 +338,34 @@ public class App {
                 m = r.matcher(httpExchange.getRequestURI().toString());
 
                 if (m.find()) {
-                    AuthData authData = null;
+                    Connection connection = null;
                     try {
                         Gson gson = new Gson();
-                        authData = gson.fromJson(body, AuthData.class);
-                    } catch (JsonSyntaxException | JsonIOException e) {
-                        e.printStackTrace();
-                    }
-
-                    Connection connection = null;
-
-                    if (authData != null) {
+                        AuthRequest request = gson.fromJson(body, AuthRequest.class);
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                        String token = Utils.auth(connection, request.getEmail(), request.getPassword());
+                        AuthResponse authResponse = new AuthResponse();
+                        authResponse.setToken(token);
+                        String response = authResponse.getToken();
+                        ArrayList<String> list = new ArrayList<>();
+                        list.add("application/json");
+                        httpExchange.getResponseHeaders().put("Content-Type", list);
+                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.write(response.getBytes());
+                        os.flush();
+                        os.close();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        httpExchange.sendResponseHeaders(500, 0);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.flush();
+                        os.close();
+                    } finally {
                         try {
-                            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            String token = Utils.auth(connection, authData.getEmail(), authData.getPassword());
-                            JSONObject response = new JSONObject();
-                            response.put("token", token);
-                            ArrayList<String> list = new ArrayList<>();
-                            list.add("application/json");
-                            httpExchange.getResponseHeaders().put("Content-Type", list);
-
-                            httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
-                            OutputStream os = httpExchange.getResponseBody();
-                            os.write(response.toString().getBytes());
-                            os.flush();
-                            os.close();
+                            if (connection != null) connection.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                            httpExchange.sendResponseHeaders(500, 0);
-                            OutputStream os = httpExchange.getResponseBody();
-                            os.flush();
-                            os.close();
-                        } finally {
-                            try {
-                                if (connection != null) connection.close();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
                         }
                     }
                 }

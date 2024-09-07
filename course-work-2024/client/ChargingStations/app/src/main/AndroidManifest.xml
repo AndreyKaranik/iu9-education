@@ -23,22 +23,22 @@
         android:theme="@style/Theme.ChargingStations"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.OrderActivity"
+            android:name=".presentation.view.OrderActivity"
             android:exported="false"
             android:label="@string/title_activity_order"
             android:theme="@style/Theme.ChargingStations" />
         <activity
-            android:name=".presentation.AuthenticationActivity"
+            android:name=".presentation.view.AuthenticationActivity"
             android:exported="false"
             android:label="@string/title_activity_authentication"
             android:theme="@style/Theme.ChargingStations" />
         <activity
-            android:name=".presentation.QRScannerActivity"
+            android:name=".presentation.view.QRScannerActivity"
             android:exported="false"
             android:label="@string/title_activity_qrscanner"
             android:theme="@style/Theme.ChargingStations" />
         <activity
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.view.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.ChargingStations">
 
@@ -50,7 +50,7 @@
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".presentation.SplashScreenActivity"
+            android:name=".presentation.view.SplashScreenActivity"
             android:exported="true"
             android:theme="@style/Theme.ChargingStations">
             <intent-filter>

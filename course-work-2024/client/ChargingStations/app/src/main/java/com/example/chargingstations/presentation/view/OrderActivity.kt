@@ -1,4 +1,4 @@
-package com.example.chargingstations.presentation
+package com.example.chargingstations.presentation.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

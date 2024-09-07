@@ -190,7 +190,7 @@ class MainActivityViewModel : ViewModel() {
                         _chargingStationImageBitmap.value = null
                         _chargingStationDetailsFetched.value = true
                         if (it.imageIds.isNotEmpty()) {
-                            fetchChargingStationImage(it.imageIds[0].id)
+                            fetchChargingStationImage(it.imageIds[0])
                         }
                     }
                 } else {
