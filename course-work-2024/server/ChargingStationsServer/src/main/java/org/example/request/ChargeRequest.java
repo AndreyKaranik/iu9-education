@@ -1,17 +1,19 @@
 package org.example.request;
 
-public class ChargeRequest {
-    private int connector_id;
+import com.google.gson.annotations.SerializedName;
 
+public class ChargeRequest {
+    @SerializedName("connector_id")
+    private int connectorId;
     private float amount;
     private String token;
 
-    public int getConnector_id() {
-        return connector_id;
+    public int getConnectorId() {
+        return connectorId;
     }
 
-    public void setConnector_id(int connector_id) {
-        this.connector_id = connector_id;
+    public void setConnectorId(int connectorId) {
+        this.connectorId = connectorId;
     }
 
     public float getAmount() {

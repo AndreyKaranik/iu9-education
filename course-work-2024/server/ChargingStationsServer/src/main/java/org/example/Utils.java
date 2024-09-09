@@ -1,5 +1,6 @@
 package org.example;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import org.example.request.ChargeRequest;
 import org.json.JSONArray;
@@ -9,15 +10,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Base64;
 
 public class Utils {
 
-    private static final SecureRandom secureRandom = new SecureRandom(); //threadsafe
-    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder(); //threadsafe
+    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 
     public static String generateNewToken() {
         byte[] randomBytes = new byte[24];
@@ -444,211 +447,79 @@ public class Utils {
         return array;
     }
 
-    /**
-     *
-     * @param connection
-     * @param email
-     * @return (userId, 0) - is active, (userId, 1) - is not active, (0, 2) - not found or exception
-     */
-    public static Pair<Integer, Integer> checkUserIsActive(Connection connection, String email) {
-        String sql = "SELECT id, is_active FROM users WHERE email = ?";
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = connection.prepareStatement(sql);
-            stmt.setString(1, email);
-            rs = stmt.executeQuery();
-
-            if (!rs.next()) {
-                return new Pair<>(0, 2);
-            }
-
-            boolean isActive = rs.getBoolean("is_active");
-            int id = rs.getInt("id");
-
-            if (isActive) {
-                return new Pair<>(id, 0);
-            } else {
-                return new Pair<>(id, 1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return new Pair<>(0, 2);
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    public static void confirm(Connection connection, String token) throws SQLException {
+        String sql = "SELECT id FROM users WHERE token = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, token);
+        ResultSet rs = stmt.executeQuery();
+        if (!rs.next()) {
+            throw new RuntimeException();
         }
+        int id = rs.getInt("id");
+        updateUserIsActiveById(connection, id, true);
     }
 
-    public static int checkUsername(Connection connection, String username) {
-        String sql = "SELECT COUNT(1) FROM users WHERE name = " + '\'' + username + '\'';
-        Statement stmt = null;
-        ResultSet rs = null;
-        try {
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(sql);
-            rs.next();
-            int count = rs.getInt("count");
-            if (count == 1) {
-                return 2;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 1;
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    public static User findUserByEmail(Connection connection, String email) throws SQLException {
+        String sql = "SELECT id, name, password, token, is_active FROM users WHERE email = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, email);
+        ResultSet rs = stmt.executeQuery();
+        if (!rs.next()) {
+            return null;
         }
-        return 0;
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        String password = rs.getString("password");
+        String token = rs.getString("token");
+        boolean isActive = rs.getBoolean("is_active");
+
+        return new User(id, name, email, password, token, isActive);
     }
 
-    public static int checkEmail(Connection connection, String email) {
-        String sql = "SELECT COUNT(1) FROM users WHERE email = " + '\'' + email + '\'';
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(sql);
-            rs.next();
-            int count = rs.getInt("count");
-            if (count == 1) {
-                return 2;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 1;
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return 0;
+    public static void insertUser(Connection connection, String name, String email, String password, String token) throws SQLException {
+        String sql = "INSERT INTO users(name, email, password, token) VALUES (?, ?, ?, ?)";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, name);
+        stmt.setString(2, email);
+        stmt.setString(3, password);
+        stmt.setString(4, token);
+        stmt.executeUpdate();
     }
 
-    public static boolean confirm(Connection connection, String token) {
-        if (token == null) {
-            return false;
-        }
-
-        String sql = "SELECT id FROM users WHERE token = " + '\'' + token + '\'';
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            stmt = connection.createStatement();
-            rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                int id = rs.getInt("id");
-                if (updateUserIsActive(connection, id, true)) {
-                    return true;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        return false;
+    public static void updateUserNameById(Connection connection, int id, String name) throws SQLException {
+        String sql = "UPDATE users SET name = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, name);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
     }
 
-    public static boolean updateUserIsActive(Connection connection, int userId, boolean isActive) {
+    public static void updateUserPasswordById(Connection connection, int id, String password) throws SQLException {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, password);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
+    }
+
+    public static void updateUserTokenById(Connection connection, int id, String token) throws SQLException {
+        String sql = "UPDATE users SET token = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setString(1, token);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
+    }
+
+    public static void updateUserIsActiveById(Connection connection, int id, boolean isActive) throws SQLException {
         String sql = "UPDATE users SET is_active = ? WHERE id = ?";
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = connection.prepareStatement(sql);
-            stmt.setBoolean(1, isActive);
-            stmt.setInt(2, userId);
-            int updatedRows = stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setBoolean(1, isActive);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
     }
 
-    public static String getUserTokenByUserId(Connection connection, int userId) {
-        String sql = "SELECT token FROM users WHERE id = ?";
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
 
-        try {
-            stmt = connection.prepareStatement(sql);
-            stmt.setInt(1, userId);
-            rs = stmt.executeQuery();
-
-            if (!rs.next()) {
-                return "";
-            }
-            String token = rs.getString("token");
-
-            return token;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "";
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static boolean insertUser(Connection connection, String name, String email, String password, String token, boolean isActive) {
-        String sql = "INSERT INTO users(name, email, password, token, is_active) VALUES (?, ?, ?, ?, ?)";
-        PreparedStatement stmt = null;
-
-        try {
-            stmt = connection.prepareStatement(sql);
-            stmt.setString(1, name);
-            stmt.setString(2, email);
-            stmt.setString(3, password);
-            stmt.setString(4, token);
-            stmt.setBoolean(5, isActive);
-            int insertedRows = stmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static String auth(Connection connection, String email, String password) throws Exception {
+    public static String auth(Connection connection, String email, String password) throws SQLException {
         String sql = "SELECT password, token FROM users WHERE email = ?";
         PreparedStatement stmt = connection.prepareStatement(sql);
         stmt.setString(1, email);
@@ -665,36 +536,79 @@ public class Utils {
         }
     }
 
-    public static int charge(Connection connection, ChargeRequest chargeRequest) throws Exception {
+    public static int charge(Connection connection, ChargeRequest chargeRequest) throws SQLException {
         String sql = "INSERT INTO orders(connector_id, user_id, amount, status) VALUES (?, ?, ?, ?)";
         PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        stmt.setInt(1, chargeRequest.getConnector_id());
+        stmt.setInt(1, chargeRequest.getConnectorId());
         if (chargeRequest.getToken() == null) {
             stmt.setNull(2, java.sql.Types.NULL);
         } else {
             int userId = getUserIdByToken(connection, chargeRequest.getToken());
+            if (userId == -1) {
+                throw new RuntimeException();
+            }
             stmt.setInt(2, userId);
         }
         stmt.setFloat(3, chargeRequest.getAmount());
         stmt.setInt(4, 0);
-        int insertedRows = stmt.executeUpdate();
+        stmt.executeUpdate();
         ResultSet rs = stmt.getGeneratedKeys();
-        if (rs.next()) {
-            return rs.getInt("id");
+        if (!rs.next()) {
+            return -1;
         }
-        return -1;
+        return rs.getInt("id");
     }
 
-    public static int getUserIdByToken(Connection connection, String token) throws Exception {
-        String sql = "SELECT user_id FROM users WHERE token = ?";
+    public static int getUserIdByToken(Connection connection, String token) throws SQLException {
+        String sql = "SELECT id FROM users WHERE token = ?";
         PreparedStatement stmt = connection.prepareStatement(sql);
         stmt.setString(1, token);
         ResultSet rs = stmt.executeQuery();
         if (!rs.next()) {
             return -1;
         }
-        return rs.getInt("user_id");
+        return rs.getInt("id");
     }
 
 
+
+
+
+    public static void sendHttpJsonResponse(HttpExchange httpExchange, Object obj) throws IOException {
+        Gson gson = new Gson();
+        String response = gson.toJson(obj);
+        ArrayList<String> list = new ArrayList<>();
+        list.add("application/json");
+        httpExchange.getResponseHeaders().put("Content-Type", list);
+        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+        OutputStream os = httpExchange.getResponseBody();
+        os.write(response.getBytes());
+        os.flush();
+        os.close();
+    }
+
+    public static void sendHttpResponse(HttpExchange httpExchange, String response) throws IOException {
+        ArrayList<String> list = new ArrayList<>();
+        list.add("application/json");
+        httpExchange.getResponseHeaders().put("Content-Type", list);
+        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+        OutputStream os = httpExchange.getResponseBody();
+        os.write(response.getBytes());
+        os.flush();
+        os.close();
+    }
+
+    public static void sendHttp200Response(HttpExchange httpExchange) throws IOException {
+        httpExchange.sendResponseHeaders(200, 0);
+        OutputStream os = httpExchange.getResponseBody();
+        os.flush();
+        os.close();
+    }
+
+    public static void sendHttp500Response(HttpExchange httpExchange) throws IOException {
+        httpExchange.sendResponseHeaders(500, 0);
+        OutputStream os = httpExchange.getResponseBody();
+        os.flush();
+        os.close();
+    }
 }

@@ -2,12 +2,9 @@ package org.example;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.net.URI;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.SecureRandom;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -19,11 +16,12 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpsServer;
 import org.example.request.AuthRequest;
 import org.example.request.ChargeRequest;
+import org.example.request.RegisterRequest;
 import org.example.response.AuthResponse;
 import org.example.response.ChargeResponse;
+import org.example.response.RegisterResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -224,22 +222,8 @@ public class App {
                     Connection connection = null;
                     try {
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
-
-                        boolean status = Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
-
-                        JSONObject object = new JSONObject();
-                        object.put("status", status);
-
-                        String response = object.toString();
-                        ArrayList<String> list = new ArrayList<>();
-                        list.add("application/json");
-                        httpExchange.getResponseHeaders().put("Content-Type", list);
-
-                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
-                        OutputStream os = httpExchange.getResponseBody();
-                        os.write(response.getBytes());
-                        os.flush();
-                        os.close();
+                        Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
+                        Utils.sendHttp200Response(httpExchange);
                     } catch (SQLException e) {
                         httpExchange.sendResponseHeaders(500, 0);
                         OutputStream os = httpExchange.getResponseBody();
@@ -255,84 +239,82 @@ public class App {
                     }
                     return;
                 }
+
+                pattern = "/orders/(\\d+)$";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    String orderId = m.group(1);
+                    Connection connection = null;
+                    try {
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                        Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
+                        Utils.sendHttp200Response(httpExchange);
+                    } catch (SQLException e) {
+                        httpExchange.sendResponseHeaders(500, 0);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.flush();
+                        os.close();
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            if (connection != null) connection.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return;
+                }
+
+
             }
 
 
             if (httpExchange.getRequestMethod().equals("POST")) {
+
                 String pattern = "/register";
                 Pattern r = Pattern.compile(pattern);
                 Matcher m = r.matcher(httpExchange.getRequestURI().toString());
 
-
                 if (m.find()) {
-                    RegistrationData registrationData = null;
+                    Connection connection = null;
                     try {
                         Gson gson = new Gson();
-                        registrationData = gson.fromJson(body, RegistrationData.class);
-                    } catch (JsonSyntaxException | JsonIOException e) {
-                        e.printStackTrace();
-                    }
-
-                    Connection connection = null;
-                    int emailStatus = 1;
-                    Pair<Integer, Integer> isActiveStatusPair;
-                    int userId = -1;
-
-                    boolean success = false;
-
-                    if (registrationData != null) {
-                        try {
-                            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                            isActiveStatusPair = Utils.checkUserIsActive(connection, registrationData.getEmail());
-                            if (isActiveStatusPair.getRight() == 1) {
-                                emailStatus = 0;
-                                userId = isActiveStatusPair.getLeft();
+                        RegisterRequest request = gson.fromJson(body, RegisterRequest.class);
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                        User user = Utils.findUserByEmail(connection, request.getEmail());
+                        if (user != null) {
+                            if (user.isActive()) {
+                                RegisterResponse registerResponse = new RegisterResponse(1);
+                                Utils.sendHttpJsonResponse(httpExchange, registerResponse);
                             } else {
-                                emailStatus = Utils.checkEmail(connection, registrationData.getEmail());
+                                String token = Utils.generateNewToken();
+                                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                                String hashedPassword = passwordEncoder.encode(request.getPassword());
+                                Utils.updateUserNameById(connection, user.getId(), user.getName());
+                                Utils.updateUserPasswordById(connection, user.getId(), hashedPassword);
+                                Utils.updateUserTokenById(connection, user.getId(), token);
+                                EmailSender.sendEmail(request.getEmail(), token);
                             }
-
-                            if (emailStatus == 0 && isActiveStatusPair.getRight() != 0) {
-                                String token;
-                                if (isActiveStatusPair.getRight() == 1) {
-                                    token = Utils.getUserTokenByUserId(connection, userId);
-                                } else {
-                                    token = Utils.generateNewToken();
-                                    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-                                    String hashedPassword = passwordEncoder.encode(registrationData.getPassword());
-                                    Utils.insertUser(connection, registrationData.getName(), registrationData.getEmail(), hashedPassword, token, false);
-                                }
-                                if (token != null && !token.isEmpty()) {
-                                    success = EmailSender.sendEmail(registrationData.getEmail(), token);
-                                }
-                            }
+                        } else {
+                            String token = Utils.generateNewToken();
+                            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                            String hashedPassword = passwordEncoder.encode(request.getPassword());
+                            Utils.insertUser(connection, request.getName(), request.getEmail(), hashedPassword, token);
+                            EmailSender.sendEmail(request.getEmail(), token);
+                        }
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        Utils.sendHttp500Response(httpExchange);
+                    } finally {
+                        try {
+                            if (connection != null) connection.close();
                         } catch (SQLException e) {
                             e.printStackTrace();
-                        } finally {
-                            try {
-                                if (connection != null) connection.close();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
                         }
                     }
-
-                    JSONObject response = new JSONObject();
-                    if (emailStatus == 0 && success) {
-                        response.put("status", 0);      // success
-                    } else if (emailStatus == 2) {
-                        response.put("status", 2);      // email exist
-                    } else {
-                        response.put("status", 1);      // failed
-                    }
-                    ArrayList<String> list = new ArrayList<>();
-                    list.add("application/json");
-                    httpExchange.getResponseHeaders().put("Content-Type", list);
-
-                    httpExchange.sendResponseHeaders(200, response.toString().getBytes(StandardCharsets.UTF_8).length);
-                    OutputStream os = httpExchange.getResponseBody();
-                    os.write(response.toString().getBytes());
-                    os.flush();
-                    os.close();
+                    return;
                 }
 
                 pattern = "/auth";
@@ -370,6 +352,7 @@ public class App {
                             e.printStackTrace();
                         }
                     }
+                    return;
                 }
 
                 pattern = "/charge";
@@ -382,24 +365,12 @@ public class App {
                         Gson gson = new Gson();
                         ChargeRequest request = gson.fromJson(body, ChargeRequest.class);
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                        int order_id = Utils.charge(connection, request);
-                        ChargeResponse chargeResponse = new ChargeResponse();
-                        chargeResponse.setOrder_id(order_id);
-                        String response = gson.toJson(chargeResponse);
-                        ArrayList<String> list = new ArrayList<>();
-                        list.add("application/json");
-                        httpExchange.getResponseHeaders().put("Content-Type", list);
-                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
-                        OutputStream os = httpExchange.getResponseBody();
-                        os.write(response.getBytes());
-                        os.flush();
-                        os.close();
+                        int orderId = Utils.charge(connection, request);
+                        ChargeResponse chargeResponse = new ChargeResponse(orderId);
+                        Utils.sendHttpJsonResponse(httpExchange, chargeResponse);
                     } catch (Exception exception) {
                         exception.printStackTrace();
-                        httpExchange.sendResponseHeaders(500, 0);
-                        OutputStream os = httpExchange.getResponseBody();
-                        os.flush();
-                        os.close();
+                        Utils.sendHttp500Response(httpExchange);
                     } finally {
                         try {
                             if (connection != null) connection.close();
@@ -407,6 +378,7 @@ public class App {
                             e.printStackTrace();
                         }
                     }
+                    return;
                 }
             }
         }

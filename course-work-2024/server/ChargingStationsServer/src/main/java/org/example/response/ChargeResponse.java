@@ -1,13 +1,21 @@
 package org.example.response;
 
-public class ChargeResponse {
-    private int order_id;
+import com.google.gson.annotations.SerializedName;
 
-    public int getOrder_id() {
-        return order_id;
+public class ChargeResponse {
+
+    @SerializedName("order_id")
+    private int orderId;
+
+    public ChargeResponse(int orderId) {
+        this.orderId = orderId;
     }
 
-    public void setOrder_id(int order_id) {
-        this.order_id = order_id;
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 }

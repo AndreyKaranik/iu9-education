@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c026a9e2-a77a-40fb-9acc-7f2a70240050" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/ApiService.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/AuthData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/RegistrationData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/request/RegisterRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/request/ChargeRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/request/ChargeRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/response/ChargeResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/response/ChargeResponse.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
