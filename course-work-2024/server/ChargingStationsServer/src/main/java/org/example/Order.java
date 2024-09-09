@@ -1,8 +1,10 @@
-package org.example.response;
+package org.example;
 
 import com.google.gson.annotations.SerializedName;
 
-public class GetOrderResponse {
+public class Order {
+
+    private int id;
     @SerializedName("connector_id")
     private int connectorId;
     @SerializedName("user_id")
@@ -11,14 +13,23 @@ public class GetOrderResponse {
     private int status;
     private int progress;
 
-    public GetOrderResponse() {}
+    public Order() {}
 
-    public GetOrderResponse(int connectorId, int userId, float amount, int status, int progress) {
+    public Order(int id, int connectorId, int userId, float amount, int status, int progress) {
+        this.id = id;
         this.connectorId = connectorId;
         this.userId = userId;
         this.amount = amount;
         this.status = status;
         this.progress = progress;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getConnectorId() {

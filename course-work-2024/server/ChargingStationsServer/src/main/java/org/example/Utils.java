@@ -3,6 +3,7 @@ package org.example;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import org.example.request.ChargeRequest;
+import org.example.request.MarkRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.SecureRandom;
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 
@@ -537,7 +539,7 @@ public class Utils {
     }
 
     public static int charge(Connection connection, ChargeRequest chargeRequest) throws SQLException {
-        String sql = "INSERT INTO orders(connector_id, user_id, amount, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO orders (connector_id, user_id, amount, status) VALUES (?, ?, ?, ?)";
         PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         stmt.setInt(1, chargeRequest.getConnectorId());
         if (chargeRequest.getToken() == null) {
@@ -568,6 +570,58 @@ public class Utils {
             return -1;
         }
         return rs.getInt("id");
+    }
+
+    public static Order findOrderById(Connection connection, int id) throws SQLException {
+        String sql = "SELECT connector_id, user_id, amount, status, progress FROM orders WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, id);
+        ResultSet rs = stmt.executeQuery();
+        if (!rs.next()) {
+            return null;
+        }
+        int connectorId = rs.getInt("connector_id");
+        int userId = rs.getInt("user_id");
+        float amount = rs.getFloat("amount");
+        int status = rs.getInt("status");
+        int progress = rs.getInt("progress");
+
+        return new Order(id, connectorId, userId, amount, status, progress);
+    }
+
+    public static void mark(Connection connection, MarkRequest markRequest) throws SQLException {
+        String sql = "INSERT INTO charging_marks (charging_station_id, status, user_id, charging_type_id, time) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        stmt.setInt(1, markRequest.getChargingStationId());
+        if (markRequest.getToken() == null) {
+            stmt.setNull(3, java.sql.Types.NULL);
+        } else {
+            int userId = getUserIdByToken(connection, markRequest.getToken());
+            if (userId == -1) {
+                throw new RuntimeException();
+            }
+            stmt.setInt(3, userId);
+        }
+        stmt.setInt(2, markRequest.getStatus());
+        stmt.setInt(4, markRequest.getChargingTypeId());
+        stmt.setTimestamp(5, Timestamp.from(Instant.now()));
+        stmt.executeUpdate();
+    }
+
+    public static void updateOrderStatusById(Connection connection, int id, int status) throws SQLException {
+        String sql = "UPDATE orders SET status = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, status);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
+    }
+
+    public static void updateOrderProgressById(Connection connection, int id, int progress) throws SQLException {
+        String sql = "UPDATE orders SET progress = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, progress);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
     }
 
 

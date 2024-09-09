@@ -21,6 +21,7 @@ import org.example.request.ChargeRequest;
 import org.example.request.RegisterRequest;
 import org.example.response.AuthResponse;
 import org.example.response.ChargeResponse;
+import org.example.response.GetOrderResponse;
 import org.example.response.RegisterResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,9 +29,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class App {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/charging_stations_database";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "postgres";
+    public static final String URL = "jdbc:postgresql://localhost:5432/charging_stations_database";
+    public static final String USER = "postgres";
+    public static final String PASSWORD = "postgres";
 
     public static void main(String[] args) throws Exception {
 
@@ -249,14 +250,21 @@ public class App {
                     Connection connection = null;
                     try {
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                        Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
-                        Utils.sendHttp200Response(httpExchange);
+                        Order order = Utils.findOrderById(connection, Integer.parseInt(orderId));
+                        if (order == null) {
+                            Utils.sendHttp500Response(httpExchange);
+                        } else {
+                            GetOrderResponse response = new GetOrderResponse();
+                            response.setConnectorId(order.getConnectorId());
+                            response.setUserId(order.getUserId());
+                            response.setAmount(order.getAmount());
+                            response.setStatus(order.getStatus());
+                            response.setProgress(order.getProgress());
+                            Utils.sendHttpJsonResponse(httpExchange, response);
+                        }
                     } catch (SQLException e) {
-                        httpExchange.sendResponseHeaders(500, 0);
-                        OutputStream os = httpExchange.getResponseBody();
-                        os.flush();
-                        os.close();
                         e.printStackTrace();
+                        Utils.sendHttp500Response(httpExchange);
                     } finally {
                         try {
                             if (connection != null) connection.close();
@@ -266,7 +274,6 @@ public class App {
                     }
                     return;
                 }
-
 
             }
 
@@ -286,8 +293,8 @@ public class App {
                         User user = Utils.findUserByEmail(connection, request.getEmail());
                         if (user != null) {
                             if (user.isActive()) {
-                                RegisterResponse registerResponse = new RegisterResponse(1);
-                                Utils.sendHttpJsonResponse(httpExchange, registerResponse);
+                                RegisterResponse response = new RegisterResponse(1);
+                                Utils.sendHttpJsonResponse(httpExchange, response);
                             } else {
                                 String token = Utils.generateNewToken();
                                 BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -296,6 +303,8 @@ public class App {
                                 Utils.updateUserPasswordById(connection, user.getId(), hashedPassword);
                                 Utils.updateUserTokenById(connection, user.getId(), token);
                                 EmailSender.sendEmail(request.getEmail(), token);
+                                RegisterResponse response = new RegisterResponse(0);
+                                Utils.sendHttpJsonResponse(httpExchange, response);
                             }
                         } else {
                             String token = Utils.generateNewToken();
@@ -303,6 +312,8 @@ public class App {
                             String hashedPassword = passwordEncoder.encode(request.getPassword());
                             Utils.insertUser(connection, request.getName(), request.getEmail(), hashedPassword, token);
                             EmailSender.sendEmail(request.getEmail(), token);
+                            RegisterResponse response = new RegisterResponse(0);
+                            Utils.sendHttpJsonResponse(httpExchange, response);
                         }
                     } catch (Exception exception) {
                         exception.printStackTrace();
@@ -367,6 +378,8 @@ public class App {
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
                         int orderId = Utils.charge(connection, request);
                         ChargeResponse chargeResponse = new ChargeResponse(orderId);
+                        ChargingThread thread = new ChargingThread(orderId);
+                        thread.start();
                         Utils.sendHttpJsonResponse(httpExchange, chargeResponse);
                     } catch (Exception exception) {
                         exception.printStackTrace();
