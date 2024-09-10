@@ -418,6 +418,8 @@ class MainActivity : ComponentActivity() {
             skipPartiallyExpanded = true,
         )
 
+        val email by mainActivityViewModel.email.collectAsState()
+
         ModalBottomSheet(modifier = Modifier
             .fillMaxHeight()
             .padding(top = 32.dp),
@@ -431,7 +433,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     text = "Вы авторизованы"
                 )
-                Button(onClick = {
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = "почта: $email"
+                )
+                Button(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    onClick = {
                     startActivity(
                         Intent(
                             this@MainActivity,
@@ -559,5 +567,13 @@ class MainActivity : ComponentActivity() {
         mapView.onStop()
         MapKitFactory.getInstance().onStop()
         super.onStop()
+    }
+
+    override fun onResume() {
+        val sharedPref =
+            getSharedPreferences("myPrefs", MODE_PRIVATE)
+        mainActivityViewModel.setToken(sharedPref.getString("token", null))
+        mainActivityViewModel.setEmail(sharedPref.getString("email", null))
+        super.onResume()
     }
 }

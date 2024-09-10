@@ -35,7 +35,7 @@ public class EmailSender {
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject("Registration Confirmation");
             message.setText("Please confirm your registration by clicking the following link: " +
-                    "http://89.111.172.144:8000/confirm?token=" + token);
+                    "http://194.67.88.154:8000/confirm?token=" + token);
 
             Transport.send(message);
             System.out.println("Email sent successfully.");

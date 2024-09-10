@@ -26,9 +26,9 @@ public class ChargingThread extends Thread {
             Utils.updateConnectorStatusById(connection, connectorId, 2);
             int progress = 0;
             while (progress < 100) {
-                Utils.updateOrderProgressById(connection, orderId, progress);
                 Thread.sleep(100);
                 progress += 1;
+                Utils.updateOrderProgressById(connection, orderId, progress);
             }
             Utils.updateOrderStatusById(connection, orderId, 1);
             Utils.updateConnectorStatusById(connection, connectorId, 1);

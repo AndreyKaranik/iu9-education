@@ -88,12 +88,14 @@ class AuthenticationActivity : ComponentActivity() {
                     val emailDialogIsShown by authenticationActivityViewModel.emailDialogIsShown.collectAsState()
                     val isAuth by authenticationActivityViewModel.isAuth.collectAsState()
                     val token by authenticationActivityViewModel.token.collectAsState()
+                    val email by authenticationActivityViewModel.email.collectAsState()
 
                     if (isAuth) {
                         val sharedPref = getSharedPreferences("myPrefs", MODE_PRIVATE)
                         with(sharedPref.edit()) {
                             putBoolean("auth", true)
                             putString("token", token)
+                            putString("email", email)
                             apply()
                         }
                         if (skipButtonIsShown) {
@@ -277,25 +279,25 @@ fun RegistrationSheet(authenticationActivityViewModel: AuthenticationActivityVie
                 )
             }
         }
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(bottom = 8.dp, start = 8.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.privacy_policy_text),
-                fontSize = 12.sp,
-                color = Color.Black
-            )
-            ClickableText(
-                text = AnnotatedString(stringResource(R.string.privacy_policy_button_label)),
-                onClick = {
-                    val url = "http://89.111.172.144:8000/privacy-policy"
-                    openUrlInBrowser(context, url)
-                },
-                style = TextStyle.Default.copy(textDecoration = TextDecoration.Underline, color = Color.Gray),
-            )
-        }
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomStart)
+//                .padding(bottom = 8.dp, start = 8.dp)
+//        ) {
+//            Text(
+//                text = stringResource(R.string.privacy_policy_text),
+//                fontSize = 12.sp,
+//                color = Color.Black
+//            )
+//            ClickableText(
+//                text = AnnotatedString(stringResource(R.string.privacy_policy_button_label)),
+//                onClick = {
+//                    val url = "http://89.111.172.144:8000/privacy-policy"
+//                    openUrlInBrowser(context, url)
+//                },
+//                style = TextStyle.Default.copy(textDecoration = TextDecoration.Underline, color = Color.Gray),
+//            )
+//        }
     }
 }
 
@@ -354,7 +356,7 @@ fun AuthorizationSheet(authenticationActivityViewModel: AuthenticationActivityVi
 
 @Composable
 fun NameTextField(name: MutableState<String>, validStatus: MutableState<Int>) {
-    val minLength = 5
+    val minLength = 4
     val maxLength = 30
     val pattern = "^[a-zA-Z0-9]*$".toRegex()
     TextField(
@@ -406,7 +408,7 @@ fun NameTextField(name: MutableState<String>, validStatus: MutableState<Int>) {
 @Composable
 fun PasswordTextField(password: MutableState<String>, validStatus: MutableState<Int>) {
     var passwordVisible by remember { mutableStateOf(false) }
-    val minLength = 5
+    val minLength = 4
     val maxLength = 30
     val pattern = "^[a-zA-Z0-9]*$".toRegex()
     TextField(

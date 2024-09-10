@@ -90,6 +90,12 @@ class MainActivityViewModel : ViewModel() {
     val chargingStationDetails: StateFlow<ChargingStationDetails?> = _chargingStationDetails
 
 
+    private val _token = MutableStateFlow<String?>(null)
+    val token: StateFlow<String?> = _token
+
+    private val _email = MutableStateFlow<String?>(null)
+    val email: StateFlow<String?> = _email
+
     val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -110,6 +116,14 @@ class MainActivityViewModel : ViewModel() {
 
     init {
         fetchChargingStations()
+    }
+
+    fun setToken(token: String?) {
+        _token.value = token
+    }
+
+    fun setEmail(email: String?) {
+        _email.value = email
     }
 
     fun showGPSDialog() {

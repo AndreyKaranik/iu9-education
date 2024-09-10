@@ -37,8 +37,8 @@
     <string name="user_name_text_field_label">Имя пользователя</string>
     <string name="user_email_text_field_label">Почта</string>
     <string name="user_password_text_field_label">Пароль</string>
-    <string name="user_name_must_contain_at_least_n_characters_valid_message">Имя пользователя должно содержать как минимум 5 символов</string>
-    <string name="password_must_contain_at_least_n_characters_valid_message">Пароль должен содержать как минимум 5 символов</string>
+    <string name="user_name_must_contain_at_least_n_characters_valid_message">Имя пользователя должно содержать как минимум 4 символов</string>
+    <string name="password_must_contain_at_least_n_characters_valid_message">Пароль должен содержать как минимум 4 символов</string>
     <string name="incorrect_email_valid_message">Некорректная почта</string>
     <string name="only_latin_characters_and_numbers_are_allowed_valid_message">Допустимы только символы латинского алфавита и цифры</string>
     <string name="sign_in_button_label">Войти</string>

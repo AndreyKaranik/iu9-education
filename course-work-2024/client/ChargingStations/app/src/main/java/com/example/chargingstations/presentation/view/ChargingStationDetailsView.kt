@@ -206,6 +206,7 @@ fun ChargingStationDetailsView(
                                                 bundle.putString("charging_station_address", chargingStationDetails!!.address)
                                                 bundle.putString("charging_type_name", it.chargingType.name)
                                                 bundle.putFloat("connector_rate", it.rate)
+                                                bundle.putString("token", mainActivityViewModel.token.value)
                                                 val intent =
                                                     Intent(context, OrderActivity::class.java)
                                                 intent.putExtras(bundle)
