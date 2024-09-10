@@ -41,6 +41,12 @@ class OrderActivityViewModel : ViewModel() {
     private val _connectorId = MutableStateFlow<Int?>(null)
     val connectorId: StateFlow<Int?> = _connectorId
 
+    private val _chargingStationId = MutableStateFlow<Int?>(null)
+    val chargingStationId: StateFlow<Int?> = _chargingStationId
+
+    private val _chargingTypeId = MutableStateFlow<Int?>(null)
+    val chargingTypeId: StateFlow<Int?> = _chargingTypeId
+
     private val _chargingStationAddress = MutableStateFlow<String?>(null)
     val chargingStationAddress: StateFlow<String?> = _chargingStationAddress
 
@@ -62,11 +68,22 @@ class OrderActivityViewModel : ViewModel() {
     private val _orderStatus = MutableStateFlow<Int?>(null)
     val orderStatus: StateFlow<Int?> = _orderStatus
 
-    private val _orderProgress = MutableStateFlow<Float?>(null)
-    val orderProgress: StateFlow<Float?> = _orderProgress
+    private val _orderProgress = MutableStateFlow<Int?>(null)
+    val orderProgress: StateFlow<Int?> = _orderProgress
+
+    private val _finished = MutableStateFlow<Boolean>(false)
+    val finished: StateFlow<Boolean> = _finished
 
     fun setConnectorId(connectorId: Int?) {
         _connectorId.value = connectorId
+    }
+
+    fun setChargingStationId(chargingStationId: Int?) {
+        _chargingStationId.value = chargingStationId
+    }
+
+    fun setChargingTypeId(chargingTypeId: Int?) {
+        _chargingTypeId.value = chargingTypeId
     }
 
     fun setChargingStationAddress(chargingStationAddress: String?) {
@@ -108,7 +125,7 @@ class OrderActivityViewModel : ViewModel() {
                             } else {
                                 Log.e(TAG, "error")
                             }
-                            delay(200)
+                            delay(100)
                         }
                     }
                 } else {
@@ -125,12 +142,15 @@ class OrderActivityViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = apiService.mark(
-                    MarkRequest(a = 0)
+                    MarkRequest(
+                        chargingStationId = chargingStationId.value!!,
+                        status = status,
+                        chargingTypeId = chargingTypeId.value!!,
+                        token = token.value
+                    )
                 ).awaitResponse()
                 if (response.isSuccessful) {
-                    response.body()?.let {
-
-                    }
+                    _finished.value = true
                 } else {
                     Log.e(TAG, "error")
                 }

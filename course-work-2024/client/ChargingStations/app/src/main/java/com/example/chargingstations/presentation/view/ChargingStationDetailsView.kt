@@ -201,7 +201,8 @@ fun ChargingStationDetailsView(
                                             onClick = {
                                                 val bundle = Bundle()
                                                 bundle.putInt("connector_id", it.id)
-                                                bundle.putInt("charging_station_id", chargingStationDetails!!.id)
+                                                bundle.putInt("charging_station_id", it.chargingStationId)
+                                                bundle.putInt("charging_type_id", it.chargingType.id)
                                                 bundle.putString("charging_station_address", chargingStationDetails!!.address)
                                                 bundle.putString("charging_type_name", it.chargingType.name)
                                                 bundle.putFloat("connector_rate", it.rate)

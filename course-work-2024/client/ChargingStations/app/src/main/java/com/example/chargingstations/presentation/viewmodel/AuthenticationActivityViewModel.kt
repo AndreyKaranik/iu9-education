@@ -83,9 +83,6 @@ class AuthenticationActivityViewModel : ViewModel() {
                                 _confirmDialogIsShown.value = true
                             }
                             1 -> {
-                                _errorDialogIsShown.value = true
-                            }
-                            2 -> {
                                 _emailDialogIsShown.value = true
                             }
                         }

@@ -624,6 +624,14 @@ public class Utils {
         stmt.executeUpdate();
     }
 
+    public static void updateConnectorStatusById(Connection connection, int id, int status) throws SQLException {
+        String sql = "UPDATE connectors SET status = ? WHERE id = ?";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, status);
+        stmt.setInt(2, id);
+        stmt.executeUpdate();
+    }
+
 
 
 

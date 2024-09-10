@@ -9,5 +9,5 @@ data class GetOrderResponse(
     val userId: Int?,
     val amount: Float,
     val status: Int,
-    val progress: Float
+    val progress: Int
 )

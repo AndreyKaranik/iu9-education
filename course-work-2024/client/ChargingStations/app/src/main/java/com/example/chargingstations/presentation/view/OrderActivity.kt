@@ -1,18 +1,25 @@
 package com.example.chargingstations.presentation.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,8 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.chargingstations.presentation.theme.ChargingStationsTheme
 import com.example.chargingstations.presentation.viewmodel.AuthenticationActivityViewModel
 import com.example.chargingstations.presentation.viewmodel.OrderActivityViewModel
@@ -36,6 +45,7 @@ class OrderActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         intent.extras?.let {
+            Log.e("ERRR", it.getInt("connector_id").toString())
             viewModel.setConnectorId(it.getInt("connector_id"))
             viewModel.setChargingStationAddress(it.getString("charging_station_address"))
             viewModel.setConnectorTypeName(it.getString("charging_type_name"))
@@ -56,6 +66,14 @@ class OrderActivity : ComponentActivity() {
                     val amount by viewModel.amount.collectAsState()
                     val orderStatus by viewModel.orderStatus.collectAsState()
                     val orderProgress by viewModel.orderProgress.collectAsState()
+                    val finished by viewModel.finished.collectAsState()
+
+                    when (finished) {
+                        true -> {
+                            finish()
+                        }
+                        false -> {}
+                    }
 
                     Box(
                         modifier = Modifier.fillMaxSize()
@@ -112,6 +130,7 @@ class OrderActivity : ComponentActivity() {
                                     }
                                 }
                             }
+
                             0 -> {
                                 Column(
                                     modifier = Modifier
@@ -119,9 +138,22 @@ class OrderActivity : ComponentActivity() {
                                         .fillMaxWidth()
                                         .padding(horizontal = 64.dp),
                                 ) {
-                                    Text(text = "progress: $orderProgress")
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally),
+                                        text = "Прогресс: $orderProgress"
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    LinearProgressIndicator(
+                                        progress = orderProgress!! / 100.0f,
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .height(8.dp)
+                                            .align(Alignment.CenterHorizontally),
+                                    )
                                 }
                             }
+
                             1 -> {
                                 Column(
                                     modifier = Modifier
@@ -129,7 +161,46 @@ class OrderActivity : ComponentActivity() {
                                         .fillMaxWidth()
                                         .padding(horizontal = 64.dp),
                                 ) {
-                                    Text(text = "completed")
+                                    Text(
+                                        text = "Зарядка завершена!",
+                                        fontSize = 14.sp
+                                    )
+                                    Text(text = "Можете оставить отметку")
+                                    Spacer(modifier = Modifier.size(16.dp))
+                                    Button(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .fillMaxWidth(),
+                                        onClick = {
+                                            viewModel.mark(1)
+                                        }
+                                    ) {
+                                        Text(text = "Зарядка прошла успешно")
+                                    }
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    Button(
+                                        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.Red),
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .fillMaxWidth(),
+                                        onClick = {
+                                            viewModel.mark(0)
+                                        }
+                                    ) {
+                                        Text(text = "Зарядка не удалась")
+                                    }
+                                    Spacer(modifier = Modifier.size(8.dp))
+                                    Button(
+                                        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.Gray),
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .fillMaxWidth(),
+                                        onClick = {
+                                            finish()
+                                        }
+                                    ) {
+                                        Text(text = "Не оставлять")
+                                    }
                                 }
                             }
                         }

@@ -378,7 +378,7 @@ public class App {
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
                         int orderId = Utils.charge(connection, request);
                         ChargeResponse chargeResponse = new ChargeResponse(orderId);
-                        ChargingThread thread = new ChargingThread(orderId);
+                        ChargingThread thread = new ChargingThread(orderId, request.getConnectorId());
                         thread.start();
                         Utils.sendHttpJsonResponse(httpExchange, chargeResponse);
                     } catch (Exception exception) {

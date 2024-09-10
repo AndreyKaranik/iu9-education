@@ -11,9 +11,11 @@ import java.sql.SQLException;
 public class ChargingThread extends Thread {
 
     private int orderId;
+    private int connectorId;
 
-    public ChargingThread(int orderId) {
+    public ChargingThread(int orderId, int connectorId) {
         this.orderId = orderId;
+        this.connectorId = connectorId;
     }
 
     @Override
@@ -21,6 +23,7 @@ public class ChargingThread extends Thread {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(App.URL, App.USER, App.PASSWORD);
+            Utils.updateConnectorStatusById(connection, connectorId, 2);
             int progress = 0;
             while (progress < 100) {
                 Utils.updateOrderProgressById(connection, orderId, progress);
@@ -28,6 +31,7 @@ public class ChargingThread extends Thread {
                 progress += 1;
             }
             Utils.updateOrderStatusById(connection, orderId, 1);
+            Utils.updateConnectorStatusById(connection, connectorId, 1);
         } catch (Exception exception) {
             exception.printStackTrace();
         } finally {
