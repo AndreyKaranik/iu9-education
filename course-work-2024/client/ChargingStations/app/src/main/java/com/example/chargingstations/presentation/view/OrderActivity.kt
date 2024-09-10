@@ -45,8 +45,9 @@ class OrderActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         intent.extras?.let {
-            Log.e("ERRR", it.getInt("connector_id").toString())
             viewModel.setConnectorId(it.getInt("connector_id"))
+            viewModel.setChargingStationId(it.getInt("charging_station_id"))
+            viewModel.setChargingTypeId(it.getInt("charging_type_id"))
             viewModel.setChargingStationAddress(it.getString("charging_station_address"))
             viewModel.setConnectorTypeName(it.getString("charging_type_name"))
             viewModel.setConnectorRate(it.getFloat("connector_rate"))
@@ -72,6 +73,7 @@ class OrderActivity : ComponentActivity() {
                         true -> {
                             finish()
                         }
+
                         false -> {}
                     }
 
@@ -162,10 +164,16 @@ class OrderActivity : ComponentActivity() {
                                         .padding(horizontal = 64.dp),
                                 ) {
                                     Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally),
                                         text = "Зарядка завершена!",
-                                        fontSize = 14.sp
+                                        fontSize = 24.sp
                                     )
-                                    Text(text = "Можете оставить отметку")
+                                    Text(
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally),
+                                        text = "Можете оставить отметку"
+                                    )
                                     Spacer(modifier = Modifier.size(16.dp))
                                     Button(
                                         modifier = Modifier
@@ -179,7 +187,8 @@ class OrderActivity : ComponentActivity() {
                                     }
                                     Spacer(modifier = Modifier.size(8.dp))
                                     Button(
-                                        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.Red),
+                                        colors = ButtonDefaults.buttonColors()
+                                            .copy(containerColor = Color.Red),
                                         modifier = Modifier
                                             .align(Alignment.CenterHorizontally)
                                             .fillMaxWidth(),
@@ -191,7 +200,8 @@ class OrderActivity : ComponentActivity() {
                                     }
                                     Spacer(modifier = Modifier.size(8.dp))
                                     Button(
-                                        colors = ButtonDefaults.buttonColors().copy(containerColor = Color.Gray),
+                                        colors = ButtonDefaults.buttonColors()
+                                            .copy(containerColor = Color.Gray),
                                         modifier = Modifier
                                             .align(Alignment.CenterHorizontally)
                                             .fillMaxWidth(),

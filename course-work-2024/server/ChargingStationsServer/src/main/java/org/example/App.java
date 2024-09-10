@@ -18,6 +18,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.example.request.AuthRequest;
 import org.example.request.ChargeRequest;
+import org.example.request.MarkRequest;
 import org.example.request.RegisterRequest;
 import org.example.response.AuthResponse;
 import org.example.response.ChargeResponse;
@@ -381,6 +382,31 @@ public class App {
                         ChargingThread thread = new ChargingThread(orderId, request.getConnectorId());
                         thread.start();
                         Utils.sendHttpJsonResponse(httpExchange, chargeResponse);
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                        Utils.sendHttp500Response(httpExchange);
+                    } finally {
+                        try {
+                            if (connection != null) connection.close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return;
+                }
+
+                pattern = "/mark";
+                r = Pattern.compile(pattern);
+                m = r.matcher(httpExchange.getRequestURI().toString());
+
+                if (m.find()) {
+                    Connection connection = null;
+                    try {
+                        Gson gson = new Gson();
+                        MarkRequest request = gson.fromJson(body, MarkRequest.class);
+                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                        Utils.mark(connection, request);
+                        Utils.sendHttp200Response(httpExchange);
                     } catch (Exception exception) {
                         exception.printStackTrace();
                         Utils.sendHttp500Response(httpExchange);

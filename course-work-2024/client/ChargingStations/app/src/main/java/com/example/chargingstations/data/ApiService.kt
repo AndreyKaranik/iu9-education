@@ -10,7 +10,6 @@ import com.example.chargingstations.domain.model.request.ChargeRequest
 import com.example.chargingstations.domain.model.request.MarkRequest
 import com.example.chargingstations.domain.model.response.ChargeResponse
 import com.example.chargingstations.domain.model.response.GetOrderResponse
-import com.example.chargingstations.domain.model.response.MarkResponse
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -41,7 +40,7 @@ interface ApiService {
     fun charge(@Body body: ChargeRequest): Call<ChargeResponse>
 
     @POST("mark")
-    fun mark(@Body body: MarkRequest): Call<MarkResponse>
+    fun mark(@Body body: MarkRequest): Call<Void>
 
     @GET("orders/{id}")
     fun getOrder(@Path("id") orderId: Int): Call<GetOrderResponse>
