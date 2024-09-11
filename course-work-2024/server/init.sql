@@ -20,7 +20,9 @@ CREATE TABLE charging_stations (
     address VARCHAR(256) NOT NULL,
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
-    opening_hours VARCHAR(10) NOT NULL,
+    opening_hours VARCHAR(5) CHECK (opening_hours ~ '^\d{1,2}-\d{1,2}$' AND
+                                    CAST(SPLIT_PART(opening_hours, '-', 1) AS INT) BETWEEN 0 AND 24 AND
+                                    CAST(SPLIT_PART(opening_hours, '-', 2) AS INT) BETWEEN 0 AND 24),
     description VARCHAR(512) NULL
 );
 
@@ -71,9 +73,9 @@ CREATE TABLE orders (
     id INT GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY,
     connector_id INT NOT NULL,
     user_id INT NULL,
-    amount REAL NOT NULL,
+    amount REAL NOT NULL CHECK (amount > 0),
     status INT NOT NULL,
-    progress INT NOT NULL DEFAULT 0,
+    progress INT NOT NULL DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
     FOREIGN KEY (connector_id) REFERENCES connectors (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
@@ -218,11 +220,11 @@ VALUES (1, 1, 0, 1, 22),
 
 INSERT INTO charging_stations (id, name, address, latitude, longitude, opening_hours, description)
 VALUES
-    (1, 'SuperCharge', 'Романов переулок, Москва', 55.755098, 37.609135, '10-21', 'Самая быстрая заряданя станция в Москве'),
-    (2, 'FastCharging', 'улица Шухова, Москва', 55.716687, 37.618151, '10-21', 'Зарядная станция быстрой зарядки'),
+    (1, 'SuperCharge', 'Романов переулок, Москва', 55.755098, 37.609135, '9-21', 'Самая быстрая заряданя станция в Москве'),
+    (2, 'FastCharging', 'улица Шухова, Москва', 55.716687, 37.618151, '0-24', 'Зарядная станция быстрой зарядки'),
     (3, 'GoodStation', 'улица Винокурова, 7/5к3, Москва', 55.689155, 37.587574, '10-21', NULL),
-    (4, 'SimpleCharge', 'Товарищеский переулок, Москва', 55.742012, 37.659915, '10-21', 'Доступная и простая зарядная станция'),
-    (5, 'BestStation', 'Проектируемый проезд № 6334, Москва', 55.760399, 37.679309, '10-21', 'Лучшая станция в Москве');
+    (4, 'SimpleCharge', 'Товарищеский переулок, Москва', 55.742012, 37.659915, '10-22', 'Доступная и простая зарядная станция'),
+    (5, 'BestStation', 'Проектируемый проезд № 6334, Москва', 55.760399, 37.679309, '10-22', 'Лучшая станция в Москве');
 
 COMMIT;
 
