@@ -225,7 +225,15 @@ public class App {
                     try {
                         connection = DriverManager.getConnection(URL, USER, PASSWORD);
                         Utils.confirm(connection, queryParams.get("token") == null ? null : URLDecoder.decode(queryParams.get("token"), StandardCharsets.UTF_8));
-                        Utils.sendHttp200Response(httpExchange);
+                        String response = "<html><body>Success</body></html>";
+                        ArrayList<String> list = new ArrayList<>();
+                        list.add("text/html");
+                        httpExchange.getResponseHeaders().put("Content-Type", list);
+                        httpExchange.sendResponseHeaders(200, response.getBytes(StandardCharsets.UTF_8).length);
+                        OutputStream os = httpExchange.getResponseBody();
+                        os.write(response.getBytes());
+                        os.flush();
+                        os.close();
                     } catch (SQLException e) {
                         httpExchange.sendResponseHeaders(500, 0);
                         OutputStream os = httpExchange.getResponseBody();
