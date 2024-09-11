@@ -43,7 +43,7 @@ CREATE TABLE connectors (
     status INT NOT NULL,
     charging_type_id INT NOT NULL,
     rate REAL NOT NULL,
-    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id) ON DELETE CASCADE,
+    FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (charging_type_id) REFERENCES charging_types (id)
 );
 
@@ -164,32 +164,72 @@ WHEN (OLD.connector_id IS DISTINCT FROM NEW.connector_id
     OR OLD.user_id IS DISTINCT FROM NEW.user_id)
 EXECUTE FUNCTION prevent_fk_update();
 
+CREATE OR REPLACE FUNCTION check_min_connector()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT COUNT(*) FROM connectors WHERE charging_statation_id = OLD.charging_station_id) = 1 THEN
+        RAISE EXCEPTION 'Cannot delete last connector for station %', OLD.charging_station_id;
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER prevent_last_connector_deletion
+BEFORE DELETE ON connectors
+FOR EACH ROW
+EXECUTE FUNCTION check_min_connector();
+
+CREATE OR REPLACE FUNCTION check_connectors_on_station()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT COUNT(*) FROM connectors WHERE charging_station_id = NEW.id) = 0 THEN
+        RAISE EXCEPTION 'Charging station % must have at least one connector', NEW.id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER validate_connectors_after_insert
+AFTER INSERT OR UPDATE ON charging_stations
+FOR EACH ROW
+EXECUTE FUNCTION check_connectors_on_station();
+
+INSERT INTO charging_types (name, current_type)
+VALUES ('TYPE 1', 'AC'),
+        ('TYPE 2', 'AC'),
+        ('GB/T', 'AC'),
+        ('CHAdeMO', 'AC');
+
+BEGIN;
+
+INSERT INTO connectors (id, charging_station_id, status, charging_type_id, rate)
+VALUES (1, 1, 0, 1, 22),
+        (2, 1, 1, 1, 15),
+        (3, 1, 1, 3, 22),
+        (4, 2, 1, 3, 30),
+        (5, 2, 1, 1, 22),
+        (6, 3, 1, 2, 22),
+        (7, 3, 1, 3, 15),
+        (8, 4, 1, 2, 15),
+        (9, 4, 1, 2, 22),
+        (10, 5, 1, 1, 22),
+        (11, 5, 1, 2, 22);
 
 INSERT INTO charging_stations (id, name, address, latitude, longitude, opening_hours, description)
 VALUES
-    (1, 'Станция 1', 'ул. Тверская, 7, Москва', 55.756, 37.618, '10-21', 'Описание для Станции 1'),
-    (2, 'Станция 2', 'ул. Арбат, 10, Москва', 55.752, 37.586, '10-21', 'Описание для Станции 2'),
-    (3, 'Станция 3', 'ул. Мясницкая, 15, Москва', 55.762, 37.634, '10-21', NULL),
-    (4, 'Станция 4', 'ул. Новый Арбат, 8, Москва', 55.751, 37.596, '10-21', 'Описание для Станции 4'),
-    (5, 'Станция 5', 'ул. Лубянка, 2, Москва', 55.758, 37.625, '10-21', 'Описание для Станции 5');
+    (1, 'SuperCharge', 'Романов переулок, Москва', 55.755098, 37.609135, '10-21', 'Самая быстрая заряданя станция в Москве'),
+    (2, 'FastCharging', 'улица Шухова, Москва', 55.716687, 37.618151, '10-21', 'Зарядная станция быстрой зарядки'),
+    (3, 'GoodStation', 'улица Винокурова, 7/5к3, Москва', 55.689155, 37.587574, '10-21', NULL),
+    (4, 'SimpleCharge', 'Товарищеский переулок, Москва', 55.742012, 37.659915, '10-21', 'Доступная и простая зарядная станция'),
+    (5, 'BestStation', 'Проектируемый проезд № 6334, Москва', 55.760399, 37.679309, '10-21', 'Лучшая станция в Москве');
+
+COMMIT;
 
 INSERT INTO charging_station_images (charging_station_id, path)
 VALUES (1, '1_1.jpg'),
         (1, '1_2.jpg'),
         (2, '2_1.jpg');
-
-INSERT INTO charging_types (name, current_type)
-VALUES ('TYPE 1', 'AC'),
-        ('GB/T', 'DC'),
-        ('TYPE 2', 'DC');
-
-INSERT INTO connectors (id, charging_station_id, status, charging_type_id, rate)
-VALUES (1, 1, 0, 1, 22),
-        (2, 1, 1, 1, 15),
-        (3, 1, 1, 1, 22),
-        (4, 1, 1, 1, 22),
-        (5, 2, 1, 1, 22),
-        (6, 2, 1, 2, 30);
 
 INSERT INTO users (name, email, password, token, is_active)
 VALUES ('Dmitry', 'dmitry@gmail.com', '$2a$10$RmeP/zA/5x3YHcnC8sY8VO2FeAENCdC0HFGv4tXYiya6vHQV.PtMy',
