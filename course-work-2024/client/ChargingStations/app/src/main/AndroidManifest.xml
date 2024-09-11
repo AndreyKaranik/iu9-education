@@ -23,21 +23,29 @@
         android:theme="@style/Theme.ChargingStations"
         tools:targetApi="31">
         <activity
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:name=".presentation.view.OrderActivity"
             android:exported="false"
             android:label="@string/title_activity_order"
             android:theme="@style/Theme.ChargingStations" />
         <activity
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:name=".presentation.view.AuthenticationActivity"
             android:exported="false"
             android:label="@string/title_activity_authentication"
             android:theme="@style/Theme.ChargingStations" />
         <activity
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:name=".presentation.view.QRScannerActivity"
             android:exported="false"
             android:label="@string/title_activity_qrscanner"
             android:theme="@style/Theme.ChargingStations" />
         <activity
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
             android:name=".presentation.view.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.ChargingStations">
