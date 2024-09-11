@@ -50,7 +50,7 @@
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".presentation.view.SplashScreenActivity"
+            android:name=".presentation.view.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.ChargingStations">
             <intent-filter>

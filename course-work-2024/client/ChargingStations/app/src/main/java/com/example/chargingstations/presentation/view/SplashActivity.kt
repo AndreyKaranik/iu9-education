@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.chargingstations.presentation.theme.ChargingStationsTheme
 import kotlinx.coroutines.delay
 
-class SplashScreenActivity : ComponentActivity() {
+class SplashActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -45,7 +45,7 @@ class SplashScreenActivity : ComponentActivity() {
                 val fadeOut = tween<Float>(durationMillis = 1000)
                 alpha.animateTo(1f, animationSpec = fadeOut)
                 delay(1000L)
-                val sharedPref = this@SplashScreenActivity.getPreferences(Context.MODE_PRIVATE)
+                val sharedPref = this@SplashActivity.getPreferences(Context.MODE_PRIVATE)
                 val isFirstLaunch = sharedPref.getBoolean("first_launch", true)
                 if (isFirstLaunch) {
                     with(sharedPref.edit()) {
@@ -54,11 +54,11 @@ class SplashScreenActivity : ComponentActivity() {
                     }
                     val bundle = Bundle()
                     bundle.putBoolean("skip_button", true)
-                    val intent = Intent(this@SplashScreenActivity, AuthenticationActivity::class.java)
+                    val intent = Intent(this@SplashActivity, AuthenticationActivity::class.java)
                     intent.putExtras(bundle)
                     startActivity(intent)
                 } else {
-                    startActivity(Intent(this@SplashScreenActivity, MainActivity::class.java))
+                    startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 }
                 finish()
             }

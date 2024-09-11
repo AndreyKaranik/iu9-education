@@ -44,7 +44,7 @@ CREATE TABLE connectors (
     charging_station_id INT NOT NULL,
     status INT NOT NULL,
     charging_type_id INT NOT NULL,
-    rate REAL NOT NULL,
+    rate REAL NOT NULL CHECK (rate > 0),
     FOREIGN KEY (charging_station_id) REFERENCES charging_stations (id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (charging_type_id) REFERENCES charging_types (id)
 );
