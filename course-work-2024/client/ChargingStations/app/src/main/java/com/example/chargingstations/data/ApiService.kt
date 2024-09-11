@@ -1,11 +1,11 @@
 package com.example.chargingstations.data
-import com.example.chargingstations.domain.model.AuthData
+import com.example.chargingstations.domain.model.request.AuthRequest
 import com.example.chargingstations.domain.model.ChargingStationDetails
 import com.example.chargingstations.domain.model.ChargingStationImage
 import com.example.chargingstations.domain.model.ChargingStationJson
-import com.example.chargingstations.domain.model.IntStatus
-import com.example.chargingstations.domain.model.RegistrationData
-import com.example.chargingstations.domain.model.Token
+import com.example.chargingstations.domain.model.response.RegisterResponse
+import com.example.chargingstations.domain.model.request.RegisterRequest
+import com.example.chargingstations.domain.model.response.AuthResponse
 import com.example.chargingstations.domain.model.request.ChargeRequest
 import com.example.chargingstations.domain.model.request.MarkRequest
 import com.example.chargingstations.domain.model.response.ChargeResponse
@@ -31,10 +31,10 @@ interface ApiService {
     fun getChargingStationImage(@Path("id") chargingStationImageId: Int): Call<ChargingStationImage>
 
     @POST("register")
-    fun register(@Body body: RegistrationData): Call<IntStatus>
+    fun register(@Body body: RegisterRequest): Call<RegisterResponse>
 
     @POST("auth")
-    fun auth(@Body body: AuthData): Call<Token>
+    fun auth(@Body body: AuthRequest): Call<AuthResponse>
 
     @POST("charge")
     fun charge(@Body body: ChargeRequest): Call<ChargeResponse>

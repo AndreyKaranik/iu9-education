@@ -68,6 +68,15 @@ import com.example.chargingstations.R
 import com.example.chargingstations.createBitmapFromVector
 import com.example.chargingstations.isNetworkAvailable
 import com.example.chargingstations.moveTo
+import com.example.chargingstations.presentation.view.component.BasicIconButton
+import com.example.chargingstations.presentation.view.component.BasicIconButtonWithProgress
+import com.example.chargingstations.presentation.view.component.ChargingStationDetailsView
+import com.example.chargingstations.presentation.view.component.ChargingStationListView
+import com.example.chargingstations.presentation.view.component.ChargingStationNotFoundDialog
+import com.example.chargingstations.presentation.view.component.ConnectionProblemDialog
+import com.example.chargingstations.presentation.view.component.GPSDialog
+import com.example.chargingstations.presentation.view.component.IncorrectQRCodeDialog
+import com.example.chargingstations.presentation.view.component.NoInternetConnectionDialog
 
 class MainActivity : ComponentActivity() {
     private lateinit var mapView: MapView

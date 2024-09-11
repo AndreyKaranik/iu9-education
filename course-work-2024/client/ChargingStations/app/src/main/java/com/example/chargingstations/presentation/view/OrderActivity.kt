@@ -68,6 +68,7 @@ class OrderActivity : ComponentActivity() {
                     val orderStatus by viewModel.orderStatus.collectAsState()
                     val orderProgress by viewModel.orderProgress.collectAsState()
                     val finished by viewModel.finished.collectAsState()
+                    val amountIsIncorrect by viewModel.amountIsIncorrect.collectAsState()
 
                     when (finished) {
                         true -> {
@@ -92,9 +93,10 @@ class OrderActivity : ComponentActivity() {
                                         text = "Укажите объем зарядки (kW/h): "
                                     )
                                     TextField(
-                                        value = amount.toString(),
+                                        value = amount,
+                                        isError = amountIsIncorrect,
                                         onValueChange = {
-                                            viewModel.setAmount(it.toFloat())
+                                            viewModel.setAmount(it)
                                         },
                                         keyboardOptions = KeyboardOptions.Default.copy(
                                             keyboardType = KeyboardType.Number
@@ -126,7 +128,8 @@ class OrderActivity : ComponentActivity() {
                                             .fillMaxWidth(),
                                         onClick = {
                                             viewModel.charge()
-                                        }
+                                        },
+                                        enabled = !amountIsIncorrect
                                     ) {
                                         Text(text = "Зарядить")
                                     }

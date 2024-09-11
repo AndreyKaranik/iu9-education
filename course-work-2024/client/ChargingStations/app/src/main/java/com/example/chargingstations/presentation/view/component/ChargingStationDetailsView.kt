@@ -1,4 +1,4 @@
-package com.example.chargingstations.presentation.view
+package com.example.chargingstations.presentation.view.component
 
 import android.content.Context
 import android.content.Intent
@@ -42,6 +42,7 @@ import com.example.chargingstations.R
 import com.example.chargingstations.presentation.theme.Gray1
 import com.example.chargingstations.presentation.theme.Gray2
 import com.example.chargingstations.presentation.theme.Green1
+import com.example.chargingstations.presentation.view.OrderActivity
 import com.example.chargingstations.presentation.viewmodel.MainActivityViewModel
 
 @Composable

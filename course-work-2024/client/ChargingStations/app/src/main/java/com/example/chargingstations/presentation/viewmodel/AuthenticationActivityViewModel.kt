@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.data.ApiService
-import com.example.chargingstations.domain.model.AuthData
-import com.example.chargingstations.domain.model.RegistrationData
+import com.example.chargingstations.domain.model.request.AuthRequest
+import com.example.chargingstations.domain.model.request.RegisterRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -78,7 +78,7 @@ class AuthenticationActivityViewModel : ViewModel() {
     fun register(name: String, email: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = apiService.register(RegistrationData(name, email, password)).awaitResponse()
+                val response = apiService.register(RegisterRequest(name, email, password)).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         when (it.status) {
@@ -107,7 +107,7 @@ class AuthenticationActivityViewModel : ViewModel() {
     fun auth(email: String, password: String) {
         viewModelScope.launch {
             try {
-                val response = apiService.auth(AuthData(email, password)).awaitResponse()
+                val response = apiService.auth(AuthRequest(email, password)).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
                         if (it.token != null) {

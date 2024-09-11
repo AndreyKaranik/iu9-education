@@ -1,4 +1,4 @@
-package com.example.chargingstations.presentation.view
+package com.example.chargingstations.presentation.view.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row

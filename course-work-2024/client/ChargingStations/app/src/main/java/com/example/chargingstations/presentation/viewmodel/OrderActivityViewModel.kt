@@ -4,8 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.chargingstations.data.ApiService
-import com.example.chargingstations.domain.model.AuthData
-import com.example.chargingstations.domain.model.RegistrationData
 import com.example.chargingstations.domain.model.request.ChargeRequest
 import com.example.chargingstations.domain.model.request.MarkRequest
 import kotlinx.coroutines.delay
@@ -56,8 +54,8 @@ class OrderActivityViewModel : ViewModel() {
     private val _connectorRate = MutableStateFlow<Float?>(null)
     val connectorRate: StateFlow<Float?> = _connectorRate
 
-    private val _amount = MutableStateFlow<Float>(0.0f)
-    val amount: StateFlow<Float> = _amount
+    private val _amount = MutableStateFlow<String>("10.0")
+    val amount: StateFlow<String> = _amount
 
     private val _token = MutableStateFlow<String?>(null)
     val token: StateFlow<String?> = _token
@@ -73,6 +71,9 @@ class OrderActivityViewModel : ViewModel() {
 
     private val _finished = MutableStateFlow<Boolean>(false)
     val finished: StateFlow<Boolean> = _finished
+
+    private val _amountIsIncorrect = MutableStateFlow<Boolean>(false)
+    val amountIsIncorrect: StateFlow<Boolean> = _amountIsIncorrect
 
     fun setConnectorId(connectorId: Int?) {
         _connectorId.value = connectorId
@@ -98,8 +99,20 @@ class OrderActivityViewModel : ViewModel() {
         _connectorRate.value = connectorRate
     }
 
-    fun setAmount(amount: Float) {
+    fun setAmount(amount: String) {
         _amount.value = amount
+        _amountIsIncorrect.value = true
+        val regex = Regex("^[0-9]*\\.?[0-9]+$")
+        if (regex.matches(amount)) {
+            try {
+                val a = amount.toDouble()
+                if (a > 0) {
+                    _amountIsIncorrect.value = false
+                }
+            } catch (e: NumberFormatException) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun setToken(token: String?) {
@@ -109,8 +122,9 @@ class OrderActivityViewModel : ViewModel() {
     fun charge() {
         viewModelScope.launch {
             try {
+                val a = amount.value.toFloat()
                 val response = apiService.charge(
-                    ChargeRequest(connectorId = connectorId.value!!, amount = amount.value, token = token.value)
+                    ChargeRequest(connectorId = connectorId.value!!, amount = a, token = token.value)
                 ).awaitResponse()
                 if (response.isSuccessful) {
                     response.body()?.let {
