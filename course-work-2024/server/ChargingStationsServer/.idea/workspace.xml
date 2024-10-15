@@ -1,14 +1,283 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
+    <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c026a9e2-a77a-40fb-9acc-7f2a70240050" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/Api.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/ChargingStation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/ChargingStation.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/AuthRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/AuthRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/ChargeRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/ChargeRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/MarkRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/MarkRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/RegisterRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/RegisterRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/AuthResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/AuthResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/ChargeResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/ChargeResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/GetOrderResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/GetOrderResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/RegisterResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/RegisterResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/AuthenticationActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/AuthenticationActivityViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/MainActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/MainActivityViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/OrderActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/OrderActivityViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../client/ChargingStations/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/../../client/ChargingStations/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/App.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/.metadata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/analysis_options.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/debug/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/kotlin/com/example/launcher/MainActivity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/drawable/launch_background.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/values-night/styles.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/main/res/values/styles.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/app/src/profile/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/gradle.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/android/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Flutter/AppFrameworkInfo.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Flutter/Debug.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Flutter/Release.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/AppDelegate.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Base.lproj/LaunchScreen.storyboard" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Base.lproj/Main.storyboard" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Info.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/Runner/Runner-Bridging-Header.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/ios/RunnerTests/RunnerTests.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/lib/main.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/flutter/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/flutter/generated_plugin_registrant.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/flutter/generated_plugins.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/main.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/my_application.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/linux/my_application.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Flutter/Flutter-Debug.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Flutter/Flutter-Release.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner.xcodeproj/project.pbxproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/AppDelegate.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Base.lproj/MainMenu.xib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Configs/AppInfo.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Configs/Debug.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Configs/Release.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Configs/Warnings.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/DebugProfile.entitlements" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Info.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/MainFlutterWindow.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/Runner/Release.entitlements" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/macos/RunnerTests/RunnerTests.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/pubspec.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/pubspec.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/test/widget_test.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/icons/Icon-192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/icons/Icon-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/icons/Icon-maskable-192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/icons/Icon-maskable-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/web/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/flutter/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/flutter/generated_plugin_registrant.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/flutter/generated_plugins.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/Runner.rc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/flutter_window.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/flutter_window.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/main.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/resource.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/resources/app_icon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/runner.exe.manifest" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/utils.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/utils.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/win32_window.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/launcher/windows/runner/win32_window.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/.metadata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/analysis_options.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/debug/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/kotlin/com/example/untitled/MainActivity.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/drawable/launch_background.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/values-night/styles.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/main/res/values/styles.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/app/src/profile/AndroidManifest.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/gradle.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/android/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Flutter/AppFrameworkInfo.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Flutter/Debug.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Flutter/Release.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/AppDelegate.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Base.lproj/LaunchScreen.storyboard" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Base.lproj/Main.storyboard" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Info.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/Runner/Runner-Bridging-Header.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/ios/RunnerTests/RunnerTests.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/lib/main.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/flutter/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/flutter/generated_plugin_registrant.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/flutter/generated_plugins.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/main.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/my_application.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/linux/my_application.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Flutter/Flutter-Debug.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Flutter/Flutter-Release.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner.xcodeproj/project.pbxproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner.xcodeproj/project.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner.xcworkspace/contents.xcworkspacedata" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/AppDelegate.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Base.lproj/MainMenu.xib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Configs/AppInfo.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Configs/Debug.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Configs/Release.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Configs/Warnings.xcconfig" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/DebugProfile.entitlements" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Info.plist" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/MainFlutterWindow.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/Runner/Release.entitlements" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/macos/RunnerTests/RunnerTests.swift" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/pubspec.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/pubspec.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/test/widget_test.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/favicon.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/icons/Icon-192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/icons/Icon-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/icons/Icon-maskable-192.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/icons/Icon-maskable-512.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/web/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/flutter/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/flutter/generated_plugin_registrant.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/flutter/generated_plugins.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/CMakeLists.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/Runner.rc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/flutter_window.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/flutter_window.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/main.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/resource.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/resources/app_icon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/runner.exe.manifest" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/utils.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/utils.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/win32_window.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../mobile-app-dev/lab2/untitled/windows/runner/win32_window.h" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,19 +310,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Golum/Desktop/iu9-education/course-work-2024/server/ChargingStationsServer&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/Golum/Desktop/iu9-education/course-work-2024/client/ChargingStations",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

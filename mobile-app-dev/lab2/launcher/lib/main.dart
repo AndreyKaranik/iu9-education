@@ -21,7 +21,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String response = "Response from API will appear here";
+  String response = "Здесь будет ответ";
   bool isSwitched = false;
 
   Future<void> requestOff() async {
@@ -81,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     });
                   },
                 ),
+
                 Text("ON"),
               ],
             ),

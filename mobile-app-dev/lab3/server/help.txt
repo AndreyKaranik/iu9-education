@@ -1,0 +1,10 @@
+pscp "C:\Users\Golum\Desktop\iu9-education\mobile-app-dev\lab2\server\server.dart" root@194.67.88.154:/root/mobiledev/lab2/server
+
+curl http://194.67.88.154:8100/value
+curl -X POST http://194.67.88.154:8100/value/42
+
+
+ssh vale@194.67.88.154
+1234
+
+pscp "C:\server.dart" root@194.67.88.154:/home/vale

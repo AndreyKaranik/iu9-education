@@ -1,11 +1,7 @@
+using Random
 using LinearAlgebra
-
-n = 100
-range_min = -10000
-range_max = 10000
-A = rand(n, n) * (range_max - range_min) .+ range_min
-x_original = rand(n) * (range_max - range_min) .+ range_min
-f = A * x_original
+using Plots
+using Distributions
 
 function gauss_classic(A, f)
     A_aug = hcat(A, f)
@@ -122,29 +118,74 @@ function gauss_combined(A, f)
     return result
 end
 
-
-
-function relative_error(x_original, x_found)
-    return norm(x_original - x_found) / norm(x_original)
+function library(A, b)
+    return A \ b
 end
 
-x_classic = gauss_classic(A, f)
-x_by_rows = gauss_by_rows(A, f)
-x_by_columns = gauss_by_columns(A, f)
-x_combined = gauss_combined(A, f)
+function euclidean_norm(vec)
+    return sqrt(sum(element^2 for element in vec))
+end
 
-error_classic = relative_error(x_original, x_classic)
-error_by_rows = relative_error(x_original, x_by_rows)
-error_by_columns = relative_error(x_original, x_by_columns)
-error_combined = relative_error(x_original, x_combined)
+function mulvec(A, vector)
+    result = Float64[]
+    for i in 1:size(A, 1)
+        element = 0.0
+        for j in 1:length(vector)
+            element += A[i, j] * vector[j]
+        end
+        push!(result, element)
+    end
+    return result
+end
 
-println("Классический метод (оценка): $error_classic")
-println("Метод по строкам (оценка): $error_by_rows")
-println("Метод по столбцам (оценка): $error_by_columns")
-println("Комбинированный метод (оценка): $error_combined")
+function generate_matrix(l, r, n)
+    return rand(Uniform(l,r), n, n)
+end
 
-# println("Оригинальный вектор x: $x_original")
-# println("Классический метод: $x_classic")
-# println("Метод по строкам: $x_by_rows")
-# println("Метод по столбцам: $x_by_columns")
-# println("Комбинированный метод: $x_combined")
+function increase_diag_elements(A, diag)
+    n = size(A, 1)
+    for i in 1:n
+        A[i, i] += diag * sum(abs(A[i, j]) for j in 1:n if j != i)
+    end
+    return A
+end
+
+function diag_dominance(A)
+    return maximum(abs(A[i, i]) - sum(abs(A[i, j]) for j in 1:size(A, 2) if j != i) for i in 1:size(A, 1))
+end
+
+function calculate(method, A::Array{Float64}, x::Array{Float64})
+    b = mulvec(A, x)
+    x_calc = method(A, b)
+    return euclidean_norm(x .- x_calc)
+end
+
+n = 100
+diag = Float64[]
+y_gauss = Float64[]
+y_gauss_row = Float64[]
+y_gauss_columns = Float64[]
+y_gauss_combined = Float64[]
+y_library = Float64[]
+coefs = [i * 0.2 for i in 1:2:10]
+
+for c in coefs
+    A = generate_matrix(-10.0, 10.0, n)
+    A = increase_diag_elements(A, c)
+    x = rand(Uniform(-10.0, 10.0), n)
+    push!(diag, diag_dominance(A))
+    push!(y_gauss, calculate(gauss_classic, A, x))
+    push!(y_gauss_row, calculate(gauss_by_rows, A, x))
+    push!(y_gauss_columns, calculate(gauss_by_columns, A, x))
+    push!(y_gauss_combined, calculate(gauss_combined, A, x))
+    push!(y_library, calculate(library, A, x))
+end
+
+p = plot(diag, 
+    [y_gauss, y_gauss_row, y_gauss_columns, y_gauss_combined, y_library], 
+    label=["gauss_classic" "gauss_by_rows" "gauss_by_columns" "gauss_combined" "library"], 
+    title=("matrix $(n)x$(n)"), 
+    xlabel=("Diagonal Dominance"), 
+    ylabel=("Absolute Error"))
+
+display(p)

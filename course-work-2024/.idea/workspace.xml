@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7138291d-6a5b-4864-ad51-431fdb357e3d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/ApiService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/Api.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/ChargingStation.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/ChargingStation.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/AuthRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/AuthRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/ChargeRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/ChargeRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/MarkRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/MarkRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/request/RegisterRequest.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/request/RegisterRequest.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/AuthResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/AuthResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/ChargeResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/ChargeResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/GetOrderResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/GetOrderResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/domain/model/response/RegisterResponse.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/data/api/response/RegisterResponse.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/AuthenticationActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/AuthenticationActivityViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/MainActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/MainActivityViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/OrderActivityViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/app/src/main/java/com/example/chargingstations/presentation/viewmodel/OrderActivityViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/ChargingStations/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/client/ChargingStations/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/ChargingStationsServer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/server/ChargingStationsServer/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="2mFCXlfkOosBJQ3CKVsMKu75rWh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "last_opened_file_path": "C:/Users/Golum/Desktop/charging-stations",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7138291d-6a5b-4864-ad51-431fdb357e3d" name="Changes" comment="" />
+      <created>1726662978984</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1726662978984</updated>
+    </task>
+    <servers />
+  </component>
+</project>
