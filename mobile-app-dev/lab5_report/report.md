@@ -3,223 +3,725 @@ year: 2024
 author: "Караник А.А."
 group: "ИУ9-72Б"
 teacher: "Посевин Д.П."
-subject: "Численные методы линейной алгебры"
-name: "Вычисление собственных значений и собственных векторов симметричной матрицы методом А.М. Данилевского"
-number: "5.1"
+subject: "Разработка мобильных приложений"
+name: "Отправка и получение значений по MQTT"
+number: "5"
 ---
 
 # Цель работы
 
-Реализовать метод вычисления собственных значений и собственных векторов симметричной матрицы методом А.М. Данилевского.
+Цель данной работы состоит в том, чтобы научиться реализовывать передачу и получение данных с помощью протокола MQTT в flutter мобильном приложении. В рамках лабораторной работы необходимо создать три текстовых поля для ввода данных и настроить два виджета: один для отправки значений по MQTT, а другой — для получения данных. Также дополнить выпадающее меню в AppBar, которое будет содержать переключение между этими виджетами.
 
 # Реализация
 
 Исходный код программы:
-```julia
-using LinearAlgebra
-using Plots
+```dart
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:math';
+import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 
-function check_gershgorin(A::Matrix{Float64}, eigenvalues::Vector{Float64})
-    n = size(A, 1)
-    for λ in eigenvalues
-        belongs_to_circle = false
-        for i in 1:n
-            center = A[i, i]
-            radius = sum(abs(A[i, j]) for j in 1:n if j != i)
-            if abs(λ - center) <= radius
-                belongs_to_circle = true
-                break
-            end
-        end
-        if !belongs_to_circle
-            return false
-        end
-    end
-    return true
-end
+void main() {
+  runApp(MyApp());
+}
 
-function check_vieta(A::Matrix{Float64}, eigenvalues::Vector{Float64})
-    n = size(A, 1)
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'lab5',
+      home: HomeScreen(),
+    );
+  }
+}
 
-    eps = 1e-3
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 
-    sum_eigenvalues = sum(eigenvalues)
-    trace_A = tr(A)
-    sum_check = abs(sum_eigenvalues - trace_A) < eps
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('lab5'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'lab2') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Lab2Screen()),
+                );
+              } else if (value == 'lab3') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Lab3Screen()),
+                );
+              } else if (value == 'anim') {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AnimScreen()));
+              } else if (value == 'mqtt1') {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Mqtt1Screen()));
+              }  else if (value == 'mqtt2') {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Mqtt2Screen()));
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(
+                  value: 'lab2',
+                  child: Text('Lab 2'),
+                ),
+                PopupMenuItem(
+                  value: 'lab3',
+                  child: Text('Lab 3'),
+                ),
+                PopupMenuItem(
+                  value: 'anim',
+                  child: Text('Anim'),
+                ),
+                PopupMenuItem(
+                  value: 'mqtt1',
+                  child: Text('mqtt1'),
+                ),
+                PopupMenuItem(
+                  value: 'mqtt2',
+                  child: Text('mqtt2'),
+                ),
+              ];
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Text('Выберите лабораторную работу из меню'),
+      ),
+    );
+  }
+}
 
-    product_eigenvalues = prod(eigenvalues)
-    det_A = det(A)
-    product_check = abs(product_eigenvalues - det_A) < eps
+class Lab2Screen extends StatefulWidget {
+  @override
+  _Lab2ScreenState createState() => _Lab2ScreenState();
+}
 
-    return sum_check && product_check
-end
+class _Lab2ScreenState extends State<Lab2Screen> {
+  String response = "Здесь будет ответ";
+  bool isSwitched = false;
 
-function check_orthogonality(vectors)
-    n = size(vectors, 2)
-    for i in 1:n
-        for j in i+1:n
-            if abs(vectors[:, i] ⋅ vectors[:, j]) > 1e-6
-                return false
-            end
-        end
-    end
-    return true
-end
+  Future<void> requestOff() async {
+    final response = await http
+        .get(Uri.parse('http://iocontrol.ru/api/sendData/karanik/value/0'));
 
-function danilevsky(A)
-    n = size(A, 1)
-    D = A
-    Bs = I
-    for i in 1:n-1
-        B = Matrix{Float64}(I, n, n)
-        B[n - i, :] = -D[n - i + 1, :] ./ D[n - i + 1,n - i]
-        B[n - i, n - i] = 1 / D[n - i + 1, n - i] 
-        C = D * B
-        B_inv = Matrix{Float64}(I, n, n)
-        B_inv[n - i, :] = D[n - i + 1, :]
-        D = B_inv * C
-        Bs *= B
-    end
-    return D, Bs
-end
+    if (response.statusCode == 200) {
+      setState(() {
+        this.response = jsonDecode(response.body).toString();
+      });
+    } else {
+      setState(() {
+        this.response = 'Failed';
+      });
+    }
+  }
 
-function characteristic_polynomial(x, coeffs)
-    n = length(coeffs)
-    return x^n + sum([coeffs[i] * x^(n-i) for i in 1:n])
-end
+  Future<void> requestOn() async {
+    final response = await http
+        .get(Uri.parse('http://iocontrol.ru/api/sendData/karanik/value/1'));
 
-function get_gershgorin_circles(A)
-    R = [sum(abs.(A[i, :])) - abs(A[i, i]) for i in 1:size(A, 1)]
-    intervals = [(A[i, i] - R[i], A[i, i] + R[i]) for i in 1:size(A, 1)]
-    return intervals
-end
+    if (response.statusCode == 200) {
+      setState(() {
+        this.response = jsonDecode(response.body).toString();
+      });
+    } else {
+      setState(() {
+        this.response = 'Failed';
+      });
+    }
+  }
 
-function find_roots(f, search_interval)
-    x_prev = search_interval[1]
-    f_prev = f(x_prev)
-    roots = []
-    step = 1e-4
-    eps = 1e-3
-    for x in x_prev:step:search_interval[2]
-        f_curr = f(x)        
-        if f_prev * f_curr < 0
-            root = bisection_method((x_prev, x), f, eps)
-            push!(roots, root)
-        end
-        x_prev = x
-        f_prev = f_curr
-    end
-    return roots 
-end
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("lab2"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            // Переключатель on/off
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("OFF"),
+                Switch(
+                  value: isSwitched,
+                  onChanged: (value) {
+                    setState(() {
+                      isSwitched = value;
+                      if (isSwitched) {
+                        requestOn();
+                      } else {
+                        requestOff();
+                      }
+                    });
+                  },
+                ),
+                Text("ON"),
+              ],
+            ),
+            SizedBox(height: 16),
+            Text(response),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-function bisection_method(interval, f, eps)
-    a, b = interval
-    fa, fb = f(a), f(b)
-    
-    if fa * fb > 0
-        error("err")
-    end
-    
-    while abs(b - a) > eps
-        mid = (a + b) / 2
-        fmid = f(mid)
-        
-        if fmid == 0
-            return mid
-        elseif fa * fmid < 0
-            b = mid
-            fb = fmid
-        else
-            a = mid
-            fa = fmid
-        end
-    end
-    return (a + b) / 2
-end
+class Lab3Screen extends StatefulWidget {
+  @override
+  _Lab3ScreenState createState() => _Lab3ScreenState();
+}
 
-function get_interval(intervals)
-    x_min, x_max = intervals[1][1], intervals[1][2]
-    for interval in intervals[2:end]
-        x_min = min(x_min, interval[1])
-        x_max = max(x_max, interval[2])
-    end
-    return (x_min, x_max)
-end
+class _Lab3ScreenState extends State<Lab3Screen> {
+  int _counter = 0;
+  String _serverResponse = '';
+  final TextEditingController _textController = TextEditingController();
 
-function find_eigenvectors(A, eigenvalues, B)
-    n = size(A, 1)
-    eigenvecs = []
-    for eigenvalue in eigenvalues
-        y = [eigenvalue^i for i in n-1:-1:0]
-        ev = B*y
-        push!(eigenvecs, ev/dot(ev,ev)^0.5)
-    end
-    return eigenvecs    
-end
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+    _sendCounterToServer();
+  }
 
-function random_symmetric_matrix(n::Int)
-    A = randn(n, n)
-    return (A + A') / 2
-end
+  void _decrementCounter() {
+    setState(() {
+      _counter--;
+    });
+    _sendCounterToServer();
+  }
 
-function main(A::Matrix{Float64})
-    if A != A'
-        error("Матрица должна быть симметричной")
-    end
+  // Отправка значения на сервер (POST)
+  Future<void> _sendCounterToServer() async {
+    final url = Uri.parse('http://194.67.88.154:8100/$_counter');
+    try {
+      final response = await http.post(url);
 
-    D, B = danilevsky(A)
-    p = (x) -> characteristic_polynomial(x, -D[1, :])
-    intervals = get_gershgorin_circles(A)
-    search_interval = get_interval(intervals)
-    eigenvalues = Float64.(find_roots(p, search_interval))
-    eigenvecs = find_eigenvectors(A, eigenvalues, B)
-    
-    if check_vieta(A, eigenvalues)
-        println("Теорема Виета выполнена.")
-    else
-        println("Теорема Виета не выполнена.")
-    end
-    
-    if check_gershgorin(A, eigenvalues)
-        println("Теорема Гершгорина выполнена.")
-    else
-        println("Теорема Гершгорина не выполнена.")
-    end
-    
-    if check_orthogonality(eigenvecs)
-        println("Собственные векторы ортогональны.")
-    else
-        println("Собственные векторы не ортогональны.")
-    end
+      if (response.statusCode == 200) {
+        setState(() {
+          _serverResponse = 'Значение отправлено: $_counter';
+        });
+      } else {
+        setState(() {
+          _serverResponse =
+              'Не удалось отправить значение. Сервер ответил кодом статуса: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _serverResponse = 'Ошибка отправки значения: $e';
+      });
+    }
+  }
 
-    x_values = search_interval[1]:0.01:search_interval[2]
-    y_values = [p(x) for x in x_values]
+  Future<void> _sendValueToServer(int value) async {
+    final url = Uri.parse('http://194.67.88.154:8100/$value');
+    try {
+      final response = await http.post(url);
 
-    plot(x_values, y_values, xlabel="x", ylabel="P(x)", title="Characteristic Polynomial", legend=false)
+      if (response.statusCode == 200) {
+        setState(() {
+          _serverResponse = 'Значение отправлено: $value';
+          _counter = value;
+        });
+      } else {
+        setState(() {
+          _serverResponse =
+              'Не удалось отправить значение. Сервер ответил кодом статуса: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _serverResponse = 'Ошибка отправки значения: $e';
+      });
+    }
+  }
 
-    y_points = [p(x) for x in eigenvalues]
-    scatter!(eigenvalues, y_points, color=:red, marker=:circle, label="Marked Points")
-end
+  // Получение значения с сервера (GET)
+  Future<void> _getValueFromServer() async {
+    final url = Uri.parse('http://194.67.88.154:8100');
+    try {
+      final response = await http.get(url);
 
-A = [2.0 1.0 2.0 2.0; 
-     1.0 3.0 4.0 1.0; 
-     2.0 4.0 3.0 2.0; 
-     2.0 1.0 2.0 5.0]
+      if (response.statusCode == 200) {
+        setState(() {
+          _counter = int.parse(response.body);
+          _serverResponse = 'Счетчик обновлен с сервера: $_counter';
+        });
+      } else {
+        setState(() {
+          _serverResponse =
+              'Не удалось получить значение. Сервер ответил кодом статуса: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _serverResponse = 'Ошибка получения значения: $e';
+      });
+    }
+  }
 
-println("Матрица: A")
-main(A)
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("lab3")),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const SizedBox(height: 20),
+            TextField(
+              controller: _textController,
+              decoration: const InputDecoration(
+                labelText: 'Введите init value',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                _sendValueToServer(int.parse(_textController.text));
+              },
+              child: const Text('POST INIT'),
+            ),
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _getValueFromServer,
+              child: const Text('GET Counter'),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _serverResponse,
+              style: const TextStyle(color: Colors.lightGreen),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Increment',
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: _decrementCounter,
+            tooltip: 'Decrement',
+            child: const Icon(Icons.remove),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-random_matrix = random_symmetric_matrix(4)
-println("Рандомная матрица: (...)")
-main(random_matrix)
+class AnimScreen extends StatefulWidget {
+  @override
+  _AnimScreenState createState() => _AnimScreenState();
+}
+
+class _AnimScreenState extends State<AnimScreen>
+    with SingleTickerProviderStateMixin {
+  double a = 1;
+  double b = 0;
+  double c = 0;
+
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, duration: Duration(seconds: 1))
+          ..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Anim'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return CustomPaint(
+                  painter: ParabolaPainter(a, b, c),
+                  child: Container(),
+                );
+              },
+            ),
+          ),
+          _buildSlider('a', a, -10, 10, (val) => setState(() => a = val)),
+          _buildSlider('b', b, -10, 10, (val) => setState(() => b = val)),
+          _buildSlider('c', c, -10, 10, (val) => setState(() => c = val)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSlider(String label, double value, double min, double max,
+      ValueChanged<double> onChanged) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        children: [
+          Text('$label: ', style: TextStyle(fontSize: 18)),
+          Expanded(
+            child: Slider(
+              value: value,
+              min: min,
+              max: max,
+              divisions: 100,
+              label: value.toStringAsFixed(2),
+              onChanged: onChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ParabolaPainter extends CustomPainter {
+  final double a;
+  final double b;
+  final double c;
+
+  ParabolaPainter(this.a, this.b, this.c);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    canvas.drawLine(Offset(0, centerY), Offset(size.width, centerY), paint);
+    canvas.drawLine(Offset(centerX, 0), Offset(centerX, size.height), paint);
+
+    paint.color = Colors.green;
+
+    final path = Path();
+    for (double x = -centerX; x <= centerX; x += 1) {
+      double y = a * pow(x / 50, 2) + b * (x / 50) + c;
+      if (x == -centerX) {
+        path.moveTo(centerX + x, centerY - y * 50);
+      } else {
+        path.lineTo(centerX + x, centerY - y * 50);
+      }
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class Mqtt1Screen extends StatefulWidget {
+  @override
+  Mqtt1ScreenState createState() => Mqtt1ScreenState();
+}
+
+class Mqtt1ScreenState extends State<Mqtt1Screen> {
+  final _formKey = GlobalKey<FormState>();
+  String _valueA = "";
+  String _valueB = "";
+  String _valueC = "";
+
+  final client = MqttServerClient('test.mosquitto.org', '');
+
+  @override
+  void initState() {
+    super.initState();
+    setupMqttClient();
+  }
+
+  Future<void> setupMqttClient() async {
+    client.logging(on: true);
+    client.setProtocolV311();
+    client.keepAlivePeriod = 20;
+    client.onDisconnected = onDisconnected;
+    client.onConnected = onConnected;
+    client.onSubscribed = onSubscribed;
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print('Connection exception - $e');
+      client.disconnect();
+    }
+  }
+
+  void sendMessage(String topic, String message) {
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      final builder = MqttClientPayloadBuilder();
+      builder.addString(message);
+      client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload!);
+      print('Message "$message" sent to topic "$topic"');
+    } else {
+      print('MQTT Client is not connected');
+    }
+  }
+
+  void onSubscribed(String topic) {
+    print('Subscription confirmed for topic $topic');
+  }
+
+  void onDisconnected() {
+    print('Disconnected from the broker');
+  }
+
+  void onConnected() {
+    print('Connected to the broker');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('MQTT Publisher'),
+        ),
+        body: Container(
+            padding: EdgeInsets.all(10.0),
+            child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Введите значение для топика A'),
+                      onSaved: (value) => _valueA = value!,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Введите значение для топика B'),
+                      onSaved: (value) => _valueB = value!,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Введите значение для топика C'),
+                      onSaved: (value) => _valueC = value!,
+                    ),
+                    SizedBox(height: 20.0),
+                    ElevatedButton(
+                      child: Text('Отправить'),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+
+                          sendMessage('IU9/test/a', _valueA);
+                          sendMessage('IU9/test/b', _valueB);
+                          sendMessage('IU9/test/c', _valueC);
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Сообщения отправлены'),
+                          ));
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 20),
+                          textStyle: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ))));
+  }
+}
+
+class Mqtt2Screen extends StatefulWidget {
+  @override
+  Mqtt2ScreenState createState() => Mqtt2ScreenState();
+}
+
+class Mqtt2ScreenState extends State<Mqtt2Screen> {
+  // Переменные для хранения полученных значений
+  String _valueA = "Ожидание данных...";
+  String _valueB = "Ожидание данных...";
+  String _valueC = "Ожидание данных...";
+
+  final client = MqttServerClient('test.mosquitto.org', '');
+
+  @override
+  void initState() {
+    super.initState();
+    setupMqttClient();
+  }
+
+  Future<void> setupMqttClient() async {
+    client.logging(on: true);
+    client.setProtocolV311();
+    client.keepAlivePeriod = 20;
+    client.onDisconnected = onDisconnected;
+    client.onConnected = onConnected;
+    client.onSubscribed = onSubscribed;
+
+    try {
+      print('Подключение к MQTT брокеру...');
+      await client.connect();
+    } catch (e) {
+      print('Ошибка подключения - $e');
+      client.disconnect();
+      return;
+    }
+
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      print('Подключение установлено!');
+    } else {
+      print('Подключение не удалось. Статус: ${client.connectionStatus}');
+      return;
+    }
+  }
+
+  Future<void> getValueFromTopic() async {
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      print('Подписываемся на топики');
+      client.subscribe('IU9/test/a', MqttQos.atLeastOnce);
+      client.subscribe('IU9/test/b', MqttQos.atLeastOnce);
+      client.subscribe('IU9/test/c', MqttQos.atLeastOnce);
+
+      client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
+        final recMess = c![0].payload as MqttPublishMessage;
+        final pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+
+        print('Получено сообщение: topic: ${c[0].topic}, payload: $pt');
+
+        setState(() {
+          if (c[0].topic == 'IU9/test/a') {
+            _valueA = pt;
+          } else if (c[0].topic == 'IU9/test/b') {
+            _valueB = pt;
+          } else if (c[0].topic == 'IU9/test/c') {
+            _valueC = pt;
+          }
+        });
+      });
+    } else {
+      print('Клиент не подключен к брокеру');
+    }
+  }
+
+  void onSubscribed(String topic) {
+    print('Subscription confirmed for topic $topic');
+  }
+
+  void onDisconnected() {
+    print('Disconnected from the broker');
+  }
+
+  void onConnected() {
+    print('Connected to the broker');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('MQTT Subscriber'),
+        ),
+        body: Container(
+        padding: EdgeInsets.all(10.0),
+    child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+    Text(
+    'Значение для топика A:',
+    style: TextStyle(fontSize: 20.0),
+    ),
+    Text(
+    _valueA,
+    style: TextStyle(fontSize: 18.0),
+    ),
+    SizedBox(height: 20.0),
+    Text(
+    'Значение для топика B:',
+    style: TextStyle(fontSize: 20.0),
+    ),
+    Text(
+    _valueB,
+    style: TextStyle(fontSize: 18.0),
+    ),
+    SizedBox(height: 20.0),
+    Text(
+    'Значение для топика C:',
+    style: TextStyle(fontSize: 20.0),
+    ),
+    Text(
+    _valueC,
+    style: TextStyle(fontSize: 18.0),
+    ),
+      SizedBox(height: 20.0),
+      ElevatedButton(
+        child: Text('Получить значения'),
+        onPressed: () {
+          getValueFromTopic();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Значения обновляются...'),
+          ));
+        },
+        style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(
+                horizontal: 50, vertical: 20),
+            textStyle: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold)),
+      ),
+    ],
+    )));
+  }
+}
 ```
 
 # Результаты
 
-![результаты](temp/1.png){width=10cm}
+![результаты](temp/1.jpg){width=5cm}
 
-![результаты](temp/2.png){width=10cm}
+![результаты](temp/2.jpg){width=5cm}
+
+![результаты](temp/3.png){width=5cm}
 
 # Вывод
 
-В ходе выполнения лабораторной работы был реализован метод вычисления собственных значений и векторов симметричной матрицы методом А.М. Данилевского. Результаты вычислений подтвердили корректность по теореме Виета и условиям теоремы Гершгорина, а также демонстрировали ортогональность найденных собственных векторов, что подтверждает правильность работы реализованного алгоритма.
+В ходе выполнения лабораторной работы была создана простая система обмена данными по MQTT с помощью двух виджетов для отправки и получения сообщений. Успешно настроена передача данных из текстовых полей, реализован механизм отображения полученных сообщений и создано выпадающее меню для удобной навигации между виджетами в AppBar.

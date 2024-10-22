@@ -456,7 +456,7 @@ class Mqtt1ScreenState extends State<Mqtt1Screen> {
   String _valueB = "";
   String _valueC = "";
 
-  final client = MqttServerClient('test.mosquitto.org', '');
+  final client = MqttServerClient('broker.emqx.io', '');
 
   @override
   void initState() {
@@ -565,7 +565,7 @@ class Mqtt2ScreenState extends State<Mqtt2Screen> {
   String _valueB = "Ожидание данных...";
   String _valueC = "Ожидание данных...";
 
-  final client = MqttServerClient('test.mosquitto.org', '');
+  final client = MqttServerClient('broker.emqx.io', '');
 
   @override
   void initState() {

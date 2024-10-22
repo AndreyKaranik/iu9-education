@@ -2,18 +2,20 @@ from tensorflow.keras.datasets import mnist
 import matplotlib.pyplot as plt
 import numpy as np
 
-N_SAMPLES  = 5000
-N_TESTS = 1000
-(train_X, train_Y), (test_X, test_Y) = mnist.load_data()
-train_X, train_Y = train_X[:N_SAMPLES], train_Y[:N_SAMPLES]
-test_X, test_Y = test_X[:N_TESTS], test_Y[:N_TESTS]
-train_X = train_X.reshape(train_X.shape[0], 28**2) / 255.0
-test_X = test_X.reshape(test_X.shape[0], 28**2) / 255.0
-train_X.shape, train_Y.shape, test_X.shape, test_Y.shape
+NUMBER_OF_SAMPLES  = 60000
+NUBMER_OF_TESTS = 10000
+(trainX, trainY), (testX, testY) = mnist.load_data()
+trainX, trainY = trainX[:NUMBER_OF_SAMPLES], trainY[:NUMBER_OF_SAMPLES]
+testX, testY = testX[:NUBMER_OF_TESTS], testY[:NUBMER_OF_TESTS]
+trainX = trainX.reshape(trainX.shape[0], 28**2) / 255.0
+testX = testX.reshape(testX.shape[0], 28**2) / 255.0
+trainX.shape, trainY.shape, testX.shape, testY.shape
 
-k = 1
-ReLU = lambda x: np.maximum(0, k*x)
-dReLU = lambda x: np.where(x > 0, k, 0)
+def ReLU(x):
+    return np.maximum(0, x)
+
+def dReLU(x):
+    return np.where(x > 0, 1, 0)
 
 def softmax(x):
     shiftx = x - np.max(x)
@@ -44,7 +46,7 @@ def categorical_cross_entropy_derivative(y, y_ref):
    return y - y_ref
 
 class Perceptron:
-    def __init__(self, input_neurons, hidden_neurons, output_neurons,  hidden_layers_count, epochs=100, learning_rate=1e-3):
+    def __init__(self, input_neurons, hidden_neurons, output_neurons,  hidden_layers_count, epochs=16, learning_rate=0.003):
         self.initial_weights = []
         self.initial_biases = []
         self.activation_functions = []
@@ -53,7 +55,7 @@ class Perceptron:
         self.learning_rate = learning_rate
         layers = [input_neurons] + [hidden_neurons] * hidden_layers_count + [output_neurons]
         for i in range(1, len(layers)):
-            W = np.random.randn(layers[i - 1], layers[i]) * 0.01
+            W = np.random.randn(layers[i - 1], layers[i]) * 0.3
             b = np.zeros(layers[i])
             self.initial_weights.append(W)
             self.initial_biases.append(b)
@@ -62,20 +64,19 @@ class Perceptron:
         self.activation_functions[-1] = softmax
         self.activation_derivatives[-1] = dsoftmax
 
+    def predict(self, x):
+        activation = x
+        for W, b, f in zip(self.weights, self.biases, self.activation_functions):
+            activation = f(np.dot(activation, W) + b)
+        return int(np.argmax(activation))
+    
     def set_learning_rate(self, learning_rate):
         self.learning_rate = learning_rate
 
     def set_epochs(self, epochs):
         self.epochs = epochs
-
-    def predict(self, x):
-        activation = x
-        for W, b, f in zip(self.weights, self.biases, self.activation_functions):
-            activation = f(np.dot(activation, W) + b)
-
-        return int(np.argmax(activation))
     
-    def forward_and_backward(self, x, y_ref, loss_func, dloss_func):
+    def forward_and_backward(self, x, y_ref, loss_function, dloss_function):
         grads_w = [None] * len(self.weights)
         grads_b = [None] * len(self.biases)
         activations = [x]
@@ -86,8 +87,8 @@ class Perceptron:
             activations.append(f(weighted_sum))
 
         y = activations[-1]
-        loss = loss_func(y, y_ref)
-        delta_loss = dloss_func(y, y_ref)
+        loss = loss_function(y, y_ref)
+        delta_loss = dloss_function(y, y_ref)
         dZ = np.dot(delta_loss, dsoftmax(inputs[-1]))
         grads_w[-1] = np.outer(activations[-2], dZ)
         grads_b[-1] = dZ
@@ -100,61 +101,58 @@ class Perceptron:
 
         return grads_w, grads_b, loss
     
-    def validate(self, X, Y, loss_func):
+    def validate(self, X, Y, loss_function):
         correct_predictions = 0
         total_loss = 0.0
         for (x, y_ref) in zip(X, Y):
             activation = x
             for W, b, f in zip(self.weights, self.biases, self.activation_functions):
                 activation = f(np.dot(activation, W) + b)
-            total_loss +=  loss_func(activation, y_ref)
+            total_loss +=  loss_function(activation, y_ref)
 
             if int(np.argmax(activation)) == np.argmax(y_ref):
                 correct_predictions += 1
         return total_loss / len(X), correct_predictions / len(X)
 
-    def train(self, train_X, train_Y, validate_X, validate_Y, loss_func, dloss_func):
-        train_one_hot = np.array([np.array([int(i == y) for i in range(10)]) for y in train_Y])
+    def train(self, trainX, trainY, validate_X, validate_Y, loss_function, dloss_function):
+        train_one_hot = np.array([np.array([int(i == y) for i in range(10)]) for y in trainY])
         validate_one_hot = np.array([np.array([int(i == y) for i in range(10)]) for y in validate_Y])
         self.weights = [np.copy(w) for w in self.initial_weights]
         self.biases = [np.copy(b) for b in self.initial_biases]
-        loss, accuracy = self.validate(validate_X, validate_one_hot, loss_func)
+        loss, accuracy = self.validate(validate_X, validate_one_hot, loss_function)
         losses = [loss]
         accuracies = [accuracy]
         for epoch in range(self.epochs):
-            for (x, y_ref) in zip(train_X, train_one_hot):
+            for (x, y_ref) in zip(trainX, train_one_hot):
                 weight_grads, bias_grads, loss = self.forward_and_backward(
                     x, 
                     y_ref,
-                    loss_func, 
-                    dloss_func
+                    loss_function, 
+                    dloss_function
                 )
 
                 for i in range(len(self.weights)):
                     self.weights[i] -= weight_grads[i] * self.learning_rate
                     self.biases[i] -= bias_grads[i] * self.learning_rate
-            loss, accuracy = self.validate(validate_X, validate_one_hot, loss_func)
+            loss, accuracy = self.validate(validate_X, validate_one_hot, loss_function)
             losses.append(loss)
             accuracies.append(accuracy)
 
         return losses, accuracies
 
-INPUT_SIZE = 28**2
-OUTPUT_NEURONS = 10
-
-def experiment(num_neurons, num_layers, epochs, learging_rate):
+def launch(number_of_neurons, number_of_layers, epochs, learging_rate):
     epochs_axis = np.arange(epochs + 1)
 
-    perceptron = Perceptron(INPUT_SIZE, num_neurons, OUTPUT_NEURONS, num_layers, epochs, learging_rate)
+    perceptron = Perceptron(28**2, number_of_neurons, 10, number_of_layers, epochs, learging_rate)
 
-    mse_loss, mse_accuracy = perceptron.train(train_X, train_Y, test_X, test_Y, MSE, dMSE)
+    mse_loss, mse_accuracy = perceptron.train(trainX, trainY, testX, testY, MSE, dMSE)
 
-    cross_entropy_loss, cross_entropy_accuracy = perceptron.train(train_X, train_Y, test_X, test_Y,categorical_cross_entropy, categorical_cross_entropy_derivative)
+    cross_entropy_loss, cross_entropy_accuracy = perceptron.train(trainX, trainY, testX, testY,categorical_cross_entropy, categorical_cross_entropy_derivative)
 
-    KL_divergence_loss, KL_divergence_accuracy = perceptron.train(train_X, train_Y, test_X, test_Y, KL_divergence, KL_divergence_derivative)
+    KL_divergence_loss, KL_divergence_accuracy = perceptron.train(trainX, trainY, testX, testY, KL_divergence, KL_divergence_derivative)
     
     plt.figure()
-    plt.title(f"Зависимость функции потерь от количества эпох, скрытых слоев: {num_layers}, нейронов: {num_neurons}")
+    plt.title(f"Зависимость функции потерь от количества эпох (скрытых слоев: {number_of_layers}, нейронов: {number_of_neurons})")
     plt.xlabel("Количество эпох")
     plt.ylabel("Значение функции потерь")
     plt.plot(epochs_axis, mse_loss, label = "MSE")
@@ -164,7 +162,7 @@ def experiment(num_neurons, num_layers, epochs, learging_rate):
     plt.show()
 
     plt.figure()
-    plt.title(f"Зависимость точности от количества эпох, скрытых слоев: {num_layers}, нейронов: {num_neurons}")
+    plt.title(f"Зависимость точности от количества эпох (скрытых слоев: {number_of_layers}, нейронов: {number_of_neurons})")
     plt.xlabel("Количество эпох")
     plt.ylabel("Точность")
     plt.plot(epochs_axis, mse_accuracy, label = "MSE")
@@ -175,14 +173,5 @@ def experiment(num_neurons, num_layers, epochs, learging_rate):
 
     return
 
-N_EPOCHS = 10
-LEARNING_RATE = 0.01
-num_layers_range = [1, 2, 3, 4]
-
-for num_layers in num_layers_range:
-    experiment(64, num_layers, N_EPOCHS, LEARNING_RATE)     
-
-num_neurons_range = [32, 64, 128]
-for neurons_num in num_layers_range:
-    experiment(neurons_num, 3, N_EPOCHS, LEARNING_RATE)     
-  
+for number_of_layers in [1, 2, 3]:
+    launch(16, number_of_layers, 16, 0.003)   
