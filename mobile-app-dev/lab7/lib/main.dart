@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:yandex_mapkit/yandex_mapkit.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -173,6 +178,23 @@ class HomeScreen extends StatelessWidget {
               },
             ),
             Divider(color: Colors.black12, thickness: 1),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.flaskVial,
+                color: Theme.of(context).primaryColor,
+              ),
+              title: Text(
+                'lab7',
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => Lab7Screen()),
+                );
+              },
+            ),
+            Divider(color: Colors.black12, thickness: 1),
           ],
         ),
       ),
@@ -297,7 +319,7 @@ class _Lab3ScreenState extends State<Lab3Screen> {
       } else {
         setState(() {
           _serverResponse =
-              'Не удалось отправить значение. Сервер ответил кодом статуса: ${response.statusCode}';
+          'Не удалось отправить значение. Сервер ответил кодом статуса: ${response.statusCode}';
         });
       }
     } catch (e) {
@@ -320,7 +342,7 @@ class _Lab3ScreenState extends State<Lab3Screen> {
       } else {
         setState(() {
           _serverResponse =
-              'Не удалось отправить значение. Сервер ответил кодом статуса: ${response.statusCode}';
+          'Не удалось отправить значение. Сервер ответил кодом статуса: ${response.statusCode}';
         });
       }
     } catch (e) {
@@ -344,7 +366,7 @@ class _Lab3ScreenState extends State<Lab3Screen> {
       } else {
         setState(() {
           _serverResponse =
-              'Не удалось получить значение. Сервер ответил кодом статуса: ${response.statusCode}';
+          'Не удалось получить значение. Сервер ответил кодом статуса: ${response.statusCode}';
         });
       }
     } catch (e) {
@@ -434,8 +456,8 @@ class _AnimScreenState extends State<AnimScreen>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(seconds: 1))
-          ..repeat();
+    AnimationController(vsync: this, duration: Duration(seconds: 1))
+      ..repeat();
   }
 
   @override
@@ -696,7 +718,7 @@ class Mqtt2ScreenState extends State<Mqtt2Screen> {
       client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
         final recMess = c![0].payload as MqttPublishMessage;
         final pt =
-            MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
 
         print('Получено сообщение: topic: ${c[0].topic}, payload: $pt');
 
@@ -773,9 +795,9 @@ class Mqtt2ScreenState extends State<Mqtt2Screen> {
                   },
                   style: ElevatedButton.styleFrom(
                       padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                      EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                       textStyle:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 ),
               ],
             )));
@@ -811,11 +833,11 @@ class _UserScreenState extends State<UserScreen> {
     setState(() {
       _users = results
           .map((row) => User(
-                id: row[0],
-                name: row[1],
-                email: row[2],
-                age: row[3],
-              ))
+        id: row[0],
+        name: row[1],
+        email: row[2],
+        age: row[3],
+      ))
           .toList();
     });
 
@@ -941,3 +963,148 @@ class User {
     required this.age,
   });
 }
+
+
+class MapPoint extends Equatable {
+  const MapPoint({
+    required this.name,
+    required this.latitude,
+    required this.longitude,
+    required this.address,
+    required this.tel
+  });
+
+  final String name;
+  final String address;
+  final String tel;
+  final double latitude;
+  final double longitude;
+
+  @override
+  List<Object?> get props => [name, address, tel, latitude, longitude];
+
+  factory MapPoint.fromJson(Map<String, dynamic> json) {
+    final gps = json['gps'].split(',');
+    return MapPoint(
+      name: json['name'],
+      latitude: double.parse(gps[0]),
+      longitude: double.parse(gps[1]),
+      address: json['address'],
+      tel: json['tel']
+    );
+  }
+}
+
+class Lab7Screen extends StatefulWidget {
+  const Lab7Screen({super.key});
+
+  @override
+  State<Lab7Screen> createState() => _Lab7ScreenState();
+}
+
+class _Lab7ScreenState extends State<Lab7Screen> {
+  late final YandexMapController _mapController;
+  List<MapPoint> mapPoints = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMapPoints();
+  }
+
+  Future<void> _loadMapPoints() async {
+    final points = await fetchMapPoints();
+    setState(() {
+      mapPoints = points;
+    });
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('lab7')),
+      body: YandexMap(
+        onMapCreated: (controller) async {
+          _mapController = controller;
+          await _mapController.moveCamera(
+            CameraUpdate.newCameraPosition(
+              const CameraPosition(
+                target: Point(
+                  latitude: 55.751244,
+                  longitude: 37.618423,
+                ),
+                zoom: 10,
+              ),
+            ),
+          );
+        },
+        mapObjects: _getPlacemarkObjects(context),
+      ),
+    );
+  }
+
+  List<PlacemarkMapObject> _getPlacemarkObjects(BuildContext context) {
+    return mapPoints
+        .map(
+          (point) => PlacemarkMapObject(
+        mapId: MapObjectId('MapObject ${point.name}'),
+        point: Point(latitude: point.latitude, longitude: point.longitude),
+        opacity: 1,
+        icon: PlacemarkIcon.single(
+          PlacemarkIconStyle(
+            image: BitmapDescriptor.fromAssetImage(
+              'assets/icons/map_point.png',
+            ),
+            scale: 0.1,
+          ),
+        ),
+        onTap: (_, __) => showModalBottomSheet(
+          context: context,
+          builder: (context) => _ModalBodyView(point: point),
+        ),
+      ),
+    )
+        .toList();
+  }
+}
+
+Future<List<MapPoint>> fetchMapPoints() async {
+  const url = 'http://pstgu.yss.su/iu9/mobiledev/lab4_yandex_map/2023.php?x=var08';
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map((item) => MapPoint.fromJson(item)).toList();
+  } else {
+    throw Exception('Ошибка загрузки данных с сервера');
+  }
+}
+
+class _ModalBodyView extends StatelessWidget {
+  const _ModalBodyView({required this.point});
+
+  final MapPoint point;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Text(point.name, style: const TextStyle(fontSize: 20)),
+        const SizedBox(height: 10),
+        Text(
+          '${point.latitude}, ${point.longitude}',
+          style: const TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+        Text(point.address, style: const TextStyle(fontSize: 14)),
+        Text(point.tel, style: const TextStyle(fontSize: 20)),
+      ]),
+    );
+  }
+}
+
