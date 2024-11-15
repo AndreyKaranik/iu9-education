@@ -8,11 +8,6 @@ class SurfacePlot extends StatefulWidget {
   _SurfacePlotState createState() => _SurfacePlotState();
 }
 
-class Curve {
-  List<Vector3> firstPart = [];
-  List<Vector3> secondPart = [];
-}
-
 class _SurfacePlotState extends State<SurfacePlot> {
   final diTreDiController = DiTreDiController()
     ..userScale = 2

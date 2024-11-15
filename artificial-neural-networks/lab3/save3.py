@@ -300,13 +300,13 @@ def levenberg_marquardt(xs, epsilon1=1e-7, mu_k=10000, M=10000):
                 tmp += mat_inv[i][j] * gradient[j]
             d[i] = tmp
             xs[i] -= d[i]
-        if rosenbrock(a_param, b_param, n_param, f0_param, xs) < rosenbrock(a_param, b_param, n_param, f0_param, xs_prev):
+        if rosenbrock(a_param , b_param , n_param , f0_param , xs) < rosenbrock(a_param , b_param , n_param , f0_param , xs_prev):
             mu_k = mu_k / 2
         else:
             mu_k = mu_k * 2
-        result.append(rosenbrock(a_param, b_param, n_param, f0_param, xs))
+        result.append(rosenbrock(a_param , b_param , n_param , f0_param , xs))
 
-    result.append(rosenbrock(a_param, b_param, n_param, f0_param, xs))
+    result.append(rosenbrock(a_param , b_param , n_param , f0_param , xs))
     return xs, iterations, result
 
 a_param = 300
@@ -323,25 +323,25 @@ x, k, result, iterations = fletcher_reeves(a_param, b_param, deepcopy(x0))
 print(f'\nМетод Флетчера-Ривза')
 print(f'Кол-во итераций: {k}')
 print(f'x = {x}')
-print(f'f(x) = {result[len(result) - 1]}')
+print(f'f(x)= {result[len(result)-1]}')
 
 # Метод сопряженных градиентов Полака-Рибьера
 x, k, result, iterations = polak_ribiere(a_param, b_param, deepcopy(x0))
 print(f'\nМетод Полака-Рибьера')
 print(f'Кол-во итераций: {k}')
 print(f'x = {x}')
-print(f'f(x) = {result[len(result) - 1]}')
+print(f'f(x)= {result[len(result)-1]}')
 
 # Квазиньютоновский метод Девидона-Флетчера-Пауэлла
 x, k, result, iterations = davidon_fletcher_powell(a_param, b_param, deepcopy(x0))
 print(f'\nМетод Девидона-Флетчера-Пауэлла')
 print(f'Кол-во итераций: {k}')
 print(f'x = {x}')
-print(f'f(x) = {result[len(result) - 1]}')
+print(f'f(x)= {result[len(result)-1]}')
 
 # Метод Левенберга-Марквардта
 x, k, result = levenberg_marquardt(deepcopy(x0))
 print(f'\nМетод Левенберга-Марквардта')
-print(f'Кол-во итераций: {len(result) - 1}')
+print(f'Кол-во итераций: {len(result)-1}')
 print(f'x = {x}')
-print(f'f(x) = {result[len(result) - 1]}')
+print(f'f(x)= {result[len(result)-1]}')
