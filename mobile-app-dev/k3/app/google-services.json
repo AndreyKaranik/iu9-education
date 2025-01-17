@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "2045790156",
+    "firebase_url": "https://lab12-2b785-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "lab12-2b785",
+    "storage_bucket": "lab12-2b785.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:2045790156:android:4c2aa6e6ab678428a0ff69",
+        "android_client_info": {
+          "package_name": "com.example.lab12"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2jI3RbqABTnEMHCEmVmCuf4ROfHP69iI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
