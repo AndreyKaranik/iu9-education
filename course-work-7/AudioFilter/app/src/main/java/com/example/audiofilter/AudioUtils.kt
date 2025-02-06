@@ -68,13 +68,9 @@ object AudioUtils {
                 Log.d("AudioSave", "Saving WAV with sampleRate: $sampleRate, dataSize: ${outputSamples.size}")
                 writeWavFile(outputStream, outputSamples, sampleRate)
             }
-
-            // Убираем статус "временного" файла, чтобы он был доступен пользователю
             contentValues.clear()
             contentValues.put(MediaStore.Audio.Media.IS_PENDING, 0)
             resolver.update(uri, contentValues, null, null)
-
-            // Обновляем медиатеку, чтобы файл появился в плеерах
             MediaScannerConnection.scanFile(context, arrayOf(uri.toString()), null, null)
         }
 
@@ -91,8 +87,8 @@ object AudioUtils {
     }
 
     fun createWavHeader(dataSize: Int, sampleRate: Int): ByteArray {
-        val numChannels = 2
-        val bitsPerSample = 16 // Глубина звука (16 бит)
+        val numChannels = 1
+        val bitsPerSample = 16
         val bytesPerSample = bitsPerSample / 8
         val byteRate = sampleRate * numChannels * bytesPerSample
         val blockAlign = numChannels * bytesPerSample
