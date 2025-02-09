@@ -29,9 +29,14 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
                 originalAudio = audioData
                 sampleRate = rate
                 _selectedFileName.value = uri.lastPathSegment
-                _processedAudio.value = audioData.copyOf() // Начальное состояние без обработки
+                _processedAudio.value = audioData.copyOf()
             }
         }
+    }
+
+    fun saveProcessedAudio() {
+        val uri = saveToMediaStore(context, _processedAudio.value!!, sampleRate)
+        _processedFileUri.value = uri
     }
 
     fun applyLowPassFilter() {
@@ -43,11 +48,13 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
     }
 
     fun applyBandPassFilter() {
-        _processedAudio.value = AudioUtils.bandPassFilter(_processedAudio.value!!, sampleRate, 1400f, 700f)
+        _processedAudio.value =
+            AudioUtils.bandPassFilter(_processedAudio.value!!, sampleRate, 1400f, 700f)
     }
 
     fun applyKalmanFilter() {
-        _processedAudio.value = AudioUtils.kalmanFilter(_processedAudio.value!!, sampleRate, 0.2f, 2.0f)
+        _processedAudio.value =
+            AudioUtils.kalmanFilter(_processedAudio.value!!, sampleRate, 0.2f, 2.0f)
     }
 
     fun applyGaussianFilter() {
@@ -58,8 +65,15 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
         _processedAudio.value = AudioUtils.medianFilter(_processedAudio.value!!, 20)
     }
 
-    fun saveProcessedAudio() {
-        val uri = saveToMediaStore(context, _processedAudio.value!!, sampleRate)
-        _processedFileUri.value = uri
+    fun applySpectralSubtraction(noiseStartMs: Int, noiseEndMs: Int, alpha: Float) {
+        _processedAudio.value = AudioUtils.spectralSubtraction(
+            _processedAudio.value!!,
+            sampleRate,
+            noiseStartMs,
+            noiseEndMs,
+            alpha = alpha.toDouble()
+        )
     }
+
+
 }

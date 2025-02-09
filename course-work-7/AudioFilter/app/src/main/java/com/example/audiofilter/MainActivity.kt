@@ -106,6 +106,11 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
                         Text("Применить медианный фильтр")
                     }
 
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { viewModel.applySpectralSubtraction(200, 500, 100.0f) }) {
+                        Text("Применить метод подавления шума")
+                    }
+
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.saveProcessedAudio() }) {
@@ -137,8 +142,6 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
 fun AudioWaveformView(audioData: ShortArray, sampleRate: Int, scrollState: ScrollState) {
 
     var scale by remember { mutableStateOf(1f) }
-
-
 
     Text(
         text = "Масштаб отображения:",
