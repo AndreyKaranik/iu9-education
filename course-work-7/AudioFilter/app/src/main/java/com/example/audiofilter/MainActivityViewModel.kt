@@ -71,7 +71,7 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
             sampleRate,
             noiseStartMs,
             noiseEndMs,
-            alpha = alpha.toDouble()
+            alpha = alpha
         )
     }
 

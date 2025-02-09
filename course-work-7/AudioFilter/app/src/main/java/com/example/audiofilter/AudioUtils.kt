@@ -22,6 +22,7 @@ import org.apache.commons.math3.complex.Complex
 import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.FastFourierTransformer
 import org.apache.commons.math3.transform.TransformType
+import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.log10
 import kotlin.math.log2
@@ -185,83 +186,58 @@ object AudioUtils {
         return filteredData
     }
 
-    fun spectralSubtraction(inputSignal: ShortArray, sampleRate: Int, noiseProfileStartMs: Int, noiseProfileEndMs: Int, alpha: Double = 1.0): ShortArray {
-        // 1. Извлекаем профиль шума из первых N миллисекунд аудиофайла
-        val noiseProfile = extractNoiseProfile(inputSignal, sampleRate, noiseProfileStartMs, noiseProfileEndMs)
-
-        // Преобразуем профиль шума в спектр с помощью FFT
-        val noiseSpectrum = performFFT(noiseProfile)
-
-        // 2. Применяем спектральное вычитание ко всему аудиофайлу
-        val processedSignal = processSignal(inputSignal, sampleRate, noiseSpectrum, alpha)
-
-        return processedSignal
-    }
-
-    // Функция извлечения профиля шума из первых N миллисекунд сигнала
     fun extractNoiseProfile(inputSignal: ShortArray, sampleRate: Int, startMs: Int, endMs: Int): ShortArray {
         val startIndex = (startMs * sampleRate) / 1000
         val endIndex = (endMs * sampleRate) / 1000
         return inputSignal.copyOfRange(startIndex, endIndex)
     }
 
-    // Функция выполнения FFT
-    fun performFFT(signal: ShortArray): Array<Complex> {
-        val nextPowerOf2 = 2.0.pow(ceil(log10(signal.size.toDouble()) / log10(2.0))).toInt()
-        val paddedSignal = signal.copyOf(nextPowerOf2)
+    fun spectralSubtraction(audioSignal: ShortArray, sampleRate: Int, startMs: Int, endMs: Int, alpha: Float, windowSize: Int = 4096, overlap: Int = 2048): ShortArray {
 
-        val complexSignal = paddedSignal.map { Complex(it.toDouble(), 0.0) }.toTypedArray()
+        val noiseProfile: ShortArray = extractNoiseProfile(audioSignal, sampleRate, startMs, endMs)
 
-        val fft = FastFourierTransformer(DftNormalization.STANDARD)
-        return fft.transform(complexSignal, TransformType.FORWARD)
-    }
+        if (windowSize != 2048 && windowSize != 4096 && windowSize != 8192) {
+            throw IllegalArgumentException("Window size must be 2048, 4096, or 8192 samples.")
+        }
 
-    // Функция обработки всего сигнала с использованием спектра шума
-    fun processSignal(inputSignal: ShortArray, sampleRate: Int, noiseSpectrum: Array<Complex>, alpha: Double): ShortArray {
-        val fft = FastFourierTransformer(DftNormalization.STANDARD)
+        val transformer = FastFourierTransformer(DftNormalization.STANDARD)
 
-        // Разбиваем сигнал на блоки, размер которых соответствует профилю шума
-        val blockSize = noiseSpectrum.size
-        val numBlocks = inputSignal.size / blockSize
-        val resultSignal = mutableListOf<Short>()
+        val outputSignal = mutableListOf<Short>()
 
-        for (blockIndex in 0 until numBlocks) {
-            // Извлекаем текущий блок
-            val startIdx = blockIndex * blockSize
-            val endIdx = min((blockIndex + 1) * blockSize, inputSignal.size)
-            val signalBlock = inputSignal.copyOfRange(startIdx, endIdx)
+        val noiseMagnitudeWindows = mutableListOf<List<Double>>()
 
-            // Преобразуем текущий блок в спектр
-            val signalBlockSpectrum = performFFT(signalBlock)
+        var startIndex = 0
+        while (startIndex + windowSize <= noiseProfile.size) {
+            val noiseWindow = noiseProfile.sliceArray(startIndex until startIndex + windowSize)
+            val noiseSpectrum = transformer.transform(noiseWindow.map { it.toDouble() }.toDoubleArray(), TransformType.FORWARD)
+            val noiseMagnitude = noiseSpectrum.map { it.abs() }
+            noiseMagnitudeWindows.add(noiseMagnitude)
+            startIndex += windowSize
+        }
 
+        val avgNoiseMagnitudeWindow = List(windowSize) {
+                index -> noiseMagnitudeWindows.map { it[index] }.average()
+        }
 
-            // Вычитание спектра шума из спектра сигнала
-            val processedBlockSpectrum = signalBlockSpectrum.mapIndexed { index, signalComplex ->
-                val noiseComplex = noiseSpectrum.getOrElse(index) { Complex.ZERO }
-
-                val signalMagnitude = signalComplex.abs()
-                val noiseMagnitude = noiseComplex.abs()
-                val newMagnitude = (signalMagnitude - alpha * noiseMagnitude).coerceAtLeast(0.0) // Вычитание шума
-
-                // Восстанавливаем комплексное число с новой амплитудой
-                val phase = signalComplex.argument // Оставляем фазу нетронутой
+        startIndex = 0
+        while (startIndex + windowSize <= audioSignal.size) {
+            val audioSignalWindow = audioSignal.sliceArray(startIndex until startIndex + windowSize)
+            val audioSignalSpectrum = transformer.transform(audioSignalWindow.map { it.toDouble() }.toDoubleArray(), TransformType.FORWARD)
+            val cleanedSpectrum = audioSignalSpectrum.mapIndexed { index, value ->
+                val magnitude = value.abs()
+                val newMagnitude = (magnitude - alpha * avgNoiseMagnitudeWindow[index]).coerceAtLeast(0.0)
+                val phase = value.argument
                 Complex(newMagnitude * kotlin.math.cos(phase), newMagnitude * kotlin.math.sin(phase))
             }
 
-            // Преобразуем обратно в временную область с помощью IFFT
-            val processedBlockComplex = fft.transform(processedBlockSpectrum.toTypedArray(), TransformType.INVERSE)
+            val cleanedSignal = transformer.transform(cleanedSpectrum.toTypedArray(), TransformType.INVERSE)
+            val cleanedSignalReal = cleanedSignal.map { it.real.toInt().toShort() }
+            outputSignal.addAll(cleanedSignalReal)
 
-            // Добавляем обратно в результирующий сигнал
-            resultSignal.addAll(processedBlockComplex.map { it.real.toInt().toShort() })
+            startIndex += windowSize
         }
 
-        // Если сигнал не делится на блоки точно, добавляем остаток
-        if (inputSignal.size % blockSize != 0) {
-            val remainingSignal = inputSignal.copyOfRange(numBlocks * blockSize, inputSignal.size)
-            resultSignal.addAll(remainingSignal.toList())
-        }
-
-        return resultSignal.toShortArray()
+        return outputSignal.toShortArray()
     }
 
 
