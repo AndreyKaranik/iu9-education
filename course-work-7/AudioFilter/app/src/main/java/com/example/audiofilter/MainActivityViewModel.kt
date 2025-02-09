@@ -35,11 +35,27 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
     }
 
     fun applyLowPassFilter() {
-        _processedAudio.value = AudioUtils.lowPassFilter(_processedAudio.value!!, sampleRate, 1000f)
+        _processedAudio.value = AudioUtils.lowPassFilter(_processedAudio.value!!, sampleRate, 700f)
     }
 
     fun applyHighPassFilter() {
-        _processedAudio.value = AudioUtils.highPassFilter(_processedAudio.value!!, sampleRate, 200f)
+        _processedAudio.value = AudioUtils.highPassFilter(_processedAudio.value!!, sampleRate, 700f)
+    }
+
+    fun applyBandPassFilter() {
+        _processedAudio.value = AudioUtils.bandPassFilter(_processedAudio.value!!, sampleRate, 1400f, 700f)
+    }
+
+    fun applyKalmanFilter() {
+        _processedAudio.value = AudioUtils.kalmanFilter(_processedAudio.value!!, sampleRate, 0.2f, 2.0f)
+    }
+
+    fun applyGaussianFilter() {
+        _processedAudio.value = AudioUtils.gaussianFilter(_processedAudio.value!!, 51, 1.0)
+    }
+
+    fun applyMedianFilter() {
+        _processedAudio.value = AudioUtils.medianFilter(_processedAudio.value!!, 20)
     }
 
     fun saveProcessedAudio() {

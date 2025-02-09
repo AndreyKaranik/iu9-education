@@ -51,6 +51,126 @@ object AudioUtils {
         return output
     }
 
+    fun bandPassFilter(input: ShortArray, sampleRate: Int, lowCutoffFreq: Float, highCutoffFreq: Float): ShortArray {
+        val output = ShortArray(input.size)
+
+        val lowRC = 1.0f / (lowCutoffFreq * 2.0f * Math.PI).toFloat()
+        val highRC = 1.0f / (highCutoffFreq * 2.0f * Math.PI).toFloat()
+
+        val dt = 1.0f / sampleRate
+
+        val lowAlpha = dt / (lowRC + dt)
+        val highAlpha = highRC / (highRC + dt)
+
+        var lowPrev = 0.0f
+        var highPrev = 0.0f
+
+        output[0] = input[0]
+
+        for (i in 1 until input.size) {
+            lowPrev = lowAlpha * input[i] + (1 - lowAlpha) * lowPrev
+            highPrev = highAlpha * (highPrev + input[i] - input[i - 1])
+            output[i] = (lowPrev - highPrev).toInt().toShort()
+        }
+
+        return output
+    }
+
+    fun kalmanFilter(input: ShortArray, sampleRate: Int, processNoiseCov: Float, measurementNoiseCov: Float): ShortArray {
+        val n = input.size
+        val filteredData = ShortArray(n)
+
+        // Начальные значения
+        var x = input[0].toFloat()  // Начальное предположение о состоянии (первый элемент)
+        var P = 1.0f  // Начальная ковариация ошибки (доверие к начальному состоянию)
+        val A = 1.0f  // Матрица состояния (здесь предполагаем, что аудио меняется линейно)
+        val H = 1.0f  // Матрица наблюдений (тоже предполагаем линейность)
+
+        // Параметры шума
+        val Q = processNoiseCov  // Ковариация шума процесса
+        val R = measurementNoiseCov  // Ковариация шума измерений
+
+        for (i in 0 until n) {
+            val z = input[i].toFloat()  // Текущее наблюдение
+
+            // Прогнозирование
+            val xMinus = A * x  // Прогнозируемое состояние
+            var PMinus = A * P * A + Q  // Прогнозированная ковариация ошибки
+
+            // Вычисление усиления Калмана
+            val K = PMinus * H / (H * PMinus * H + R)
+
+            // Обновление состояния
+            x = xMinus + K * (z - H * xMinus)
+
+            // Обновление ковариации
+            P = (1 - K * H) * PMinus
+
+            // Сохранение результата в массив
+            filteredData[i] = x.toInt().toShort()  // Конвертируем в short перед сохранением
+        }
+
+        return filteredData
+    }
+
+    fun gaussianFilter(audioData: ShortArray, kernelSize: Int, sigma: Double): ShortArray {
+        val kernel = generateGaussianKernel(kernelSize, sigma)
+
+        val filteredData = ShortArray(audioData.size)
+
+        for (i in audioData.indices) {
+            var sum = 0.0
+            var weightSum = 0.0
+            for (j in -kernelSize / 2..kernelSize / 2) {
+                val index = i + j
+                if (index in audioData.indices) {
+                    sum += audioData[index].toDouble() * kernel[j + kernelSize / 2]
+                    weightSum += kernel[j + kernelSize / 2]
+                }
+            }
+            filteredData[i] = (sum / weightSum).toInt().toShort()
+        }
+
+        return filteredData
+    }
+
+    fun generateGaussianKernel(size: Int, sigma: Double): DoubleArray {
+        val kernel = DoubleArray(size)
+        val mean = (size - 1) / 2.0
+        var sum = 0.0
+        for (i in 0 until size) {
+            val x = i - mean
+            kernel[i] = Math.exp(-0.5 * (x * x) / (sigma * sigma))
+            sum += kernel[i]
+        }
+        for (i in 0 until size) {
+            kernel[i] /= sum
+        }
+        return kernel
+    }
+
+    fun medianFilter(audioData: ShortArray, windowSize: Int): ShortArray {
+        val filteredData = ShortArray(audioData.size)
+
+        val halfWindow = windowSize / 2
+
+        for (i in audioData.indices) {
+            val window = mutableListOf<Short>()
+            for (j in -halfWindow..halfWindow) {
+                val index = i + j
+                if (index in audioData.indices) {
+                    window.add(audioData[index])
+                }
+            }
+            window.sort()
+            filteredData[i] = window[window.size / 2]
+        }
+
+        return filteredData
+    }
+
+
+
     fun saveToMediaStore(context: Context, outputSamples: ShortArray, sampleRate: Int): Uri? {
         val fileName = "filtered_audio_${System.currentTimeMillis()}.wav"
         val contentValues = ContentValues().apply {

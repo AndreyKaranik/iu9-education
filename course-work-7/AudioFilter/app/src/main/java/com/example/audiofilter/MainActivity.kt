@@ -87,6 +87,27 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { viewModel.applyBandPassFilter() }) {
+                        Text("Применить полосовой фильтр")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { viewModel.applyKalmanFilter() }) {
+                        Text("Применить фильтр Калмана")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { viewModel.applyGaussianFilter() }) {
+                        Text("Применить Гауссов фильтр")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = { viewModel.applyMedianFilter() }) {
+                        Text("Применить медианный фильтр")
+                    }
+
+
+                    Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { viewModel.saveProcessedAudio() }) {
                         Text("Сохранить результат")
                     }
