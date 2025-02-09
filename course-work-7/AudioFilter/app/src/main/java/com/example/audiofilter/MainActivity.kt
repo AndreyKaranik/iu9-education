@@ -107,7 +107,7 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applySpectralSubtraction(200, 500, 100.0f) }) {
+                    Button(onClick = { viewModel.applySpectralSubtraction(200, 500, 1.0f) }) {
                         Text("Применить метод подавления шума")
                     }
 

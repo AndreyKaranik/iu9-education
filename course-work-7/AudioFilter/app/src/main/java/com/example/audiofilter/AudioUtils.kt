@@ -23,7 +23,9 @@ import org.apache.commons.math3.transform.DftNormalization
 import org.apache.commons.math3.transform.FastFourierTransformer
 import org.apache.commons.math3.transform.TransformType
 import kotlin.math.ceil
+import kotlin.math.log10
 import kotlin.math.log2
+import kotlin.math.min
 import kotlin.math.pow
 
 object AudioUtils {
@@ -183,69 +185,83 @@ object AudioUtils {
         return filteredData
     }
 
-    fun spectralSubtraction(inputSignal: ShortArray, sampleRate: Int, noiseProfileStartMs: Int, noiseProfileEndMs: Int, alpha: Double): ShortArray {
-        // Шаг 1: Дополняем сигнал до ближайшей степени двойки
-        val signalLength = inputSignal.size
-        val nextPowerOf2 = 2.0.pow(ceil(log2(signalLength.toDouble()))).toInt()
-        val paddedSignal = inputSignal.copyOf(nextPowerOf2)  // Дополняем сигнал нулями
-
-        // Преобразуем сигнал в массив комплексных чисел для FFT
-        val signalComplex = paddedSignal.map { Complex(it.toDouble(), 0.0) }.toTypedArray()
-
-        // Шаг 2: Применяем FFT с нормализацией
-        val fft = FastFourierTransformer(DftNormalization.STANDARD)
-        val signalSpectrum = fft.transform(signalComplex, TransformType.FORWARD)
-
-        // Шаг 3: Создаем спектр шума (вычисляем спектр на основе предоставленного диапазона в ms)
+    fun spectralSubtraction(inputSignal: ShortArray, sampleRate: Int, noiseProfileStartMs: Int, noiseProfileEndMs: Int, alpha: Double = 1.0): ShortArray {
+        // 1. Извлекаем профиль шума из первых N миллисекунд аудиофайла
         val noiseProfile = extractNoiseProfile(inputSignal, sampleRate, noiseProfileStartMs, noiseProfileEndMs)
 
-        // Дополняем профиль шума до ближайшей степени двойки
-        val noiseLength = noiseProfile.size
-        val nextPowerOf2Noise = 2.0.pow(ceil(log2(noiseLength.toDouble()))).toInt()
-        val paddedNoiseProfile = noiseProfile.copyOf(nextPowerOf2Noise)  // Дополняем профиль шума нулями
+        // Преобразуем профиль шума в спектр с помощью FFT
+        val noiseSpectrum = performFFT(noiseProfile)
 
-        // Переходим к спектру шума с помощью FFT
-        val noiseComplex = paddedNoiseProfile.map { Complex(it.toDouble(), 0.0) }.toTypedArray()
-        val noiseSpectrum = fft.transform(noiseComplex, TransformType.FORWARD)
+        // 2. Применяем спектральное вычитание ко всему аудиофайлу
+        val processedSignal = processSignal(inputSignal, sampleRate, noiseSpectrum, alpha)
 
-        // Шаг 4: Вычитаем спектр шума из спектра сигнала с использованием логарифмической шкалы для более стабильного вычитания
-        val noiseMagnitude = noiseSpectrum.map { it.abs() }.toDoubleArray()
-        val signalMagnitude = signalSpectrum.map { it.abs() }.toDoubleArray()
-
-        // Применяем логарифмическую шкалу для спектров
-        val signalLog = signalMagnitude.map { log2(it + 1e-10) } // Добавляем малое значение, чтобы избежать логарифма от нуля
-        val noiseLog = noiseMagnitude.map { log2(it + 1e-10) } // Тоже самое для шума
-
-        // Снижаем амплитуду шума с учетом коэффициента alpha
-        val resultLog = signalLog.mapIndexed { index, logSignal ->
-            val logNoise = noiseLog.getOrElse(index) { 0.0 }
-            val adjustedLog = logSignal - alpha * logNoise
-            adjustedLog.coerceAtLeast(0.0) // Сохраняем значение, не давая ему стать отрицательным
-        }
-
-        // Преобразуем обратно в амплитуду
-        val resultMagnitude = resultLog.map { 2.0.pow(it) } // Обратный логарифм
-
-        // Формируем итоговый спектр с обновленными амплитудами
-        val resultSpectrum = signalSpectrum.mapIndexed { index, complex ->
-            val resultAbs = resultMagnitude.getOrElse(index) { 0.0 }
-            val scaleFactor = resultAbs / complex.abs()
-            complex.multiply(scaleFactor)
-        }.toTypedArray()
-
-        // Шаг 5: Применяем IFFT для восстановления сигнала с подавленным шумом
-        val inverseFFT = FastFourierTransformer(DftNormalization.STANDARD)
-        val processedSignalComplex = inverseFFT.transform(resultSpectrum, TransformType.INVERSE)
-
-        // Преобразуем обратно в ShortArray
-        return processedSignalComplex.map { it.real.toInt().toShort() }.toShortArray()
+        return processedSignal
     }
 
-    // Функция для извлечения профиля шума по диапазону времени
+    // Функция извлечения профиля шума из первых N миллисекунд сигнала
     fun extractNoiseProfile(inputSignal: ShortArray, sampleRate: Int, startMs: Int, endMs: Int): ShortArray {
         val startIndex = (startMs * sampleRate) / 1000
         val endIndex = (endMs * sampleRate) / 1000
         return inputSignal.copyOfRange(startIndex, endIndex)
+    }
+
+    // Функция выполнения FFT
+    fun performFFT(signal: ShortArray): Array<Complex> {
+        val nextPowerOf2 = 2.0.pow(ceil(log10(signal.size.toDouble()) / log10(2.0))).toInt()
+        val paddedSignal = signal.copyOf(nextPowerOf2)
+
+        val complexSignal = paddedSignal.map { Complex(it.toDouble(), 0.0) }.toTypedArray()
+
+        val fft = FastFourierTransformer(DftNormalization.STANDARD)
+        return fft.transform(complexSignal, TransformType.FORWARD)
+    }
+
+    // Функция обработки всего сигнала с использованием спектра шума
+    fun processSignal(inputSignal: ShortArray, sampleRate: Int, noiseSpectrum: Array<Complex>, alpha: Double): ShortArray {
+        val fft = FastFourierTransformer(DftNormalization.STANDARD)
+
+        // Разбиваем сигнал на блоки, размер которых соответствует профилю шума
+        val blockSize = noiseSpectrum.size
+        val numBlocks = inputSignal.size / blockSize
+        val resultSignal = mutableListOf<Short>()
+
+        for (blockIndex in 0 until numBlocks) {
+            // Извлекаем текущий блок
+            val startIdx = blockIndex * blockSize
+            val endIdx = min((blockIndex + 1) * blockSize, inputSignal.size)
+            val signalBlock = inputSignal.copyOfRange(startIdx, endIdx)
+
+            // Преобразуем текущий блок в спектр
+            val signalBlockSpectrum = performFFT(signalBlock)
+
+
+            // Вычитание спектра шума из спектра сигнала
+            val processedBlockSpectrum = signalBlockSpectrum.mapIndexed { index, signalComplex ->
+                val noiseComplex = noiseSpectrum.getOrElse(index) { Complex.ZERO }
+
+                val signalMagnitude = signalComplex.abs()
+                val noiseMagnitude = noiseComplex.abs()
+                val newMagnitude = (signalMagnitude - alpha * noiseMagnitude).coerceAtLeast(0.0) // Вычитание шума
+
+                // Восстанавливаем комплексное число с новой амплитудой
+                val phase = signalComplex.argument // Оставляем фазу нетронутой
+                Complex(newMagnitude * kotlin.math.cos(phase), newMagnitude * kotlin.math.sin(phase))
+            }
+
+            // Преобразуем обратно в временную область с помощью IFFT
+            val processedBlockComplex = fft.transform(processedBlockSpectrum.toTypedArray(), TransformType.INVERSE)
+
+            // Добавляем обратно в результирующий сигнал
+            resultSignal.addAll(processedBlockComplex.map { it.real.toInt().toShort() })
+        }
+
+        // Если сигнал не делится на блоки точно, добавляем остаток
+        if (inputSignal.size % blockSize != 0) {
+            val remainingSignal = inputSignal.copyOfRange(numBlocks * blockSize, inputSignal.size)
+            resultSignal.addAll(remainingSignal.toList())
+        }
+
+        return resultSignal.toShortArray()
     }
 
 
