@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,9 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
+import com.example.audiofilter.ui.theme.AudioFilterTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.exp
@@ -41,13 +45,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         viewModel = MainActivityViewModel(this)
         setContent {
-            AudioProcessorScreen(viewModel)
+            AudioFilterTheme {
+                AudioFilterScreen(viewModel)
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
+fun AudioFilterScreen(viewModel: MainActivityViewModel) {
     val context = LocalContext.current
     val selectedFileName by viewModel.selectedFileName.collectAsState()
     val processedFileUri by viewModel.processedFileUri.collectAsState()
@@ -70,50 +77,40 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
             modifier = Modifier.fillMaxSize(),
         ) {
             item {
-                Button(onClick = { filePickerLauncher.launch("audio/*") }) {
+
+                Text(
+                    text = "AudioFilter",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "Выберете аудиофайл перед началом работы",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        filePickerLauncher.launch("audio/*")
+                    }
+                ) {
                     Text("Выбрать аудиофайл")
                 }
 
                 selectedFileName?.let {
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.applyLowPassFilter() }) {
-                        Text("Применить НЧ-фильтр")
-                    }
-
                     Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applyHighPassFilter() }) {
-                        Text("Применить ВЧ-фильтр")
-                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applyBandPassFilter() }) {
-                        Text("Применить полосовой фильтр")
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applyKalmanFilter() }) {
-                        Text("Применить фильтр Калмана")
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applyGaussianFilter() }) {
-                        Text("Применить Гауссов фильтр")
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applyMedianFilter() }) {
-                        Text("Применить медианный фильтр")
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.applySpectralSubtraction(200, 500, 1.0f) }) {
-                        Text("Применить метод подавления шума")
-                    }
-
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.saveProcessedAudio() }) {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            viewModel.saveProcessedAudio()
+                        }
+                    ) {
                         Text("Сохранить результат")
                     }
 
@@ -121,6 +118,35 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Файл сохранён")
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    LowPassFilterView(viewModel = viewModel)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    HighPassFilterView(viewModel = viewModel)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    BandPassFilterView(viewModel = viewModel)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    KalmanFilterView(viewModel = viewModel)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    GaussianFilterView(viewModel = viewModel)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    MedianFilterView(viewModel = viewModel)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    SpectralSubtractionView(viewModel = viewModel)
+
                 }
             }
 
@@ -134,6 +160,197 @@ fun AudioProcessorScreen(viewModel: MainActivityViewModel) {
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LowPassFilterView(viewModel: MainActivityViewModel) {
+    var cutoffFreq by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Низкочастотный фильтр",
+        apply = {
+            viewModel.applyLowPassFilter(cutoffFreq.text.toFloat())
+        }) {
+        ParamFieldView(
+            name = "cutoffFreq",
+            value = cutoffFreq,
+            onValueChange = { newValue -> cutoffFreq = newValue })
+    }
+}
+
+@Composable
+fun HighPassFilterView(viewModel: MainActivityViewModel) {
+    var cutoffFreq by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Высокочастотный фильтр",
+        apply = {
+            viewModel.applyHighPassFilter(cutoffFreq.text.toFloat())
+        }) {
+        ParamFieldView(
+            name = "cutoffFreq",
+            value = cutoffFreq,
+            onValueChange = { newValue -> cutoffFreq = newValue })
+    }
+}
+
+@Composable
+fun BandPassFilterView(viewModel: MainActivityViewModel) {
+    var lowCutoffFreq by remember { mutableStateOf(TextFieldValue("")) }
+    var highCutoffFreq by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Полосовой фильтр",
+        apply = {
+            viewModel.applyBandPassFilter(
+                lowCutoffFreq.text.toFloat(),
+                highCutoffFreq.text.toFloat()
+            )
+        }) {
+        ParamFieldView(
+            name = "lowCutoffFreq",
+            value = lowCutoffFreq,
+            onValueChange = { newValue -> lowCutoffFreq = newValue }
+        )
+        ParamFieldView(
+            name = "highCutoffFreq",
+            value = highCutoffFreq,
+            onValueChange = { newValue -> highCutoffFreq = newValue }
+        )
+    }
+}
+
+@Composable
+fun KalmanFilterView(viewModel: MainActivityViewModel) {
+    var processNoiseCov by remember { mutableStateOf(TextFieldValue("")) }
+    var measurementNoiseCov by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Полосовой фильтр",
+        apply = {
+            viewModel.applyKalmanFilter(
+                processNoiseCov.text.toFloat(),
+                measurementNoiseCov.text.toFloat()
+            )
+        }) {
+        ParamFieldView(
+            name = "processNoiseCov",
+            value = processNoiseCov,
+            onValueChange = { newValue -> processNoiseCov = newValue }
+        )
+        ParamFieldView(
+            name = "measurementNoiseCov",
+            value = measurementNoiseCov,
+            onValueChange = { newValue -> measurementNoiseCov = newValue }
+        )
+    }
+}
+
+@Composable
+fun GaussianFilterView(viewModel: MainActivityViewModel) {
+    var kernelSize by remember { mutableStateOf(TextFieldValue("")) }
+    var sigma by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Гауссов фильтр",
+        apply = {
+            viewModel.applyGaussianFilter(kernelSize.text.toInt(), sigma.text.toDouble())
+        }) {
+        ParamFieldView(
+            name = "kernelSize",
+            value = kernelSize,
+            onValueChange = { newValue -> kernelSize = newValue }
+        )
+        ParamFieldView(
+            name = "sigma",
+            value = sigma,
+            onValueChange = { newValue -> sigma = newValue }
+        )
+    }
+}
+
+@Composable
+fun MedianFilterView(viewModel: MainActivityViewModel) {
+    var windowSize by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Медианный фильтр",
+        apply = {
+            viewModel.applyMedianFilter(windowSize.text.toInt())
+        }) {
+        ParamFieldView(
+            name = "windowSize",
+            value = windowSize,
+            onValueChange = { newValue -> windowSize = newValue }
+        )
+    }
+}
+
+@Composable
+fun SpectralSubtractionView(viewModel: MainActivityViewModel) {
+    var noiseStartMs by remember { mutableStateOf(TextFieldValue("")) }
+    var noiseEndMs by remember { mutableStateOf(TextFieldValue("")) }
+    var alpha by remember { mutableStateOf(TextFieldValue("")) }
+
+    FilterView(
+        title = "Метод шумоподавления с использованием спектрального вычитания",
+        apply = {
+            viewModel.applySpectralSubtraction(noiseStartMs.text.toInt(), noiseEndMs.text.toInt(), alpha.text.toFloat())
+        }) {
+        ParamFieldView(
+            name = "noiseStartMs",
+            value = noiseStartMs,
+            onValueChange = { newValue -> noiseStartMs = newValue }
+        )
+        ParamFieldView(
+            name = "noiseEndMs",
+            value = noiseEndMs,
+            onValueChange = { newValue -> noiseEndMs = newValue }
+        )
+        ParamFieldView(
+            name = "alpha",
+            value = alpha,
+            onValueChange = { newValue -> alpha = newValue }
+        )
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ParamFieldView(
+    name: String,
+    value: TextFieldValue,
+    onValueChange: (newValue: TextFieldValue) -> Unit
+) {
+    OutlinedTextField(
+        modifier = Modifier.fillMaxWidth(0.5f),
+        value = value,
+        onValueChange = { newValue -> onValueChange(newValue) },
+        label = { Text(name) },
+        singleLine = true
+    )
+}
+
+@Composable
+fun FilterView(title: String, apply: () -> Unit, Body: @Composable () -> Unit) {
+    Column {
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Body()
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(
+            onClick = {
+                apply()
+            }
+        ) {
+            Text("Применить")
         }
     }
 }
@@ -153,7 +370,6 @@ fun AudioWaveformView(audioData: ShortArray, sampleRate: Int, scrollState: Scrol
             scale = newScale
         },
         valueRange = 0.2f..2.0f,
-        steps = 20,
         modifier = Modifier.padding(bottom = 16.dp)
     )
 

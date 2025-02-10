@@ -39,33 +39,37 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
         _processedFileUri.value = uri
     }
 
-    fun applyLowPassFilter() {
-        _processedAudio.value = AudioUtils.lowPassFilter(_processedAudio.value!!, sampleRate, 700f)
+    fun applyLowPassFilter(cutoffFreq: Float) {
+        _processedAudio.value = AudioUtils.lowPassFilter(_processedAudio.value!!, sampleRate, cutoffFreq)
     }
 
-    fun applyHighPassFilter() {
-        _processedAudio.value = AudioUtils.highPassFilter(_processedAudio.value!!, sampleRate, 700f)
+    fun applyHighPassFilter(cutoffFreq: Float) {
+        _processedAudio.value = AudioUtils.highPassFilter(_processedAudio.value!!, sampleRate, cutoffFreq)
     }
 
-    fun applyBandPassFilter() {
+    fun applyBandPassFilter(lowCutoffFreq: Float, highCutoffFreq: Float) {
         _processedAudio.value =
-            AudioUtils.bandPassFilter(_processedAudio.value!!, sampleRate, 1400f, 700f)
+            AudioUtils.bandPassFilter(_processedAudio.value!!, sampleRate, lowCutoffFreq, highCutoffFreq)
     }
 
-    fun applyKalmanFilter() {
+    fun applyKalmanFilter(processNoiseCov: Float, measurementNoiseCov: Float) {
         _processedAudio.value =
-            AudioUtils.kalmanFilter(_processedAudio.value!!, sampleRate, 0.2f, 2.0f)
+            AudioUtils.kalmanFilter(_processedAudio.value!!, sampleRate, processNoiseCov, measurementNoiseCov)
     }
 
-    fun applyGaussianFilter() {
-        _processedAudio.value = AudioUtils.gaussianFilter(_processedAudio.value!!, 51, 1.0)
+    fun applyGaussianFilter(kernelSize: Int, sigma: Double) {
+        _processedAudio.value = AudioUtils.gaussianFilter(_processedAudio.value!!, kernelSize, sigma)
     }
 
-    fun applyMedianFilter() {
-        _processedAudio.value = AudioUtils.medianFilter(_processedAudio.value!!, 20)
+    fun applyMedianFilter(windowSize: Int) {
+        _processedAudio.value = AudioUtils.medianFilter(_processedAudio.value!!, windowSize)
     }
 
-    fun applySpectralSubtraction(noiseStartMs: Int, noiseEndMs: Int, alpha: Float) {
+    fun applySpectralSubtraction(
+        noiseStartMs: Int,
+        noiseEndMs: Int,
+        alpha: Float
+    ) {
         _processedAudio.value = AudioUtils.spectralSubtraction(
             _processedAudio.value!!,
             sampleRate,

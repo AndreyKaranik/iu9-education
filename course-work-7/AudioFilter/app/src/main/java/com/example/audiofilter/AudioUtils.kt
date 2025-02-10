@@ -34,7 +34,7 @@ object AudioUtils {
         val byteArray = inputStream.readBytes()
         val sampleRate = ByteBuffer.wrap(byteArray.copyOfRange(24, 28)).order(ByteOrder.LITTLE_ENDIAN).int
 
-        val audioDataStart = 44 // WAV-формат начинается с 44 байта заголовка
+        val audioDataStart = 44
         val audioBytes = byteArray.copyOfRange(audioDataStart, byteArray.size)
         val buffer = ByteBuffer.wrap(audioBytes).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
 
@@ -227,7 +227,7 @@ object AudioUtils {
                 val magnitude = value.abs()
                 val newMagnitude = (magnitude - alpha * avgNoiseMagnitudeWindow[index]).coerceAtLeast(0.0)
                 val phase = value.argument
-                Complex(newMagnitude * kotlin.math.cos(phase), newMagnitude * kotlin.math.sin(phase))
+                Complex(newMagnitude * cos(phase), newMagnitude * sin(phase))
             }
 
             val cleanedSignal = transformer.transform(cleanedSpectrum.toTypedArray(), TransformType.INVERSE)
@@ -276,7 +276,7 @@ object AudioUtils {
         outputStream.write(byteBuffer.array())
     }
 
-    fun createWavHeader(dataSize: Int, sampleRate: Int): ByteArray {
+    private fun createWavHeader(dataSize: Int, sampleRate: Int): ByteArray {
         val numChannels = 1
         val bitsPerSample = 16
         val bytesPerSample = bitsPerSample / 8
@@ -286,19 +286,19 @@ object AudioUtils {
 
         return ByteBuffer.allocate(44).apply {
             order(ByteOrder.LITTLE_ENDIAN)
-            put("RIFF".toByteArray()) // "RIFF" chunk descriptor
-            putInt(totalDataLen) // Total file size - 8 bytes
-            put("WAVE".toByteArray()) // "WAVE" format
-            put("fmt ".toByteArray()) // "fmt " sub-chunk
-            putInt(16) // Sub-chunk size (16 for PCM)
-            putShort(1) // Audio format (1 = PCM)
-            putShort(numChannels.toShort()) // Number of channels
-            putInt(sampleRate) // Sample rate (правильная частота)
-            putInt(byteRate) // Byte rate (sampleRate * numChannels * bytesPerSample)
-            putShort(blockAlign.toShort()) // Block align
-            putShort(bitsPerSample.toShort()) // Bits per sample (16 bits)
-            put("data".toByteArray()) // "data" sub-chunk
-            putInt(dataSize * bytesPerSample) // Data chunk size
+            put("RIFF".toByteArray())
+            putInt(totalDataLen)
+            put("WAVE".toByteArray())
+            put("fmt ".toByteArray())
+            putInt(16)
+            putShort(1)
+            putShort(numChannels.toShort())
+            putInt(sampleRate)
+            putInt(byteRate)
+            putShort(blockAlign.toShort())
+            putShort(bitsPerSample.toShort())
+            put("data".toByteArray())
+            putInt(dataSize * bytesPerSample)
         }.array()
     }
 
