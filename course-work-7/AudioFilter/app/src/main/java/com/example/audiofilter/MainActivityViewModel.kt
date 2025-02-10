@@ -79,5 +79,4 @@ class MainActivityViewModel(private val context: Context) : ViewModel() {
         )
     }
 
-
 }

@@ -97,34 +97,30 @@ object AudioUtils {
         val n = input.size
         val filteredData = ShortArray(n)
 
-        // Начальные значения
-        var x = input[0].toFloat()  // Начальное предположение о состоянии (первый элемент)
-        var P = 1.0f  // Начальная ковариация ошибки (доверие к начальному состоянию)
-        val A = 1.0f  // Матрица состояния (здесь предполагаем, что аудио меняется линейно)
-        val H = 1.0f  // Матрица наблюдений (тоже предполагаем линейность)
+        var x = input[0].toFloat()
+        var P = 1.0f
+        val A = 1.0f
+        val H = 1.0f
+        val I = 1.0f
+        val AT = 1.0f
+        val HT = 1.0f
 
-        // Параметры шума
-        val Q = processNoiseCov  // Ковариация шума процесса
-        val R = measurementNoiseCov  // Ковариация шума измерений
+        val Q = processNoiseCov
+        val R = measurementNoiseCov
 
         for (i in 0 until n) {
-            val z = input[i].toFloat()  // Текущее наблюдение
+            val z = input[i].toFloat()
 
-            // Прогнозирование
-            val xMinus = A * x  // Прогнозируемое состояние
-            var PMinus = A * P * A + Q  // Прогнозированная ковариация ошибки
+            val xMinus = A * x
+            val PMinus = A * P * AT + Q
 
-            // Вычисление усиления Калмана
-            val K = PMinus * H / (H * PMinus * H + R)
+            val K = PMinus * HT / (H * PMinus * HT + R)
 
-            // Обновление состояния
             x = xMinus + K * (z - H * xMinus)
 
-            // Обновление ковариации
-            P = (1 - K * H) * PMinus
+            P = (I - K * H) * PMinus
 
-            // Сохранение результата в массив
-            filteredData[i] = x.toInt().toShort()  // Конвертируем в short перед сохранением
+            filteredData[i] = x.toInt().toShort()
         }
 
         return filteredData
@@ -222,7 +218,10 @@ object AudioUtils {
         startIndex = 0
         while (startIndex + windowSize <= audioSignal.size) {
             val audioSignalWindow = audioSignal.sliceArray(startIndex until startIndex + windowSize)
-            val audioSignalSpectrum = transformer.transform(audioSignalWindow.map { it.toDouble() }.toDoubleArray(), TransformType.FORWARD)
+            val audioSignalSpectrum = transformer.transform(
+                audioSignalWindow.map { it.toDouble() }.toDoubleArray(),
+                TransformType.FORWARD
+            )
             val cleanedSpectrum = audioSignalSpectrum.mapIndexed { index, value ->
                 val magnitude = value.abs()
                 val newMagnitude = (magnitude - alpha * avgNoiseMagnitudeWindow[index]).coerceAtLeast(0.0)
