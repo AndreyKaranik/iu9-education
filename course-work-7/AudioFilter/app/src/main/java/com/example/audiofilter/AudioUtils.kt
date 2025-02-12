@@ -32,7 +32,8 @@ import kotlin.math.pow
 object AudioUtils {
     fun readWavFile(inputStream: InputStream): Pair<ShortArray, Int> {
         val byteArray = inputStream.readBytes()
-        val sampleRate = ByteBuffer.wrap(byteArray.copyOfRange(24, 28)).order(ByteOrder.LITTLE_ENDIAN).int
+        val sampleRate =
+            ByteBuffer.wrap(byteArray.copyOfRange(24, 28)).order(ByteOrder.LITTLE_ENDIAN).int
 
         val audioDataStart = 44
         val audioBytes = byteArray.copyOfRange(audioDataStart, byteArray.size)
@@ -68,32 +69,23 @@ object AudioUtils {
         return output
     }
 
-    fun bandPassFilter(input: ShortArray, sampleRate: Int, lowCutoffFreq: Float, highCutoffFreq: Float): ShortArray {
-        val output = ShortArray(input.size)
-
-        val lowRC = 1.0f / (lowCutoffFreq * 2.0f * Math.PI).toFloat()
-        val highRC = 1.0f / (highCutoffFreq * 2.0f * Math.PI).toFloat()
-
-        val dt = 1.0f / sampleRate
-
-        val lowAlpha = dt / (lowRC + dt)
-        val highAlpha = highRC / (highRC + dt)
-
-        var lowPrev = 0.0f
-        var highPrev = 0.0f
-
-        output[0] = input[0]
-
-        for (i in 1 until input.size) {
-            lowPrev = lowAlpha * input[i] + (1 - lowAlpha) * lowPrev
-            highPrev = highAlpha * (highPrev + input[i] - input[i - 1])
-            output[i] = (lowPrev - highPrev).toInt().toShort()
-        }
-
-        return output
+    fun bandPassFilter(
+        input: ShortArray,
+        sampleRate: Int,
+        lowCutoffFreq: Float,
+        highCutoffFreq: Float
+    ): ShortArray {
+        val lowpass = lowPassFilter(input, sampleRate, lowCutoffFreq)
+        val bandpass = highPassFilter(lowpass, sampleRate, highCutoffFreq)
+        return bandpass
     }
 
-    fun kalmanFilter(input: ShortArray, sampleRate: Int, processNoiseCov: Float, measurementNoiseCov: Float): ShortArray {
+    fun kalmanFilter(
+        input: ShortArray,
+        sampleRate: Int,
+        processNoiseCov: Float,
+        measurementNoiseCov: Float
+    ): ShortArray {
         val n = input.size
         val filteredData = ShortArray(n)
 
@@ -182,13 +174,26 @@ object AudioUtils {
         return filteredData
     }
 
-    fun extractNoiseProfile(inputSignal: ShortArray, sampleRate: Int, startMs: Int, endMs: Int): ShortArray {
+    fun extractNoiseProfile(
+        inputSignal: ShortArray,
+        sampleRate: Int,
+        startMs: Int,
+        endMs: Int
+    ): ShortArray {
         val startIndex = (startMs * sampleRate) / 1000
         val endIndex = (endMs * sampleRate) / 1000
         return inputSignal.copyOfRange(startIndex, endIndex)
     }
 
-    fun spectralSubtraction(audioSignal: ShortArray, sampleRate: Int, startMs: Int, endMs: Int, alpha: Float, windowSize: Int = 4096, overlap: Int = 2048): ShortArray {
+    fun spectralSubtraction(
+        audioSignal: ShortArray,
+        sampleRate: Int,
+        startMs: Int,
+        endMs: Int,
+        alpha: Float,
+        windowSize: Int = 4096,
+        overlap: Int = 2048
+    ): ShortArray {
 
         val noiseProfile: ShortArray = extractNoiseProfile(audioSignal, sampleRate, startMs, endMs)
 
@@ -205,14 +210,17 @@ object AudioUtils {
         var startIndex = 0
         while (startIndex + windowSize <= noiseProfile.size) {
             val noiseWindow = noiseProfile.sliceArray(startIndex until startIndex + windowSize)
-            val noiseSpectrum = transformer.transform(noiseWindow.map { it.toDouble() }.toDoubleArray(), TransformType.FORWARD)
+            val noiseSpectrum = transformer.transform(
+                noiseWindow.map { it.toDouble() }.toDoubleArray(),
+                TransformType.FORWARD
+            )
             val noiseMagnitude = noiseSpectrum.map { it.abs() }
             noiseMagnitudeWindows.add(noiseMagnitude)
             startIndex += windowSize
         }
 
-        val avgNoiseMagnitudeWindow = List(windowSize) {
-                index -> noiseMagnitudeWindows.map { it[index] }.average()
+        val avgNoiseMagnitudeWindow = List(windowSize) { index ->
+            noiseMagnitudeWindows.map { it[index] }.average()
         }
 
         startIndex = 0
@@ -224,12 +232,14 @@ object AudioUtils {
             )
             val cleanedSpectrum = audioSignalSpectrum.mapIndexed { index, value ->
                 val magnitude = value.abs()
-                val newMagnitude = (magnitude - alpha * avgNoiseMagnitudeWindow[index]).coerceAtLeast(0.0)
+                val newMagnitude =
+                    (magnitude - alpha * avgNoiseMagnitudeWindow[index]).coerceAtLeast(0.0)
                 val phase = value.argument
                 Complex(newMagnitude * cos(phase), newMagnitude * sin(phase))
             }
 
-            val cleanedSignal = transformer.transform(cleanedSpectrum.toTypedArray(), TransformType.INVERSE)
+            val cleanedSignal =
+                transformer.transform(cleanedSpectrum.toTypedArray(), TransformType.INVERSE)
             val cleanedSignalReal = cleanedSignal.map { it.real.toInt().toShort() }
             outputSignal.addAll(cleanedSignalReal)
 
@@ -254,7 +264,10 @@ object AudioUtils {
 
         audioUri?.let { uri ->
             resolver.openOutputStream(uri)?.use { outputStream ->
-                Log.d("AudioSave", "Saving WAV with sampleRate: $sampleRate, dataSize: ${outputSamples.size}")
+                Log.d(
+                    "AudioSave",
+                    "Saving WAV with sampleRate: $sampleRate, dataSize: ${outputSamples.size}"
+                )
                 writeWavFile(outputStream, outputSamples, sampleRate)
             }
             contentValues.clear()
@@ -300,7 +313,6 @@ object AudioUtils {
             putInt(dataSize * bytesPerSample)
         }.array()
     }
-
 
 
 }

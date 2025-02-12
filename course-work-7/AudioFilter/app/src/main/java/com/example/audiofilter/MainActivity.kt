@@ -228,7 +228,7 @@ fun KalmanFilterView(viewModel: MainActivityViewModel) {
     var measurementNoiseCov by remember { mutableStateOf(TextFieldValue("")) }
 
     FilterView(
-        title = "Полосовой фильтр",
+        title = "Метод Калмана",
         apply = {
             viewModel.applyKalmanFilter(
                 processNoiseCov.text.toFloat(),
