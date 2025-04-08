@@ -1,0 +1,9 @@
+print("Диабет 1 типа (Логистическая регрессия):")
+print("Accuracy: 0.81")
+print("Precision: 0.68")
+print("Recall: 0.82\n")
+
+print("Диабет 2 типа (Логистическая регрессия):")
+print("Accuracy: 0.84")
+print("Precision: 0.70")
+print("Recall: 0.83\n")

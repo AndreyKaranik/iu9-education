@@ -1,0 +1,63 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath}
+
+\begin{document}
+
+\title{Аналитические расчеты системы массового обслуживания}
+\author{Вариант $N = 11$}
+\date{}
+\maketitle
+
+\section{Исходные данные}
+\begin{itemize}
+    \item Интенсивность поступления задач: $\lambda = 1$ задача/мин.
+    \item Среднее время обработки одной задачи процессором: $1.4 \times 11 = 15.4$ сек $= 0.2567$ мин.
+    \item Интенсивность обслуживания одного процессора: $\mu = \frac{60}{15.4} = 3.896$ задач/мин.
+    \item Число процессоров: $s = 2$.
+\end{itemize}
+
+\section{Аналитические расчеты}
+
+\subsection{Коэффициент загрузки системы}
+\begin{equation}
+    \rho = \frac{\lambda}{s \mu} = \frac{1}{2 \times 3.896} = \frac{1}{7.792} \approx 0.1283.
+\end{equation}
+
+\subsection{Вероятность того, что система пуста ($P_0$)}
+Формула:
+\begin{equation}
+    P_0 = \frac{1}{1 + \frac{\lambda}{\mu} + \frac{(\lambda/\mu)^2}{2! (1 - \rho)}}
+\end{equation}
+
+Подставляем значения:
+\begin{equation}
+    \frac{\lambda}{\mu} = \frac{1}{3.896} \approx 0.2567
+\end{equation}
+\begin{equation}
+    \frac{(\lambda/\mu)^2}{2! (1 - \rho)} = \frac{(0.2567)^2}{2 \times (1 - 0.1283)}
+\end{equation}
+\begin{equation}
+    = \frac{0.0659}{2 \times 0.8717} = \frac{0.0659}{1.7434} \approx 0.0378.
+\end{equation}
+\begin{equation}
+    P_0 = \frac{1}{1 + 0.2567 + 0.0378} = \frac{1}{1.2945} \approx 0.7724.
+\end{equation}
+
+\subsection{Средняя длина очереди ($L_q$)}
+Формула:
+\begin{equation}
+    L_q = \frac{(\lambda/\mu)^2 P_0}{2(1 - \rho)^2}
+\end{equation}
+
+Подставляем:
+\begin{equation}
+    L_q = \frac{(0.2567)^2 \times 0.7724}{2(1 - 0.1283)^2}
+\end{equation}
+\begin{equation}
+    = \frac{0.0659 \times 0.7724}{2 \times 0.8717^2}
+\end{equation}
+\begin{equation}
+    = \frac{0.0509}{2 \times 0.7598} = \frac{0.0509}{1.5196} \approx 0.0335.
+\end{equation}
+
+\end{document}
