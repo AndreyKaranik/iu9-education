@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="login_title">Вход</string>
+    <string name="email_label">Почта</string>
+    <string name="email_error">Введите корректный email</string>
+    <string name="password_label">Пароль</string>
+    <string name="login_button">Войти</string>
+    <string name="not_registered">Еще не зарегистрированы? Перейти к регистрации.</string>
+
+    <string name="registration_title">Регистрация</string>
+    <string name="name_label">Имя</string>
+    <string name="name_error">Имя не может быть пустым</string>
+    <string name="password_error">Пароль должен содержать минимум 4 символа</string>
+    <string name="privacy_policy_checkbox">Я согласен с политикой конфиденциальности</string>
+    <string name="terms_checkbox">Я принимаю пользовательское соглашение</string>
+    <string name="register_button">Зарегистрироваться</string>
+    <string name="already_registered">Уже зарегистрированы? Войти.</string>
+    <string name="privacy_policy_link">Политика конфиденциальности</string>
+    <string name="terms_link">Пользовательское соглашение</string>
+
+    <string name="email_confirmation_title">Подтверждение email</string>
+    <string name="email_confirmation_message">На вашу почту было отправлено письмо подтверждения. Пожалуйста, проверьте ваш почтовый ящик.</string>
+    <string name="accept_button">Принять</string>
+
+    <string name="error_email_already_in_use">Такая почта уже используется</string>
+    <string name="error_request_failed">Не удалось выполнить запрос</string>
+    <string name="error_invalid_credentials">Неправильная почта или пароль</string>
+    <string name="error_account_not_verified">Учетная запись не подтверждена</string>
+
+    <string name="error_location_permission">Разрешение на геолокацию не предоставлено</string>
+    <string name="error_location_disabled">Геолокация отключена. Включите её.</string>
+    <string name="error_no_internet">Нет подключения к интернету</string>
+
+    <string name="getting_started">Начало работы</string>
+    <string name="create_group">Создать группу</string>
+    <string name="join_group">Войти в группу</string>
+    <string name="sign_out">Выйти из системы</string>
+
+    <string name="create_group_title">Создание группы</string>
+    <string name="group_name_label">Название группы</string>
+    <string name="group_name_error">Название группы не может быть пустым</string>
+
+    <string name="group_type_label">Тип группы</string>
+    <string name="group_type_unspecified">Не указано</string>
+    <string name="group_type_family">Семья</string>
+    <string name="group_type_friends">Друзья</string>
+    <string name="group_type_travel">Путешествие</string>
+
+    <string name="group_code_label">Код для входа</string>
+    <string name="group_code_error">Код не может быть пустым</string>
+
+    <string name="create_group_button">Создать группу</string>
+
+    <string name="go_back">Вернуться</string>
+
+    <string name="join_group_title">Вход в группу</string>
+    <string name="group_id_label">ID группы</string>
+    <string name="group_id_error">Введите корректный ID группы (только цифры)</string>
+    <string name="join_group_button">Войти в группу</string>
+
+    <string name="error_user_already_in_group">Пользователь уже состоит в группе</string>
+
+    <string name="error_invalid_group_id_or_code">Неправильный ID группы или код</string>
+
+    <string name="leave_group">Покинуть группу</string>
+
+    <string name="select_user">Выберите пользователя:</string>
+    <string name="search">Поиск</string>
+    <string name="no_results_found">Ничего не найдено</string>
+
+    <string name="mode_live_tracking">Отслеживание в реальном времени</string>
+    <string name="mode_time_interval">Местоположение по интервалу времени</string>
+    <string name="mode_dbscan">Кластеризация DBSCAN</string>
+    <string name="mode_with_photos">Местоположение с фотографиями</string>
+    <string name="label_kalman_filter">Включить фильтр Калмана</string>
+    <string name="label_cluster_radius">Радиус кластера (м)</string>
+    <string name="label_time_from">От</string>
+    <string name="label_time_to">До</string>
+
+    <string name="select_mode">Выбрать режим:</string>
+
+    <string name="latitude">Широта:</string>
+    <string name="longitude">Долгота:</string>
+    <string name="accelerometer_amplitude_chart">График амплитуды акселерометра:</string>
+    <string name="steps_last_hour">Количество шагов за последний час:</string>
+
+    <string name="your_data">Ваши данные</string>
+    <string name="last_record_time">Время последней записи местопложения (UTC+0)</string>
+
+</resources>

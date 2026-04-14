@@ -121,7 +121,7 @@ function worker_process(id::Int, population::Vector{Chromosome},
                     history_lock::ReentrantLock,
                     start_time::Float64)
     for generation in 1:GENERATIONS
-        current_time = (time() - start_time) * 1000  # milliseconds
+        current_time = (time() - start_time) * 1000
         
         if generation % MIGRATION_INTERVAL == 0
             elite_before = population[1:div(POPULATION_SIZE, 2)]
@@ -213,7 +213,7 @@ function run_sequential_evolution()
     start_time = time()
     
     for generation in 1:GENERATIONS
-        current_time = (time() - start_time) * 1000  # milliseconds
+        current_time = (time() - start_time) * 1000
         population = evolve_population!(population)
         decoded = [decode_chromosome(ch) for ch in population]
         zs = [evaluate_rosenbrock(x, y) for (x, y) in decoded]

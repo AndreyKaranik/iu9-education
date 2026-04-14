@@ -1,0 +1,92 @@
+<resources>
+    <string name="app_name" translatable="false">GPSTracker</string>
+
+    <string name="login_title">Login</string>
+    <string name="email_label">Email</string>
+    <string name="email_error">Enter a valid email</string>
+    <string name="password_label">Password</string>
+    <string name="login_button">Login</string>
+    <string name="not_registered">Not registered yet? Go to registration.</string>
+
+    <string name="registration_title">Registration</string>
+    <string name="name_label">Name</string>
+    <string name="name_error">Name cannot be empty</string>
+    <string name="password_error">Password must be at least 4 characters</string>
+    <string name="privacy_policy_checkbox">I agree to the Privacy Policy</string>
+    <string name="terms_checkbox">I accept the Terms of Use</string>
+    <string name="register_button">Register</string>
+    <string name="already_registered">Already registered? Log in.</string>
+    <string name="privacy_policy_link">Privacy Policy</string>
+    <string name="terms_link">Terms of Use</string>
+
+    <string name="email_confirmation_title">Email confirmation</string>
+    <string name="email_confirmation_message">A confirmation email has been sent to your email address. Please check your inbox.</string>
+    <string name="accept_button">Accept</string>
+
+    <string name="error_email_already_in_use">This email is already in use</string>
+    <string name="error_request_failed">Request failed</string>
+    <string name="error_invalid_credentials">Invalid email or password</string>
+    <string name="error_account_not_verified">Account not verified</string>
+
+    <string name="error_location_permission">Location permission not granted</string>
+    <string name="error_location_disabled">Location is turned off. Please enable it.</string>
+    <string name="error_no_internet">No internet connection</string>
+
+    <string name="getting_started">Getting Started</string>
+    <string name="create_group">Create Group</string>
+    <string name="join_group">Join Group</string>
+    <string name="sign_out">Sign Out</string>
+
+    <string name="create_group_title">Create Group</string>
+    <string name="group_name_label">Group name</string>
+    <string name="group_name_error">Group name cannot be empty</string>
+
+    <string name="group_type_label">Group type</string>
+    <string name="group_type_unspecified">Unspecified</string>
+    <string name="group_type_family">Family</string>
+    <string name="group_type_friends">Friends</string>
+    <string name="group_type_travel">Travel</string>
+
+    <string name="group_code_label">Group join code</string>
+    <string name="group_code_error">Join code cannot be empty</string>
+
+    <string name="create_group_button">Create Group</string>
+
+    <string name="go_back">Go back</string>
+
+    <string name="join_group_title">Join Group</string>
+    <string name="group_id_label">Group ID</string>
+    <string name="group_id_error">Please enter a valid group ID (digits only)</string>
+    <string name="join_group_button">Join Group</string>
+
+    <string name="error_user_already_in_group">User is already in the group</string>
+
+    <string name="error_invalid_group_id_or_code">Invalid group ID or join code</string>
+
+    <string name="leave_group">Leave group</string>
+
+    <string name="select_user">Select user:</string>
+    <string name="search">Search</string>
+    <string name="no_results_found">No results found</string>
+
+    <string name="mode_live_tracking">Live Tracking</string>
+    <string name="mode_time_interval">Location by Time Interval</string>
+    <string name="mode_dbscan">DBSCAN Clustering</string>
+    <string name="mode_with_photos">Locations with Photos</string>
+    <string name="label_kalman_filter">Enable Kalman Filter</string>
+    <string name="label_cluster_radius">Cluster Radius (m)</string>
+    <string name="label_time_from">From</string>
+    <string name="label_time_to">To</string>
+
+    <string name="select_mode">Select mode:</string>
+
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
+    <string name="accelerometer_amplitude_chart">Accelerometer amplitude chart:</string>
+    <string name="steps_last_hour">Steps in the last hour:</string>
+
+    <string name="your_data">Your data</string>
+    <string name="last_record_time">Time of last location record (UTC+0)</string>
+
+
+</resources>
